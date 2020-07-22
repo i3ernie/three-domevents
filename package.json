@@ -1,0 +1,57 @@
+{
+  "name": "threex.domevents",
+  "version": "0.20.0715",
+  "license": "MIT",
+  "description": "domevents for three.js",
+  "author": "i3ernie",
+  "repository": "https://gitlab.mhkservice.net/onpla/threex/demevents",
+  "contributors": [],
+  "keywords": [
+    "three.js",
+    "WebGL",
+    "Viewport"
+  ],
+  "dependencies": {
+    "jshint": "^2.11.1",
+    "three": "^0.118",
+    "threex.viewport": "git+ssh://git@gitlab.mhkservice.net:onpla/threex/viewport.git"
+  },
+  "devDependencies": {
+    "@rollup/plugin-alias": "latest",
+    "@rollup/plugin-inject": "latest",
+    "@rollup/plugin-replace": "latest",
+    "customevent-polyfill": "git://github.com/d4tocchini/customevent-polyfill.git",
+    "gulp": "^4.0.2",
+    "gulp-better-rollup": "latest",
+    "gulp-load-plugins": "latest",
+    "gulp-rollup": "latest",
+    "gulp-sourcemaps": "latest",
+    "gulp-uglify": "latest",
+    "lodash": "latest",
+    "requirejs-babel": "git://github.com/mikach/requirejs-babel.git",
+    "requirejs-plugins": "^1.0.2",
+    "rollup": "latest",
+    "rollup-plugin-amd": "latest",
+    "rollup-plugin-buble": "latest",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "viewport": "git+ssh://git@gitlab.mhkservice.net:onpla/threex/viewport.git"
+  },
+  "directories": {
+    "example": "examples",
+    "dist": "dist",
+    "test": "test"
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist/domevents.es.js",
+    "dist/domevents.amd.js",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "gulp build",
+    "buildBundles": "rollup -c",
+    "init": "npm install",
+    "update": "npm update"
+  }
+}
