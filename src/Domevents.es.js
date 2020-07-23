@@ -375,7 +375,10 @@ Object.assign( DomEvents.prototype,  {
 			listener = listener || obj;
 			for ( let key in DomEvents.eventMapping ){
 				if ( !scope.hasListener( obj, key ) ) {
-					scope.addEventListener( obj, key, listener[ DomEvents.eventMapping[key] ] || logEvent);
+					scope.addEventListener( obj, key, key);
+					if ( listener[ DomEvents.eventMapping[key] ] ) {
+						scope.addEventListener( obj, key, listener[ DomEvents.eventMapping[key] ] );
+					}
 				}
 			}
 		};
