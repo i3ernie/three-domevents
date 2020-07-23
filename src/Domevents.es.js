@@ -580,8 +580,8 @@ Object.assign( DomEvents.prototype,  {
 				});
 			}
 			else if ( typeof handler.callback === "string" && typeof object3d.dispatchEvent === "function" ) {
-				object3d.dispatchEvent( handler.callback, {
-					type: eventName,
+				object3d.dispatchEvent( {
+					type: handler.callback,
 					target: object3d,
 					origDomEvent: origDomEvent,
 					intersect: intersect,
