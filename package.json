@@ -1,5 +1,5 @@
 {
-  "name": "threex.domevents",
+  "name": "three-domevents",
   "version": "0.20.0715",
   "license": "MIT",
   "description": "domevents for three.js",
@@ -12,11 +12,10 @@
     "Viewport"
   ],
   "dependencies": {
-    "jshint": "^2.11.1",
-    "three": "^0.118",
-    "threex.viewport": "git+ssh://git@gitlab.mhkservice.net:onpla/threex/viewport.git"
+    "three": "^0.118"
   },
   "devDependencies": {
+    "jshint": "^2.11.1",
     "@rollup/plugin-alias": "latest",
     "@rollup/plugin-inject": "latest",
     "@rollup/plugin-replace": "latest",
@@ -34,7 +33,7 @@
     "rollup-plugin-amd": "latest",
     "rollup-plugin-buble": "latest",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "viewport": "git+ssh://git@gitlab.mhkservice.net:onpla/threex/viewport.git"
+    "three-viewport": "git+https://github.com/i3ernie/three-viewport.git"
   },
   "directories": {
     "example": "examples",
