@@ -68,15 +68,6 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 	var TOUCH_POSX, TOUCH_POSY;
 	var CLICK_TIMEOUT = 500;
 
-	var logEvent = function( ev ){
-		if ( ev.type === "click" || 
-			ev.type === "mousedown" || ev.type === "mouseup" || 
-			ev.type === "mouseover" || ev.type === "mouseout" ||
-			ev.type === "dblclick"
-		)
-			{ console.log( ev.type+" - "+ev.target.name ); }
-	};
-
 	// # Constructor
 	var DomEvents = function( camera, domElement )
 	{
@@ -354,56 +345,61 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
 		},
 
+		removeMappedListener :function ( obj ){
+			var scope = this;
+
+			for ( var key in DomEvents.eventMapping ){
+				this.removeEventListener( obj, key);
+			}
+			if ( obj.children.length > 0 ){
+				obj.children.forEach( function( el ){
+					scope.removeMappedListener( el );
+				});
+			}
+		},
+
 		activate : function( object3d, listener ){
 
 			var scope = this;
 
-			var addListener = function( obj ){
-				listener = obj;
+			var addListener = function( obj, listener ){
+				listener = listener || obj;
 				for ( var key in DomEvents.eventMapping ){
-					scope.addEventListener( obj, key, listener[ DomEvents.eventMapping[key] ] || logEvent);
+					if ( !scope.hasListener( obj, key ) ) {
+						scope.addEventListener( obj, key, key);
+						if ( listener[ DomEvents.eventMapping[key] ] ) {
+							scope.addEventListener( obj, key, listener[ DomEvents.eventMapping[key] ] );
+						}
+					}
 				}
 			};
 			
 			if ( object3d.parent ){
-				addListener( object3d );
+				addListener( object3d, listener );
 			}
 			
 			var add = object3d.add;
 			object3d.add = function( child ){
 				addListener( child );
-				
-				console.log("added", this, child);
 
 				scope.activate( child );			
 				
 				add.apply( object3d, arguments );
 			};
 
-			var rem = object3d.remove;
-			object3d.remove = function( child ){
-				
-				function removeListener( obj ){
-					for ( var key in DomEvents.eventMapping ){
-						scope.removeEventListener( obj, key);
-					}
-					if ( obj.children.length > 0 ){
-						obj.children.forEach( function( el ){
-							removeListener( el );
-						});
-					}
-				}
-
-				removeListener( child );
-
-				rem.apply( object3d, arguments );
-			};
-
-			if( object3d.children.length>0 ){ 
-				object3d.children.forEach(function( child ){ console.log(child);
+			if( object3d.children.length > 0 ){ 
+				object3d.children.forEach(function( child ){ 
 					scope.activate( child );
 				});
 			}
+
+			var rem = object3d.remove;
+			object3d.remove = function( child ){
+
+				scope.removeMappedListener( child );
+
+				rem.apply( object3d, arguments );
+			};
 
 		},
 

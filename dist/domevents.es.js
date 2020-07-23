@@ -68,15 +68,6 @@ var TOUCH_BEGIN, TOUCH_LATEST = 0;
 var TOUCH_POSX, TOUCH_POSY;
 var CLICK_TIMEOUT = 500;
 
-var logEvent = function( ev ){
-	if ( ev.type === "click" || 
-		ev.type === "mousedown" || ev.type === "mouseup" || 
-		ev.type === "mouseover" || ev.type === "mouseout" ||
-		ev.type === "dblclick"
-	)
-		{ console.log( ev.type+" - "+ev.target.name ); }
-};
-
 // # Constructor
 var DomEvents = function( camera, domElement )
 {
@@ -375,7 +366,10 @@ Object.assign( DomEvents.prototype,  {
 			listener = listener || obj;
 			for ( var key in DomEvents.eventMapping ){
 				if ( !scope.hasListener( obj, key ) ) {
-					scope.addEventListener( obj, key, listener[ DomEvents.eventMapping[key] ] || logEvent);
+					scope.addEventListener( obj, key, key);
+					if ( listener[ DomEvents.eventMapping[key] ] ) {
+						scope.addEventListener( obj, key, listener[ DomEvents.eventMapping[key] ] );
+					}
 				}
 			}
 		};
