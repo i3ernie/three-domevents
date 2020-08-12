@@ -793,6 +793,19 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 	        var scope = this;
 
 	        if ( eventName === "drag" ){
+	            object3d.addEventListener("mousedown", function( event ){
+	                scope.stateMouse.mousedown = true;
+	            });
+	            object3d.addEventListener("mousemove", function( event ){
+				
+					if ( scope.stateMouse.mousedown === event.target.id ) {
+						if ( !scope.stateMouse.dragging ) {
+							scope.stateMouse.dragging = event.target.id;
+							scope._onMouseEvent('dragstart', event.origDomEvent);
+						}
+						scope._onMouseEvent('drag', event.origDomEvent);
+					}
+				});
 	            object3d.addEventListener("dragstart", function( event ){
 	                scope._draggingObj = event.target;
 	            });
@@ -803,22 +816,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 	        DomEvents.prototype.addEventListener.call(this, object3d, eventName, callback, opt);
 	    },
 
-	    _onMouseDown : function( event ){
-	        
-	        this.stateMouse.mousedown = true;
-	        DomEvents.prototype._onMouseDown.call( this, event );
-	    },
-
 	    _onMouseMove : function( event ){
 	        DomEvents.prototype._onMouseMove.call( this, event );
-
-	        if ( this.stateMouse.mousedown ) {
-	            if ( !this.stateMouse.dragging ) {
-	                this.stateMouse.dragging = true;
-	                this._onMouseEvent('dragstart', event);
-	            }
-	            this._onMouseEvent('drag', event);
-	        }
 	    },
 
 	    _onMouseUp : function( event ){
