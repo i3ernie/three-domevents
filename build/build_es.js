@@ -34,6 +34,43 @@ const build_domeventsES = function( done ){
             exports: 'named',
             sourcemap: true
           });
+          build_extDomeventsES( done );
+    }).catch(
+        (err)=>{console.error(err);}
+    );
+};
+
+const build_extDomeventsES = function( done ){
+   
+    rollup.rollup({
+        input : 'src/ExtendedDomevents.es.js',
+        external: ['../node_modules/three/build/three.module.js'],
+        
+        plugins:[
+            
+            resolve(),
+            
+            buble({
+				transforms: {
+					arrow: false,
+					classes: true
+				}
+            })
+        ]
+    }).then(( bundle ) => { 
+        bundle.write({
+            file: './dist/extdomevents.es.js',
+            plugins:[
+                replace({
+                    "../node_modules/three/" : "../../three/"
+                })
+            ],
+            
+            format: 'es',
+            name: 'three',
+            exports: 'named',
+            sourcemap: true
+          });
           done();
     }).catch(
         (err)=>{console.error(err);}

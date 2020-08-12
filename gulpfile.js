@@ -30,13 +30,8 @@ gulp.task("build", ( done ) => {
     });
 });
 
-gulp.task("buildAMD", ( done )=>{
-    "use strict";
-    build_domevents( done );
-});
+gulp.task("buildAMD", build_domevents );
 
-gulp.task("buildES", ( done ) => {
-    build_domeventsES( done );
-});
+gulp.task("buildES", build_domeventsES );
 
 gulp.task('default', gulp.series('init', 'buildAMD', 'buildES') );
