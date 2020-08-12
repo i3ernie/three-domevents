@@ -44,6 +44,7 @@
     "LICENSE",
     "README.md",
     "dist/domevents.es.js",
+    "dist/extdomevents.es.js",
     "dist/domevents.amd.js",
     "package.json"
   ],
