@@ -794,7 +794,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
 	        if ( eventName === "drag" ){
 	            object3d.addEventListener("mousedown", function( event ){
-	                scope.stateMouse.mousedown = true;
+	                scope.stateMouse.mousedown = event.target.id;
 	            });
 	            object3d.addEventListener("mousemove", function( event ){
 				

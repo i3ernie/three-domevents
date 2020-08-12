@@ -32,7 +32,7 @@ ExtendedDomEvents.prototype = Object.assign( Object.create( DomEvents.prototype 
 
         if ( eventName === "drag" ){
             object3d.addEventListener("mousedown", function( event ){
-                scope.stateMouse.mousedown = true;
+                scope.stateMouse.mousedown = event.target.id;
             });
             object3d.addEventListener("mousemove", function( event ){
 			
