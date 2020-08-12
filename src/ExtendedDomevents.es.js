@@ -31,6 +31,9 @@ ExtendedDomEvents.prototype = Object.assign( Object.create( DomEvents.prototype 
         let scope = this;
 
         if ( eventName === "drag" ){
+            object3d.addEventListener("mousdown", function( event ){
+                scope.stateMouse.mousedown = true;
+            });
             object3d.addEventListener("dragstart", function( event ){
                 scope._draggingObj = event.target;
             });
@@ -39,12 +42,6 @@ ExtendedDomEvents.prototype = Object.assign( Object.create( DomEvents.prototype 
             });
         }
         DomEvents.prototype.addEventListener.call(this, object3d, eventName, callback, opt);
-    },
-
-    _onMouseDown : function( event ){
-        
-        this.stateMouse.mousedown = true;
-        DomEvents.prototype._onMouseDown.call( this, event );
     },
 
     _onMouseMove : function( event ){
