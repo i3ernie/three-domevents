@@ -11,7 +11,7 @@ DomEvents.eventMapping.drag = "onDrag";
 
 const ExtendedDomEvents = function( camera, domElement, opt ){
 
-    this.state = {
+    this.stateMouse = {
         mousedown : false,
         dragging : false
     };
@@ -23,6 +23,7 @@ const ExtendedDomEvents = function( camera, domElement, opt ){
 };
 
 ExtendedDomEvents.prototype = Object.assign( Object.create( DomEvents.prototype ), {
+
     constructor : ExtendedDomEvents,
 
     addEventListener : function( object3d, eventName, callback, opt ){ 
@@ -41,41 +42,45 @@ ExtendedDomEvents.prototype = Object.assign( Object.create( DomEvents.prototype 
 
     _onMouseDown : function( event ){
         
-        this.state.mousedown = true;
+        this.stateMouse.mousedown = true;
         DomEvents.prototype._onMouseDown.call( this, event );
     },
 
     _onMouseMove : function( event ){
         DomEvents.prototype._onMouseMove.call( this, event );
 
-        if ( this.state.mousedown ){
-            if ( !this.state.dragging ) {
-                this.state.dragging = true;
+        if ( this.stateMouse.mousedown ){
+            if ( !this.stateMouse.dragging ) {
+                this.stateMouse.dragging = true;
                 this._onMouseEvent('dragstart', event);
             }
             this._onMouseEvent('drag', event);
         }
     },
+
     _onMouseUp : function( event ){
         
         DomEvents.prototype._onMouseUp.call( this, event );
 
-        if ( this.state.dragging ){ 
-            console.log("mouseup", this.state.dragging);
+        if ( this.stateMouse.dragging ){ 
+
+            this.stateMouse.dragging = false;
             
             if ( this._draggingObj ) {
-                this.state.dragging = false;
+
                 this._notify ( "dragend", this._draggingObj, event, {object:this._draggingObj} );
-	
+
+            } else {
+                
+                this._onMouseEvent('dragend', event);
             }
-            this._stopDragging();
         }
-        this.state.mousedown = false;
+        this.stateMouse.mousedown = false;
         
     },
-    _stopDragging : function(){
-        this.state.dragging = false;
-        this._onMouseEvent('dragend', event);
+
+    _stopDragging : function() {
+        
     }
 });
 
