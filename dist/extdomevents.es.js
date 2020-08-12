@@ -780,12 +780,6 @@ var ExtendedDomEvents = function( camera, domElement, opt ){
 
     this._draggingObj = null;
 
-    domElement.addEventListener("mousemove", function( ev ){
-		if ( this._draggingObj ){
-			ev.preventDefault();
-			ev.stopPropagation();
-		}
-	}.bind( this ) );
     
     //call parent constructor
     DomEvents.apply( this, arguments );
@@ -818,7 +812,7 @@ ExtendedDomEvents.prototype = Object.assign( Object.create( DomEvents.prototype 
     _onMouseMove : function( event ){
         DomEvents.prototype._onMouseMove.call( this, event );
 
-        if ( this.stateMouse.mousedown ){
+        if ( this.stateMouse.mousedown ) {
             if ( !this.stateMouse.dragging ) {
                 this.stateMouse.dragging = true;
                 this._onMouseEvent('dragstart', event);
