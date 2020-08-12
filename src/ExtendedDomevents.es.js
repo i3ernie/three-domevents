@@ -17,6 +17,13 @@ const ExtendedDomEvents = function( camera, domElement, opt ){
     };
 
     this._draggingObj = null;
+
+    domElement.addEventListener("mousemove", function( ev ){
+		if ( this._draggingObj ){
+			ev.preventDefault();
+			ev.stopPropagation();
+		}
+	}.bind( this ) );
     
     //call parent constructor
     DomEvents.apply( this, arguments );
