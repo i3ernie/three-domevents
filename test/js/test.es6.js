@@ -46,7 +46,7 @@ function init() {
         setTimeout(function(){ VP.scene.add(mesh); }, 6000);
     };
 
-    let box = new THREE.Mesh( new THREE.BoxGeometry(20,20,20) );
+    let box = new THREE.Mesh( new THREE.BoxGeometry(20,20,20),new THREE.MeshBasicMaterial({color:"green"}) );
     box.name = "mini_1";
     box.position.set(100,100,100);
 
@@ -57,6 +57,9 @@ function init() {
     box2.onClick = function( ev ){
         console.log("*** red box click", ev );
         ev.stopPropagation();
+    };
+    box.onClick = function( ev ){
+        console.log("*** box click", ev );
     };
 
     VP.scene.add( mesh );

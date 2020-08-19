@@ -191,9 +191,15 @@ Object.assign( DomEvents.prototype,  {
 
 	addEventListener : function( object3d, eventName, callback, opt ){
 		opt = opt || {};
-		
+
+		let _this = this;
+
 		let useCapture = opt.useCapture || false;
 		let scope = this;
+
+		extensions.forEach(function( ext ){ 
+			if ( ext.addEventListener ) ext.addEventListener.call( _this, object3d, eventName, callback, opt );
+		});
 
 		if ( typeof eventName === "object" ) {
 			for ( let i = 0; i < eventName.length; i++ ){
@@ -202,7 +208,7 @@ Object.assign( DomEvents.prototype,  {
 		} else {
 			this.bind( object3d, eventName, callback, useCapture );
 		}
-		
+
 		if ( opt.recursive ) {
 			_.each( object3d.children, function( object3d ){
 				scope.addEventListener( object3d, eventName, callback, opt );
@@ -339,9 +345,10 @@ Object.assign( DomEvents.prototype,  {
 		
 		const add = object3d.add;
 		object3d.add = function( child ){
-			addListener( child );
 
-			scope.activate( child );			
+			scope.activate( child );
+			
+			addListener( child );
 			
 			add.apply( object3d, arguments );
 		};
@@ -391,65 +398,6 @@ Object.assign( DomEvents.prototype,  {
 		return !!objectCtx[eventName+'Handlers'];
 	},
 
-
-	/********************************************************************************/
-	/*		onMove								*/
-	/********************************************************************************/
-
-	// # handle mousemove kind of events
-
-	_onMove	: function( eventName, mouseX, mouseY, origDomEvent )
-	{
-		//console.log('eventName', eventName, 'boundObjs', this._boundObjs[eventName])
-		// get objects bound to this event
-		let boundObjs	= this._boundObjs[eventName];
-		if( boundObjs === undefined || boundObjs.length === 0 )	return;
-
-		// compute the intersection
-		let vector = new Vector3( mouseX, mouseY, 0.5 );
-		this._ray.setFromCamera( vector, this._camera );
-
-		let intersects = null;
-		try {
-			intersects  = this._ray.intersectObjects( boundObjs );
-		} catch( e ){
-			this.clean();
-			this._onMove( eventName, mouseX, mouseY, origDomEvent );
-			return;
-		}
-
-		let oldSelected	= this._selected;
-		let notifyOver, notifyOut, notifyMove;
-		let intersect;
-		let newSelected;
-
-		if( intersects.length > 0 ){
-			intersect	= intersects[ 0 ];
-			newSelected	= intersect.object;
-
-			this._selected	= newSelected;
-			// if newSelected bound mousemove, notify it
-			notifyMove	= this._bound('mousemove', newSelected);
-
-			if( oldSelected !== newSelected ){
-				// if newSelected bound mouseenter, notify it
-				notifyOver	= this._bound('mouseover', newSelected);
-				// if there is a oldSelect and oldSelected bound mouseleave, notify it
-				notifyOut	= oldSelected && this._bound('mouseout', oldSelected);
-			}
-		}else{
-			// if there is a oldSelect and oldSelected bound mouseleave, notify it
-			notifyOut	= oldSelected && this._bound('mouseout', oldSelected);
-			this._selected	= null;
-		}
-
-		// notify mouseMove - done at the end with a copy of the list to allow callback to remove handlers
-		notifyMove && this._notify('mousemove', newSelected, origDomEvent, intersect);
-		// notify mouseEnter - done at the end with a copy of the list to allow callback to remove handlers
-		notifyOver && this._notify('mouseover', newSelected, origDomEvent, intersect);
-		// notify mouseLeave - done at the end with a copy of the list to allow callback to remove handlers
-		notifyOut  && this._notify('mouseout' , oldSelected, origDomEvent, intersect);
-	},
 
 
 	/********************************************************************************/
@@ -504,10 +452,10 @@ Object.assign( DomEvents.prototype,  {
 		let handlers	= objectCtx ? objectCtx[eventName+'Handlers'] : null;
 
 		// parameter check
-		console.assert(arguments.length === 4);
+		console.assert( arguments.length === 4 );
 
 		// do bubbling
-		if( !objectCtx || !handlers || handlers.length === 0 ){
+		if( !objectCtx || !handlers || handlers.length === 0 ){ 
 			object3d.parent && this._notify( eventName, object3d.parent, origDomEvent, intersect );
 			return;
 		}
@@ -515,10 +463,14 @@ Object.assign( DomEvents.prototype,  {
 		// notify all handlers
 		handlers = objectCtx[eventName+'Handlers'];
 		let toPropagate	= true;
-
+		let capture = false;
+		
 		for( let i = 0; i < handlers.length; i++ ){
+
 			let handler	= handlers[i];
-			if ( typeof handler.callback === "function") {
+
+			capture = handler.useCapture;
+			if ( typeof handler.callback === "function") { 
 				handler.callback({
 					type: eventName,
 					target: object3d,
@@ -526,6 +478,9 @@ Object.assign( DomEvents.prototype,  {
 					intersect: intersect,
 					stopPropagation: function () {
 						toPropagate = false;
+					},
+					preventDefault : function() {
+						capture = true;
 					}
 				});
 			}
@@ -537,16 +492,22 @@ Object.assign( DomEvents.prototype,  {
 					intersect: intersect,
 					stopPropagation: function () {
 						toPropagate = false;
+					},
+					preventDefault : function() {
+						capture = true;
 					}
 				});
 			}
-			console.log(object3d.id, toPropagate );
-			if( !toPropagate ) continue;
-			// do bubbling
-			if( handler.useCapture === false ){
-				object3d.parent && this._notify( eventName, object3d.parent, origDomEvent, intersect );
+			
+			if( capture ){ 
+				break;
 			}
 		}
+
+		// do bubbling
+		if( toPropagate ) {
+			object3d.parent && this._notify( eventName, object3d.parent, origDomEvent, intersect );
+		};
 	}
 
 });

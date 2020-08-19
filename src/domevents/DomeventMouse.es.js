@@ -1,3 +1,6 @@
+import {Vector3} from "../../node_modules/three/build/three.module.js";
+
+
 import getRelativeMouseXY from "../PointerTools.es.js";
 
 const CLICK_TIMEOUT = 500;
@@ -34,6 +37,65 @@ const _onMouseUp	= function( event ){
     return _onMouseEvent.call(this, 'mouseup'	, event);
 };
 
+/********************************************************************************/
+/*		onMove								*/
+/********************************************************************************/
+
+// # handle mousemove kind of events
+
+const _onMove = function( eventName, mouseX, mouseY, origDomEvent )
+{
+    //console.log('eventName', eventName, 'boundObjs', this._boundObjs[eventName])
+    // get objects bound to this event
+    let boundObjs	= this._boundObjs[eventName];
+    if( boundObjs === undefined || boundObjs.length === 0 )	return;
+
+    // compute the intersection
+    let vector = new Vector3( mouseX, mouseY, 0.5 );
+    this._ray.setFromCamera( vector, this._camera );
+
+    let intersects = null;
+    try {
+        intersects  = this._ray.intersectObjects( boundObjs );
+    } catch( e ){
+        this.clean();
+        this._onMove( eventName, mouseX, mouseY, origDomEvent );
+        return;
+    }
+
+    let oldSelected	= this._selected;
+    let notifyOver, notifyOut, notifyMove;
+    let intersect;
+    let newSelected;
+
+    if( intersects.length > 0 ){
+        intersect	= intersects[ 0 ];
+        newSelected	= intersect.object;
+
+        this._selected	= newSelected;
+        // if newSelected bound mousemove, notify it
+        notifyMove	= this._bound('mousemove', newSelected);
+
+        if( oldSelected !== newSelected ){
+            // if newSelected bound mouseenter, notify it
+            notifyOver	= this._bound('mouseover', newSelected);
+            // if there is a oldSelect and oldSelected bound mouseleave, notify it
+            notifyOut	= oldSelected && this._bound('mouseout', oldSelected);
+        }
+    }else{
+        // if there is a oldSelect and oldSelected bound mouseleave, notify it
+        notifyOut	= oldSelected && this._bound('mouseout', oldSelected);
+        this._selected	= null;
+    }
+
+    // notify mouseMove - done at the end with a copy of the list to allow callback to remove handlers
+    notifyMove && this._notify('mousemove', newSelected, origDomEvent, intersect);
+    // notify mouseEnter - done at the end with a copy of the list to allow callback to remove handlers
+    notifyOver && this._notify('mouseover', newSelected, origDomEvent, intersect);
+    // notify mouseLeave - done at the end with a copy of the list to allow callback to remove handlers
+    notifyOut  && this._notify('mouseout' , oldSelected, origDomEvent, intersect);
+};
+
 
 const _onClick = function( event )
 {
@@ -61,16 +123,15 @@ const _onMouseEvent	= function( eventName, domEvent )
 {
     let mouseCoords = getRelativeMouseXY( domEvent );
     this._onEvent(eventName, mouseCoords.x, mouseCoords.y, domEvent);
-    //console.log("RH", eventName, mouseCoords.x, mouseCoords.y, domEvent);
 };
 
 const _onMouseMove	= function( domEvent )
 {
     let mouseCoords = getRelativeMouseXY( domEvent );
     
-    this._onMove('mousemove', mouseCoords.x, mouseCoords.y, domEvent);
-    this._onMove('mouseover', mouseCoords.x, mouseCoords.y, domEvent);
-    this._onMove('mouseout' , mouseCoords.x, mouseCoords.y, domEvent);
+    _onMove.call(this, 'mousemove', mouseCoords.x, mouseCoords.y, domEvent);
+    _onMove.call(this, 'mouseover', mouseCoords.x, mouseCoords.y, domEvent);
+    _onMove.call(this, 'mouseout' , mouseCoords.x, mouseCoords.y, domEvent);
 };
 
 
