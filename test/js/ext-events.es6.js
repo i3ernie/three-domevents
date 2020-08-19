@@ -1,7 +1,7 @@
 
 import * as THREE from '../../node_modules/three/build/three.module.js';
 import DomEvents from "../../src/ExtendedDomevents.es.js";
-import Viewport from "../../node_modules/viewport/dist/viewport.es.js";
+import Viewport from "../../node_modules/three-viewport/dist/viewport.es.js";
 import WoodBox from "../WoodBox.js";
 
 var VP;

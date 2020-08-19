@@ -1,16 +1,15 @@
 import {Raycaster, Vector3} from "../node_modules/three/build/three.module.js";
 
-// This THREEx helper makes it easy to handle the mouse events in your 3D scene
-//
-// * CHANGES NEEDED
-//   * handle drag/drop
-//   * notify events not object3D - like DOM
-//     * so single object with property
-//   * DONE bubling implement bubling/capturing
-//   * DONE implement event.stopPropagation()
-//   * DONE implement event.type = "click" and co
-//   * DONE implement event.target
-//
+import DomeventClick from "./domevents/DomeventMouse.es.js";
+import DomeventTouch from "./domevents/DomeventTouch.es.js";
+
+/** This THREEx helper makes it easy to handle the mouse events in your 3D scene
+
+   * CHANGES NEEDED
+   * handle drag/drop
+   * notify events not object3D - like DOM
+   * so single object with property
+
 // # Lets get started
 //
 // First you include it in your page
@@ -57,16 +56,10 @@ import {Raycaster, Vector3} from "../node_modules/three/build/three.module.js";
 //
 // # Code
 
-//
+ */
 
 	/** @namespace */
-const TOUCH_MS = 200;
-let TOUCH_TIMER;
-let onlongtouch;
-let TOUCH_duration = 500;
-let TOUCH_BEGIN, TOUCH_LATEST = 0;
-let TOUCH_POSX, TOUCH_POSY;
-const CLICK_TIMEOUT = 500;
+const extensions = [];
 
 const logEvent = function( ev ){
 	if ( ev.type === "click" || 
@@ -77,51 +70,6 @@ const logEvent = function( ev ){
 		console.log( ev.type+" - "+ev.target.name );
 };
 
-const _getRelativeMouseXY = function( domEvent ) {
-
-	let element = domEvent.target || domEvent.srcElement;
-
-	if (element.nodeType === 3) {
-		element = element.parentNode; // Safari fix -- see http://www.quirksmode.org/js/events_properties.html
-	}
-
-	//get the real position of an element relative to the page starting point (0, 0)
-	//credits go to brainjam on answering http://stackoverflow.com/questions/5755312/getting-mouse-position-relative-to-content-area-of-an-element
-	let elPosition	= { x : 0 , y : 0};
-	let tmpElement	= element;
-	//store padding
-	let style	= getComputedStyle(tmpElement, null);
-	elPosition.y += parseInt(style.getPropertyValue("padding-top"), 10);
-	elPosition.x += parseInt(style.getPropertyValue("padding-left"), 10);
-
-	//add positions
-	do {
-		elPosition.x	+= tmpElement.offsetLeft;
-		elPosition.y	+= tmpElement.offsetTop;
-		style		= getComputedStyle(tmpElement, null);
-
-		elPosition.x	+= parseInt(style.getPropertyValue("border-left-width"), 10);
-		elPosition.y	+= parseInt(style.getPropertyValue("border-top-width"), 10);
-	} while(tmpElement = tmpElement.offsetParent);
-
-	let elDimension	= {
-		width	: (element === window) ? window.innerWidth	: element.offsetWidth,
-		height	: (element === window) ? window.innerHeight	: element.offsetHeight
-	};
-
-	if ( domEvent.type === "touchend" || domEvent.type === "touchstart" ){
-		return {
-			x : +((domEvent.changedTouches[ 0 ].pageX - elPosition.x) / elDimension.width ) * 2 - 1,
-			y : -((domEvent.changedTouches[ 0 ].pageY - elPosition.y) / elDimension.height) * 2 + 1
-		};
-	}
-	else{
-		return {
-			x : +((domEvent.pageX - elPosition.x) / elDimension.width ) * 2 - 1,
-			y : -((domEvent.pageY - elPosition.y) / elDimension.height) * 2 + 1
-		};
-	}
-};
 
 // # Constructor
 const DomEvents = function( camera, domElement )
@@ -131,45 +79,27 @@ const DomEvents = function( camera, domElement )
 	this._ray 			= new Raycaster();
 	this._selected		= null;
 	this._boundObjs		= {};
+	this.enabled = false;
 	// Bind dom event for mouse and touch
 	let _this			= this;
 	this.firstClick 	= false;
 	this.delay = 300;
 
-	this._$onClick		= function(){ _this._onClick.apply(_this, arguments); 	};
-	this._$onDblClick	= function(){ _this._onDblClick.apply(_this, arguments);	};
-	this._$onMouseMove	= function(){ _this._onMouseMove.apply(_this, arguments);	};
-	this._$onMouseDown	= function(){ _this._onMouseDown.apply(_this, arguments);	};
-	this._$onMouseUp	= function(){ _this._onMouseUp.apply(_this, arguments);		};
-	this._$onTouchMove	= function(){ _this._onTouchMove.apply(_this, arguments);	};
-	this._$onTouchStart	= function(){ _this._onTouchStart.apply(_this, arguments);	};
-	this._$onTouchEnd	= function(){ _this._onTouchEnd.apply(_this, arguments);	};
-	this._$onContextmenu	= function(){ _this._onContextmenu.apply(_this, arguments);	};
-
-	this._domElement.addEventListener( 'click'		, this._$onClick		, false );
-	this._domElement.addEventListener( 'dblclick'	, this._$onDblClick		, false );
-	this._domElement.addEventListener( 'mousemove'	, this._$onMouseMove	, false );
-	this._domElement.addEventListener( 'mousedown'	, this._$onMouseDown	, false );
-	this._domElement.addEventListener( 'mouseup'	, this._$onMouseUp		, false );
-
-	this._domElement.addEventListener( 'touchmove'	, this._$onTouchMove	, false );
-	this._domElement.addEventListener( 'touchstart'	, this._$onTouchStart	, false );
-	this._domElement.addEventListener( 'touchend'	, this._$onTouchEnd		, false );
+	this.timeStamp = null;
 	
-	this._domElement.addEventListener( 'contextmenu', this._$onContextmenu	, false );
+
+
+	extensions.forEach(function( ext ){
+		ext.initialize.apply( _this, arguments );
+	});
+
+	this.enable();
 };
 
 DomEvents.eventNames	= [
-	"click",
-	"dblclick",
 	"mouseover",
 	"mouseout",
-	"mousemove",
-	"mousedown",
-	"mouseup",
-	"contextmenu",
-	"touchstart",
-	"touchend",
+	
     "mousemiddledown",
     "mouserightdown",
     "mousemiddleup",
@@ -177,14 +107,21 @@ DomEvents.eventNames	= [
 ];
 
 DomEvents.eventMapping = {
-	"click" : "onClick",
-	"mousedown" : "onMousedown",
-	"mouseup" 	: "onMouseup",
 	"mouseover" : "onMouseover",
 	"mouseout" 	: "onMouseout",
-	"mousemove" : "onMousemove",
 	"dblclick"  : "onDblclick"
 };
+
+DomEvents.extend = function( obj ){
+	extensions.push( obj );
+
+	Object.assign( DomEvents.eventMapping, obj.eventMapping );
+	DomEvents.eventNames = DomEvents.eventNames.concat( obj.eventNames );
+};
+
+DomEvents.extend( DomeventClick );
+DomEvents.extend( DomeventTouch );
+//
 
 DomEvents.hasEvent = function( eventName ){
 	return DomEvents.eventNames.indexOf( eventName ) !== -1;
@@ -192,19 +129,31 @@ DomEvents.hasEvent = function( eventName ){
 
 Object.assign( DomEvents.prototype,  {
 
+	enable : function() {
+
+		let scope = this;
+
+		extensions.forEach(function( ext ){
+			ext.enable.apply( scope, arguments );
+		});
+
+		this.enabled = true;
+	},
+
+	disable : function(){
+
+		extensions.forEach(function( ext ){
+			ext.disable.apply( this, arguments );
+		});
+
+		this.enabled = false;
+	},
+
 	// # Destructor
 	destroy	: function()
 	{
 		// unBind dom event for mouse and touch
-		this._domElement.removeEventListener( 'click'		, this._$onClick		, false );
-		this._domElement.removeEventListener( 'dblclick'	, this._$onDblClick		, false );
-		this._domElement.removeEventListener( 'mousemove'	, this._$onMouseMove	, false );
-		this._domElement.removeEventListener( 'mousedown'	, this._$onMouseDown	, false );
-		this._domElement.removeEventListener( 'mouseup'		, this._$onMouseUp		, false );
-		this._domElement.removeEventListener( 'touchmove'	, this._$onTouchMove	, false );
-		this._domElement.removeEventListener( 'touchstart'	, this._$onTouchStart	, false );
-		this._domElement.removeEventListener( 'touchend'	, this._$onTouchEnd		, false );
-		this._domElement.removeEventListener( 'contextmenu'	, this._$onContextmenu	, false );
+		this.disable();
 	},
 
 
@@ -242,20 +191,21 @@ Object.assign( DomEvents.prototype,  {
 
 	addEventListener : function( object3d, eventName, callback, opt ){
 		opt = opt || {};
+		
 		let useCapture = opt.useCapture || false;
 		let scope = this;
 
-		if ( typeof eventName == "object" ) {
-			for ( let i = 0; i<eventName.length; i++){
-				this.bind(object3d, eventName[i], callback, useCapture);
+		if ( typeof eventName === "object" ) {
+			for ( let i = 0; i < eventName.length; i++ ){
+				this.bind( object3d, eventName[i], callback, useCapture );
 			}
-			return;
+		} else {
+			this.bind( object3d, eventName, callback, useCapture );
 		}
-
-		this.bind(object3d, eventName, callback, useCapture);
+		
 		if ( opt.recursive ) {
 			_.each( object3d.children, function( object3d ){
-				scope.bind( object3d, eventName, callback, useCapture );
+				scope.addEventListener( object3d, eventName, callback, opt );
 			});
 		}
 	},
@@ -590,186 +540,16 @@ Object.assign( DomEvents.prototype,  {
 					}
 				});
 			}
+			console.log(object3d.id, toPropagate );
 			if( !toPropagate ) continue;
 			// do bubbling
 			if( handler.useCapture === false ){
 				object3d.parent && this._notify( eventName, object3d.parent, origDomEvent, intersect );
 			}
 		}
-	},
-
-	/********************************************************************************/
-	/*		handle mouse events						*/
-	/********************************************************************************/
-	// # handle mouse events
-
-	_onMouseDown	: function( event ){
-		if ( event.buttons && event.buttons > 1 ) {
-			if ( event.button === 1 ) {
-				return this._onMouseEvent('mousemiddledown', event);
-			}
-			if ( event.button === 2 ) {
-				//rightdown
-				return this._onMouseEvent('mouserightdown', event);
-			}
-		}
-		DomEvents.timeStamp = event.timeStamp;
-
-		return this._onMouseEvent('mousedown', event);
-	},
-	_onMouseUp	: function( event ){
-        if ( event.buttons && event.buttons > 1 ) {
-            if ( event.button === 1 ) {
-                return this._onMouseEvent('mousemiddleup', event);
-            }
-            if ( event.button === 2 ) {
-                //rightdown
-                return this._onMouseEvent('mouserightup', event);
-            }
-        }
-		return this._onMouseEvent('mouseup'	, event);
-	},
-
-	_onMouseEvent	: function( eventName, domEvent )
-	{
-		let mouseCoords = _getRelativeMouseXY( domEvent );
-		this._onEvent(eventName, mouseCoords.x, mouseCoords.y, domEvent);
-		//console.log("RH", eventName, mouseCoords.x, mouseCoords.y, domEvent);
-	},
-
-	_onMouseMove	: function( domEvent )
-	{
-		let mouseCoords = _getRelativeMouseXY( domEvent );
-		
-		this._onMove('mousemove', mouseCoords.x, mouseCoords.y, domEvent);
-		this._onMove('mouseover', mouseCoords.x, mouseCoords.y, domEvent);
-		this._onMove('mouseout' , mouseCoords.x, mouseCoords.y, domEvent);
-	},
-
-	_onClick		: function( event )
-	{
-		// TODO handle touch ?
-		if ( DomEvents.timeStamp !== null && (event.timeStamp - DomEvents.timeStamp) > CLICK_TIMEOUT ){
-            return;
-        }
-        DomEvents.timeStamp = null;
-		this._onMouseEvent('click'	, event);
-	},
-
-	_onDblClick		: function( event )
-	{
-		// TODO handle touch ?
-		this._onMouseEvent('dblclick'	, event);
-	},
-
-	_onContextmenu	: function( event )
-	{
-		//TODO don't have a clue about how this should work with touch..
-		this._onMouseEvent('contextmenu'	, event);
-	},
-
-
-	/********************************************************************************/
-	/*		handle touch events						*/
-	/********************************************************************************/
-	// # handle touch events
-
-	_onTouchStart	: function( event ){
-
-		TOUCH_BEGIN = new Date().getTime();
-
-		TOUCH_POSX = event.touches[0].clientX;
-		TOUCH_POSY = event.touches[0].clientY;
-
-		TOUCH_TIMER = setTimeout(onlongtouch, TOUCH_duration);
-
-		return this._onTouchEvent('mousedown', event);
-	},
-
-	_onTouchEnd	: function(event){
-		const TOUCH_END = new Date().getTime();
-		const time = TOUCH_END - TOUCH_BEGIN;
-		const timesince = TOUCH_END - TOUCH_LATEST;
-		let evt;
-
-		if (event.touches.length > 1) {
-			return;
-		}
-
-		if (TOUCH_TIMER) {
-			clearTimeout(TOUCH_TIMER);
-		}
-
-		if( timesince < 500 && timesince > 0 ){
-			evt = new MouseEvent("dblclick", {
-				bubbles: true,
-				cancelable: true,
-				view: window,
-				clientX: TOUCH_POSX,
-				clientY: TOUCH_POSY,
-				offsetX: TOUCH_POSX,
-				offsetY: TOUCH_POSY,
-				pageX: TOUCH_POSX,
-				pageY: TOUCH_POSY
-			});
-			event.target.dispatchEvent(evt);
-			TOUCH_LATEST = new Date().getTime();
-			return this._onMouseEvent('mouseup', event);
-		} else {
-
-			if (time <= TOUCH_MS) {
-				evt = new MouseEvent("click", {
-					bubbles: true,
-					cancelable: true,
-					view: window,
-					clientX: TOUCH_POSX,
-					clientY: TOUCH_POSY,
-					offsetX: TOUCH_POSX,
-					offsetY: TOUCH_POSY,
-					pageX: TOUCH_POSX,
-					pageY: TOUCH_POSY
-				});
-				event.target.dispatchEvent(evt);
-				TOUCH_LATEST = new Date().getTime();
-				return this._onMouseEvent('mouseup', event);
-			}
-			else {
-				TOUCH_LATEST = new Date().getTime();
-				return this._onTouchEvent('mouseup', event);
-			}
-		}
-	},
-
-	_onTouchMove : function(domEvent)
-	{
-		if( domEvent.touches.length !== 1 )	return;
-
-		domEvent.preventDefault();
-		let mouseX	= +(domEvent.touches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
-		let mouseY	= -(domEvent.touches[ 0 ].pageY / window.innerHeight) * 2 + 1;
-
-		this._onMove('mousemove', mouseX, mouseY, domEvent);
-		this._onMove('mouseover', mouseX, mouseY, domEvent);
-		this._onMove('mouseout' , mouseX, mouseY, domEvent);
-	},
-
-	_onTouchEvent : function(eventName, domEvent)
-	{
-		if( domEvent.touches.length !== 1 )	return;
-
-		domEvent.preventDefault();
-
-		let mouseX	= +(domEvent.touches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
-		let mouseY	= -(domEvent.touches[ 0 ].pageY / window.innerHeight) * 2 + 1;
-		this._onEvent(eventName, mouseX, mouseY, domEvent);
 	}
 
 });
-
-
-	onlongtouch = function() {
-		//console.log("longtouch");
-	};
 
 export default DomEvents;
 export { DomEvents };

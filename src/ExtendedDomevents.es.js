@@ -1,26 +1,42 @@
 import DomEvents from "./Domevents.es.js";
+import DomeventDrag from "./domevents/DomeventDrag.es.js";
 
-DomEvents.eventNames.push("drag");
-DomEvents.eventNames.push("dragstart");
-DomEvents.eventNames.push("dragend");
-
-DomEvents.eventMapping.dragstart = "onDragstart";
-DomEvents.eventMapping.dragend = "onDragend";
-DomEvents.eventMapping.drag = "onDrag";
-
+DomEvents.extend( DomeventDrag );
 
 const ExtendedDomEvents = function( camera, domElement, opt ){
 
-    this.stateMouse = {
-        mousedown : false,
-        dragging : false
-    };
-
-    this._draggingObj = null;
-
-    
     //call parent constructor
     DomEvents.apply( this, arguments );
+};
+
+const _onMouseup = function( event ){
+
+    if ( this.stateMouse.dragging ){ 
+      
+        this.stateMouse.dragging = false;
+
+
+        if ( this._draggingObj ) {
+
+            this._notify ( "dragend", this._draggingObj, event, {object:this._draggingObj} );
+            this._draggingObj = null;
+
+        } else {
+            
+            this._onMouseEvent('dragend', event);
+        }
+    }
+    this.stateMouse.mousedownd = false;
+};
+
+const onMousemove = function( event ){
+    if ( scope.stateMouse.mousedownd === event.target.id ) {
+        if ( !scope.stateMouse.dragging ) {
+            scope.stateMouse.dragging = event.target.id;
+            scope._onMouseEvent('dragstart', event.origDomEvent);
+        }
+        scope._onMouseEvent('drag', event.origDomEvent);
+    }
 };
 
 ExtendedDomEvents.prototype = Object.assign( Object.create( DomEvents.prototype ), {
@@ -30,25 +46,25 @@ ExtendedDomEvents.prototype = Object.assign( Object.create( DomEvents.prototype 
     addEventListener : function( object3d, eventName, callback, opt ){ 
         let scope = this;
 
-        if ( eventName === "drag" ){
+        if ( eventName === "drag" ){ console.log( object3d );
             if( !this.hasListener(object3d, "mousedown") ){
                 this.addEventListener( object3d, "mousedown", "mousedown" );
             }
-            object3d.addEventListener("mousedown", function( event ){
-                scope.stateMouse.mousedown = event.target.id;
+            object3d.addEventListener("mousedown", function( event ){ 
+                scope.stateMouse.mousedownd = event.target.id;
             });
+
+            if( !this.hasListener(object3d, "mouseup") ){
+                this.addEventListener( object3d, "mouseup", "mouseup" );
+            }
+            object3d.addEventListener("mouseup", _onMouseup.bind(this) );
+
             if( !this.hasListener(object3d, "mousemove") ){
                 this.addEventListener( object3d, "mousemove", "mousemove" );
             }
             object3d.addEventListener("mousemove", function( event ){
 			
-				if ( scope.stateMouse.mousedown === event.target.id ) {
-					if ( !scope.stateMouse.dragging ) {
-						scope.stateMouse.dragging = event.target.id;
-						scope._onMouseEvent('dragstart', event.origDomEvent);
-					}
-					scope._onMouseEvent('drag', event.origDomEvent);
-				}
+				
 			});
             object3d.addEventListener("dragstart", function( event ){
                 scope._draggingObj = event.target;
@@ -58,31 +74,6 @@ ExtendedDomEvents.prototype = Object.assign( Object.create( DomEvents.prototype 
             });
         }
         DomEvents.prototype.addEventListener.call(this, object3d, eventName, callback, opt);
-    },
-
-    _onMouseMove : function( event ){
-        DomEvents.prototype._onMouseMove.call( this, event );
-    },
-
-    _onMouseUp : function( event ){
-        
-        DomEvents.prototype._onMouseUp.call( this, event );
-
-        if ( this.stateMouse.dragging ){ 
-
-            this.stateMouse.dragging = false;
-            
-            if ( this._draggingObj ) {
-
-                this._notify ( "dragend", this._draggingObj, event, {object:this._draggingObj} );
-
-            } else {
-                
-                this._onMouseEvent('dragend', event);
-            }
-        }
-        this.stateMouse.mousedown = false;
-        
     },
 
     _stopDragging : function() {
