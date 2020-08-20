@@ -8,16 +8,16 @@ var VP;
 var DEH;
 
 const onDrag = function( ev ){
-    //console.log("** dragging", ev.target.name);
-}
+    console.log("** dragging", ev.target.name);
+};
 
 const onDragstart = function( ev ){
     console.log("** dragging start", ev.target.name);
-}
+};
 
 const onDragend = function( ev ){
     console.log("** dragging end", ev.target.name);
-}
+};
 
 init();
 

@@ -1,7 +1,9 @@
 import getRelativeMouseXY from "../PointerTools.es.js";
 
 const _onMousedown = function( event ){ 
-    this._mousedownd[event.target.id] = event.target;
+    if ( event.intersect.object.id === event.target.id ){
+        this._mousedownd[event.target.id] = event.target;
+    }
 };
 
 const _onMouseupDrag = function( event ){
@@ -9,7 +11,7 @@ const _onMouseupDrag = function( event ){
     if ( this.stateMouse.dragging ){ 
         this.stateMouse.dragging = false;
         
-        for ( let key in this._draggingObjs ) {
+        for ( let key in this._draggingObjs ) { 
             this._notify ( "dragend", this._draggingObjs[key], event, {object:this._draggingObjs[key]} );
         }
     }
@@ -27,7 +29,7 @@ const _onMousemove = function( event ){
 
             _onMouseEvent.call(this, 'dragstart', event.origDomEvent);
         }
-        
+
         _onMouseEvent.call(this, 'drag', event.origDomEvent);
     }
 };
