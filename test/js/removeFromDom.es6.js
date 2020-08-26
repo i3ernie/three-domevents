@@ -115,7 +115,7 @@ function init() {
 
 
 function logEvent( ev ){
-    console.log( "eventListener: " + ev.type + " for " + ev.target.name + " on ", ev.intersect.object.name );
+    console.log( "eventListener: " + ev.type + " for " + ev.target.name + " <-on-- "+ ev.intersect.object.name );
 }
 function logOnClick( ev ){
     console.log( ev.target.name + ".onClick: " );
@@ -140,7 +140,7 @@ function removePlus( ev ){
 function remove( ev ){
     let obj = ev.target;
 
-    console.log("mesh onclick ", obj.name );
+    console.log("remove" + obj.name+ " <-on-- "+ ev.intersect.object.name );
         
     VP.scene.remove( obj );
 

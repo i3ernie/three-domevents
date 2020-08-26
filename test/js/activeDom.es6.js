@@ -20,7 +20,17 @@ function init() {
 
     DEH = new DomEvents( VP.camera, VP.renderer.domElement );
 
-    DEH.activate( VP.scene );
+    let activeWorld = new THREE.Object3D();
+    activeWorld.name = "active_world";
+
+    VP.scene.add( activeWorld );
+
+    let world = new THREE.Object3D();
+    world.name = "world";
+
+    VP.scene.add( world );
+
+    DEH.activate( activeWorld ); //or for global ( VP.Scene )
 
     //box number one
     let mesh1 = new WoodBox(100, 100, 100);
@@ -88,9 +98,9 @@ function init() {
 
 
 
-    VP.scene.add( mesh1 );
-    VP.scene.add( mesh2 );
-    VP.scene.add( mesh3 );
+    activeWorld.add( mesh1 );
+    activeWorld.add( mesh2 );
+    activeWorld.add( mesh3 );
 
     let box_blue = new THREE.Mesh( new THREE.BoxGeometry(40, 40, 40),new THREE.MeshBasicMaterial({color:"blue"}) );
     box_blue.name = "box_blue_3.3";
@@ -108,7 +118,7 @@ function init() {
 
 
 function logEvent( ev ){
-    console.log( "eventListener: " + ev.type + " for " + ev.target.name + " on ", ev.intersect.object.name );
+    console.log( "eventListener: " + ev.type + " for " + ev.target.name + " <--on-- ", ev.intersect.object.name );
 }
 function logOnClick( ev ){
     console.log( ev.target.name + ".onClick: " );
@@ -118,12 +128,13 @@ function logOnClick( ev ){
 
 function remove( ev ){
     let obj = ev.target;
+    let parent = obj.parent;
 
-    console.log("mesh onclick ", obj.name );
+    console.log("remove " + obj.name + " <--on-- " + ev.intersect.object.name);
         
-    VP.scene.remove( obj );
+    parent.remove( obj );
 
     setTimeout(function(){ 
-        VP.scene.add(obj); 
+        parent.add(obj); 
     }, 5000);
 }
