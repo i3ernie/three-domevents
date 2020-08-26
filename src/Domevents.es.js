@@ -102,7 +102,7 @@ const DomEvents = function( camera, domElement )
 	this.enable();
 };
 
-DomEvents.eventNames	= [
+DomEvents.eventNames = [
 	"mouseover",
 	"mouseout",
 	
@@ -118,7 +118,7 @@ DomEvents.eventMapping = {
 	"dblclick"  : "onDblclick"
 };
 
-DomEvents.extend = function( obj ){
+DomEvents.extend = function( obj ) {
 	extensions.push( obj );
 
 	Object.assign( DomEvents.eventMapping, obj.eventMapping );
@@ -129,7 +129,7 @@ DomEvents.extend( DomeventClick );
 DomEvents.extend( DomeventTouch );
 //
 
-DomEvents.hasEvent = function( eventName ){
+DomEvents.hasEvent = function( eventName ) {
 	return DomEvents.eventNames.indexOf( eventName ) !== -1;
 };
 
@@ -139,7 +139,7 @@ Object.assign( DomEvents.prototype,  {
 
 		let scope = this;
 
-		extensions.forEach(function( ext ){
+		extensions.forEach(function( ext ) {
 			ext.enable.apply( scope, arguments );
 		});
 
@@ -148,7 +148,7 @@ Object.assign( DomEvents.prototype,  {
 
 	disable : function(){
 
-		extensions.forEach(function( ext ){
+		extensions.forEach(function( ext ) {
 			ext.disable.apply( this, arguments );
 		});
 
@@ -169,20 +169,20 @@ Object.assign( DomEvents.prototype,  {
 
 	// handle domevent context in object3d instance
 
-	_objectCtxInit	: function( object3d ){
+	_objectCtxInit	: function( object3d ) {
 		object3d._3xDomEvent = {};
 
 		DomEvents.eventNames.forEach(function( eventName ){
 			object3d._3xDomEvent[eventName]	= [];
 		});
 	},
-	_objectCtxDeinit : function( object3d ){
+	_objectCtxDeinit : function( object3d ) {
 		delete object3d._3xDomEvent;
 	},
-	_objectCtxIsInit : function( object3d ){
+	_objectCtxIsInit : function( object3d ) {
 		return !!object3d._3xDomEvent;
 	},
-	_objectCtxGet : function( object3d ){
+	_objectCtxGet : function( object3d ) {
 		return object3d._3xDomEvent;
 	},
 	/********************************************************************************/
@@ -199,7 +199,7 @@ Object.assign( DomEvents.prototype,  {
 		return this._camera;
 	},
 
-	addEventListener : function( object3d, eventName, callback, opt ){
+	addEventListener : function( object3d, eventName, callback, opt ) {
 		opt = opt || {};
 
 		let _this = this;
@@ -264,7 +264,8 @@ Object.assign( DomEvents.prototype,  {
 		}
 	},
 
-	removeEventListener	: function( object3d, eventName, callback, useCapture ){
+	removeEventListener	: function( object3d, eventName, callback, useCapture ) {
+		
 		if ( eventName === null || eventName === undefined ){
 			eventName = DomEvents.eventNames;
 			return;
