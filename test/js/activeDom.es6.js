@@ -35,7 +35,7 @@ function init() {
     //box number one
     let mesh1 = new WoodBox(100, 100, 100);
     mesh1.name = "box_1";
-    mesh1.position.set(-200,-50,0);
+    mesh1.position.set(-200, 50, 0);
 
 
     let box = new THREE.Mesh( new THREE.BoxGeometry(40,40,40),new THREE.MeshBasicMaterial({color:"yellow"}) );
@@ -54,7 +54,7 @@ function init() {
     //box number two
     let mesh2 = new WoodBox( 150, 150, 150 );
     mesh2.name = "box_2";
-    mesh2.position.set( -30,-50,0 );
+    mesh2.position.set( -30, 75, 0 );
 
     mesh2.addEventListener("click", logEvent);
     mesh2.onClick = remove;
@@ -63,7 +63,7 @@ function init() {
     //box number three
     let mesh3 = new WoodBox( 180, 180, 180 );
     mesh3.name = "box_3";
-    mesh3.position.set( 150, -50, 0 );
+    mesh3.position.set( 150, 90, 0 );
 
     let box_green = new THREE.Mesh( new THREE.BoxGeometry(40,40,40),new THREE.MeshBasicMaterial({color:"green"}) );
     box_green.name = "mini_3.1";
@@ -96,6 +96,12 @@ function init() {
     mesh3.onClick = remove;
 
 
+
+    let mesh4 = new WoodBox( 100, 100, 100 );
+    mesh4.name = "box_3";
+    mesh4.position.set( 150, 50, -200 );
+
+    world.add( mesh4 );
 
 
     activeWorld.add( mesh1 );

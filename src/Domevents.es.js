@@ -94,6 +94,10 @@ const DomEvents = function( camera, domElement )
 	extensions.forEach(function( ext ){
 		ext.initialize.apply( _this, arguments );
 	});
+	DomEvents.eventNames.forEach(function( eventName ){
+		_this._boundObjs[eventName]	= [];
+	});
+	
 
 	this.enable();
 };
@@ -167,6 +171,10 @@ Object.assign( DomEvents.prototype,  {
 
 	_objectCtxInit	: function( object3d ){
 		object3d._3xDomEvent = {};
+
+		DomEvents.eventNames.forEach(function( eventName ){
+			object3d._3xDomEvent[eventName]	= [];
+		});
 	},
 	_objectCtxDeinit : function( object3d ){
 		delete object3d._3xDomEvent;
@@ -235,7 +243,10 @@ Object.assign( DomEvents.prototype,  {
 			return;
 		}
 
-		if( !this._objectCtxIsInit( object3d ) )	this._objectCtxInit( object3d );
+		if( !this._objectCtxIsInit( object3d ) ){	
+			this._objectCtxInit( object3d );
+		}
+
 		let objectCtx = this._objectCtxGet( object3d );
 		if( !objectCtx[eventName+'Handlers'] )	objectCtx[eventName+'Handlers']	= [];
 
@@ -283,20 +294,24 @@ Object.assign( DomEvents.prototype,  {
 
 		if( !this._objectCtxIsInit(object3d) )	this._objectCtxInit(object3d);
 
-		let objectCtx	= this._objectCtxGet(object3d);
-		if( !objectCtx[eventName+'Handlers'] )	objectCtx[eventName+'Handlers']	= [];
+		let objectCtx	= this._objectCtxGet( object3d );
+		if( !objectCtx[eventName+'Handlers'] )	return;
 
-		let handlers	= objectCtx[eventName+'Handlers'];
+		let handlers = objectCtx[eventName+'Handlers'];
 
-		if (typeof callback !== "function") {   // kill all events of this type
-			delete objectCtx[eventName+'Handlers'];
+		if ( typeof callback !== "function" ) {   // kill all events of this type
+			objectCtx[eventName+'Handlers'] = [];
+
 			let index = boundObjs.indexOf( object3d );
-			if (index > -1) boundObjs.splice( index, 1 );
+			if ( index > -1 ) {
+				boundObjs.splice( index, 1 );
+			}
 			return;
 		}
 
-		for( let i = 0; i < handlers.length; i++ ){
+		for( let i = 0; i < handlers.length; i++ ) {
 			let handler	= handlers[i];
+
 			if( callback !== handler.callback )	continue;
 			if( useCapture !== handler.useCapture )	continue;
 			handlers.splice(i, 1);
@@ -324,7 +339,7 @@ Object.assign( DomEvents.prototype,  {
 			if ( object3d.target ) {
 				object3d= object3d.target
 			} else {
-				console.warn("object3d is nit instance of THREE.Object3D");
+				console.warn("object3d is not instance of THREE.Object3D");
 				return;
 			}
 		}

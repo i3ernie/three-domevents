@@ -50959,12 +50959,18 @@ var DomEvents = function( camera, domElement )
 	this.delay = 300;
 
 	this.timeStamp = null;
-	
 
+	
+	this.onRemove = function(){ _this.removeFromDom.apply( _this, arguments ); };
+	this.onAdd = function(){ _this.addToDom.apply( _this, arguments ); };
 
 	extensions.forEach(function( ext ){
 		ext.initialize.apply( _this, arguments );
 	});
+	DomEvents.eventNames.forEach(function( eventName ){
+		_this._boundObjs[eventName]	= [];
+	});
+	
 
 	this.enable();
 };
@@ -51038,6 +51044,10 @@ Object.assign( DomEvents.prototype,  {
 
 	_objectCtxInit	: function( object3d ){
 		object3d._3xDomEvent = {};
+
+		DomEvents.eventNames.forEach(function( eventName ){
+			object3d._3xDomEvent[eventName]	= [];
+		});
 	},
 	_objectCtxDeinit : function( object3d ){
 		delete object3d._3xDomEvent;
@@ -51106,7 +51116,10 @@ Object.assign( DomEvents.prototype,  {
 			return;
 		}
 
-		if( !this._objectCtxIsInit( object3d ) )	{ this._objectCtxInit( object3d ); }
+		if( !this._objectCtxIsInit( object3d ) ){	
+			this._objectCtxInit( object3d );
+		}
+
 		var objectCtx = this._objectCtxGet( object3d );
 		if( !objectCtx[eventName+'Handlers'] )	{ objectCtx[eventName+'Handlers']	= []; }
 
@@ -51119,7 +51132,9 @@ Object.assign( DomEvents.prototype,  {
 		if( this._boundObjs[eventName] === undefined ){
 			this._boundObjs[eventName]	= [];
 		}
-		this._boundObjs[eventName].push( object3d );
+		if ( this._boundObjs[eventName].indexOf( object3d ) === -1 ){
+			this._boundObjs[eventName].push( object3d );
+		}
 	},
 
 	removeEventListener	: function( object3d, eventName, callback, useCapture ){
@@ -51152,20 +51167,24 @@ Object.assign( DomEvents.prototype,  {
 
 		if( !this._objectCtxIsInit(object3d) )	{ this._objectCtxInit(object3d); }
 
-		var objectCtx	= this._objectCtxGet(object3d);
-		if( !objectCtx[eventName+'Handlers'] )	{ objectCtx[eventName+'Handlers']	= []; }
+		var objectCtx	= this._objectCtxGet( object3d );
+		if( !objectCtx[eventName+'Handlers'] )	{ return; }
 
-		var handlers	= objectCtx[eventName+'Handlers'];
+		var handlers = objectCtx[eventName+'Handlers'];
 
-		if (typeof callback !== "function") {   // kill all events of this type
-			delete objectCtx[eventName+'Handlers'];
+		if ( typeof callback !== "function" ) {   // kill all events of this type
+			objectCtx[eventName+'Handlers'] = [];
+
 			var index$1 = boundObjs.indexOf( object3d );
-			if (index$1 > -1) { boundObjs.splice( index$1, 1 ); }
+			if ( index$1 > -1 ) {
+				boundObjs.splice( index$1, 1 );
+			}
 			return;
 		}
 
-		for( var i = 0; i < handlers.length; i++ ){
+		for( var i = 0; i < handlers.length; i++ ) {
 			var handler	= handlers[i];
+
 			if( callback !== handler.callback )	{ continue; }
 			if( useCapture !== handler.useCapture )	{ continue; }
 			handlers.splice(i, 1);
@@ -51174,7 +51193,7 @@ Object.assign( DomEvents.prototype,  {
 
 		// from this object from this._boundObjs
 		var index = boundObjs.indexOf( object3d );
-		if ( index !== -1 ) {
+		if ( index === -1 ) {
 			return;
 		}
 
@@ -51183,63 +51202,170 @@ Object.assign( DomEvents.prototype,  {
 
 	},
 
-	removeMappedListener :function ( obj ){
+	removeFromDom : function( object3d, opt ) {
+
+		var options = Object.assign({recursive : true}, opt);
+		var scope = this;
+
+		if ( object3d.type !== "Mesh" && object3d.type !== "Object3D" ){
+
+			if ( object3d.target ) {
+				object3d= object3d.target;
+			} else {
+				console.warn("object3d is not instance of THREE.Object3D");
+				return;
+			}
+		}
+
+		function _remove( obj ){
+
+			if ( obj._3xDomEvent ) {
+				scope._objectCtxDeinit( obj );
+			}
+
+			var index;
+			var boundObjs;
+
+			DomEvents.eventNames.forEach( function( eventName ) {
+
+				boundObjs = scope._boundObjs[eventName];
+
+				if( boundObjs ) {
+
+					index = boundObjs.indexOf( obj );
+
+					while ( index > -1 ) {
+
+						boundObjs.splice( index, 1 );
+						index = boundObjs.indexOf( obj );
+					}
+				}
+			});
+			
+			//das ganze fuer alle kinder 
+			if ( options.recursive && obj.children.length > 0 ) {
+
+				obj.children.forEach( function( child ){
+					_remove( child );
+				});
+			}
+		}
+		
+		//und los gehts aufraeumen...
+		_remove( object3d );
+	
+	},
+
+	/**
+	 * 
+	 * @param {*} object3d 
+	 * @param {recursive, useCapture} opt 
+	 * all dom events like 'click' will be triggert to the object3d
+	 * and can be catched with i.e.
+	 * object3d.addEventListener('click', function( ev ){ ... });
+	 * or just define a 'onClick' function in the object3d
+	 * object3d.onClick = function( ev ){ ... };
+	 * this function will be autom. bound to the 'click' event
+	 */
+	addToDom : function( object3d, opt ){
+
+		var options = Object.assign({recursive : true, useCapture: false, bindFunctions : true}, opt);
+		var scope = this;
+
+		if ( object3d.type !== "Mesh" && object3d.type !== "Object3D" ){
+
+			if ( object3d.target ) {
+				object3d= object3d.target;
+			} else {
+				console.warn("object3d is nit instance of THREE.Object3D", object3d );
+				return;
+			}
+		}
+
+		function add ( obj ){
+
+			if( obj.userData.preventDomevents ) { return; }
+
+			DomEvents.eventNames.forEach( function( eventName ) {
+
+				if( scope.hasListener( obj, eventName ) ) { return; }
+
+				scope.bind( obj, eventName, eventName, false );
+				
+				if ( options.bindFunctions 
+					&& DomEvents.eventMapping[eventName] 
+					&& typeof obj[ DomEvents.eventMapping[eventName] ] === "function" ) 
+				{	
+					scope.bind( obj, eventName, obj[DomEvents.eventMapping[eventName]], options.useCapture );
+				}
+
+			});
+
+			if ( options.recursive && obj.children.length > 0 ) {
+				obj.children.forEach( function( child ){
+					add( child );
+				});
+			}
+		}
+
+		//start register all known events
+		add( object3d );
+	},
+
+	removeMappedListener :function ( object3d ){
 		var scope = this;
 
 		for ( var key in DomEvents.eventMapping ){
-			this.removeEventListener( obj, key);
+			this.removeEventListener( object3d, key);
 		}
-		if ( obj.children.length > 0 ){
-			obj.children.forEach( function( el ){
+		if ( object3d.children.length > 0 ){
+			object3d.children.forEach( function( el ){
 				scope.removeMappedListener( el );
 			});
 		}
 	},
 
-	activate : function( object3d, listener ){
+	activate : function( object3d, opt ){
+		var options = Object.assign({observe:true}, opt);
+
+		
+		this.addToDom( object3d, opt );
+		
+		if ( options.observe ) {
+			this._observe( object3d );
+		}
+		
+
+	},
+
+	_observe : function( object3d ){
 
 		var scope = this;
 
-		var addListener = function( obj, listener ){
-			listener = listener || obj;
-			for ( var key in DomEvents.eventMapping ){
-				if ( !scope.hasListener( obj, key ) ) {
-					scope.addEventListener( obj, key, key);
-					if ( listener[ DomEvents.eventMapping[key] ] ) {
-						scope.addEventListener( obj, key, listener[ DomEvents.eventMapping[key] ] );
-					}
-				}
-			}
-		};
-		
-		if ( object3d.parent ){
-			addListener( object3d, listener );
-		}
-		
 		var add = object3d.add;
 		object3d.add = function( child ){
 
 			scope.activate( child );
 			
-			addListener( child );
-			
 			add.apply( object3d, arguments );
 		};
-
-		if( object3d.children.length > 0 ){ 
-			object3d.children.forEach(function( child ){ 
-				scope.activate( child );
-			});
-		}
 
 		var rem = object3d.remove;
 		object3d.remove = function( child ){
 
-			scope.removeMappedListener( child );
+			scope.removeFromDom( child );
 
 			rem.apply( object3d, arguments );
 		};
 
+		//wenn kindelemente vorhanden
+		if( object3d.children.length > 0 ){ 
+
+			object3d.children.forEach(function( child ){ 
+				scope._observe( child );
+			});
+		}
+		
 	},
 
 	clean : function( )
