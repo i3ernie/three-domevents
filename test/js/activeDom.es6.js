@@ -2,6 +2,7 @@ import * as THREE from '../../node_modules/three/build/three.module.js';
 import DomEvents from "../../src/Domevents.es.js";
 import Viewport from "../../node_modules/three-viewport/dist/viewport.es.js";
 import WoodBox from "../WoodBox.js";
+import Grassground from "./Grassground.es.js";
 
 var VP;
 var DEH;
@@ -18,16 +19,23 @@ function init() {
 
     VP.camera.position.z = 500;
 
+    // add a ambient light
+    VP.scene.add( new THREE.AmbientLight( 0x020202 ) );
+
+    // add a light in front
+    let light	= new THREE.DirectionalLight('white', 2);
+    light.position.set(100, 100, 300);
+    VP.scene.add( light );
+
     DEH = new DomEvents( VP.camera, VP.renderer.domElement );
 
     let activeWorld = new THREE.Object3D();
     activeWorld.name = "active_world";
-
     VP.scene.add( activeWorld );
+
 
     let world = new THREE.Object3D();
     world.name = "world";
-
     VP.scene.add( world );
 
     DEH.activate( activeWorld ); //or for global ( VP.Scene )
@@ -98,10 +106,21 @@ function init() {
 
 
     let mesh4 = new WoodBox( 100, 100, 100 );
-    mesh4.name = "box_3";
+    mesh4.name = "box_4";
     mesh4.position.set( 150, 50, -200 );
 
+    let ground = new Grassground({
+        width		: 2000,
+		height		: 2000,
+		repeatX		: 10,
+        repeatY		: 10,
+        "image" : "big"
+    });
+
+
+
     world.add( mesh4 );
+    VP.scene.add( ground );
 
 
     activeWorld.add( mesh1 );
