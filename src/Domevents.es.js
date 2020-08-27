@@ -464,28 +464,51 @@ Object.assign( DomEvents.prototype,  {
 		if ( options.observe ) {
 			this._observe( object3d );
 		}
-		
+	},
 
+	deactivate : function( object3d ) {
+		let scope = this;
+
+		if ( object3d._previousFunctions ){
+			if ( typeof object3d._previousFunctions.add === "function") { 
+				object3d.add = object3d._previousFunctions.add;
+			}
+			if ( typeof object3d._previousFunctions.remove === "function") {
+				object3d.remove = object3d._previousFunctions.remove;
+			}
+		}
+
+		if( object3d.children.length > 0 ){ 
+			object3d.children.forEach( function( child ){ 
+				scope.deactivate( child );
+			});
+		}
 	},
 
 	_observe : function( object3d ){
 
 		let scope = this;
 
-		const add = object3d.add;
+		if ( ! object3d._previousFunctions ) {
+			object3d._previousFunctions = {};
+		}
+
+		object3d._previousFunctions.add = object3d.add;
 		object3d.add = function( child ){
 
 			scope.activate( child );
 			
-			add.apply( object3d, arguments );
+			object3d._previousFunctions.add.apply( object3d, arguments );
 		};
-
-		const rem = object3d.remove;
+		
+		object3d._previousFunctions.remove = object3d.remove;
 		object3d.remove = function( child ){
+
+			scope.deactivate( child );
 
 			scope.removeFromDom( child );
 
-			rem.apply( object3d, arguments );
+			object3d._previousFunctions.remove.apply( object3d, arguments );
 		};
 
 		//wenn kindelemente vorhanden

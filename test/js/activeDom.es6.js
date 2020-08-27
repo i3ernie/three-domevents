@@ -76,6 +76,7 @@ function init() {
     let box_green = new THREE.Mesh( new THREE.BoxGeometry(40,40,40),new THREE.MeshBasicMaterial({color:"green"}) );
     box_green.name = "mini_3.1";
     box_green.position.set(90, 90, 90);
+    box_green.addEventListener("click", logEvent );
     mesh3.add(box_green);
 
     box = new THREE.Mesh( new THREE.BoxGeometry(20,20,20),new THREE.MeshBasicMaterial({color:"green"}) );
@@ -100,6 +101,8 @@ function init() {
 
 
     mesh3.addEventListener("click", logEvent );
+
+    mesh3.addEventListener("click", function(){ console.log("lalalaaaa"); } );
 
     mesh3.onClick = remove;
 
