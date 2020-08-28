@@ -4,12 +4,13 @@
   "license": "MIT",
   "description": "domevents for three.js",
   "author": "i3ernie",
-  "repository": "https://gitlab.mhkservice.net/onpla/threex/demevents",
+  "repository": "https://github.com/i3ernie/three-domevents",
   "contributors": [],
   "keywords": [
     "three.js",
     "WebGL",
-    "Viewport"
+    "Viewport",
+    "Domevents"
   ],
   "dependencies": {
     "three": "^0.118"
