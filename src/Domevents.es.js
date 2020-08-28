@@ -402,8 +402,9 @@ Object.assign( DomEvents.prototype,  {
 
 		if ( object3d.type !== "Mesh" && object3d.type !== "Object3D" ){
 
+			//event object?
 			if ( object3d.target ) {
-				object3d= object3d.target
+				object3d = object3d.target;
 			} else {
 				console.warn("object3d is nit instance of THREE.Object3D", object3d );
 				return;
