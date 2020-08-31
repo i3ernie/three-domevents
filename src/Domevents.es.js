@@ -607,7 +607,7 @@ Object.assign( DomEvents.prototype,  {
 		// parameter check
 		console.assert( arguments.length === 4 );
 
-		// do bubbling
+		// if no handler do bubbling
 		if( !objectCtx || !handlers || handlers.length === 0 ){ 
 			if ( object3d.parent ) this._notify( eventName, object3d.parent, origDomEvent, intersect );
 			return;
