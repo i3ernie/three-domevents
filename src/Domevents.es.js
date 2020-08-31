@@ -625,7 +625,7 @@ Object.assign( DomEvents.prototype,  {
 			capture = true;
 		};
 		
-		for( let i = 0; i < handlers.length; i++ ){
+		for( let i = 0; i < handlers.length; i++ ) {
 
 			let handler	= handlers[i];
 
