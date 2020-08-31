@@ -7,7 +7,7 @@ const build_domeventsES = function( done ){
    
     rollup.rollup({
         input : 'src/Domevents.es.js',
-        external: ['../node_modules/three/build/three.module.js'],
+        external: ['../node_modules/three/build/three.module.js', '../../node_modules/three/build/three.module.js'],
         
         plugins:[
             

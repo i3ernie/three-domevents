@@ -50975,7 +50975,7 @@ var DomEvents = function( camera, domElement )
 	this.enable();
 };
 
-DomEvents.eventNames	= [
+DomEvents.eventNames = [
 	"mouseover",
 	"mouseout",
 	
@@ -50991,7 +50991,7 @@ DomEvents.eventMapping = {
 	"dblclick"  : "onDblclick"
 };
 
-DomEvents.extend = function( obj ){
+DomEvents.extend = function( obj ) {
 	extensions.push( obj );
 
 	Object.assign( DomEvents.eventMapping, obj.eventMapping );
@@ -51002,7 +51002,7 @@ DomEvents.extend( DomeventClick );
 DomEvents.extend( DomeventTouch );
 //
 
-DomEvents.hasEvent = function( eventName ){
+DomEvents.hasEvent = function( eventName ) {
 	return DomEvents.eventNames.indexOf( eventName ) !== -1;
 };
 
@@ -51012,7 +51012,7 @@ Object.assign( DomEvents.prototype,  {
 
 		var scope = this;
 
-		extensions.forEach(function( ext ){
+		extensions.forEach(function( ext ) {
 			ext.enable.apply( scope, arguments );
 		});
 
@@ -51021,7 +51021,7 @@ Object.assign( DomEvents.prototype,  {
 
 	disable : function(){
 
-		extensions.forEach(function( ext ){
+		extensions.forEach(function( ext ) {
 			ext.disable.apply( this, arguments );
 		});
 
@@ -51042,20 +51042,20 @@ Object.assign( DomEvents.prototype,  {
 
 	// handle domevent context in object3d instance
 
-	_objectCtxInit	: function( object3d ){
+	_objectCtxInit	: function( object3d ) {
 		object3d._3xDomEvent = {};
 
 		DomEvents.eventNames.forEach(function( eventName ){
 			object3d._3xDomEvent[eventName]	= [];
 		});
 	},
-	_objectCtxDeinit : function( object3d ){
+	_objectCtxDeinit : function( object3d ) {
 		delete object3d._3xDomEvent;
 	},
-	_objectCtxIsInit : function( object3d ){
+	_objectCtxIsInit : function( object3d ) {
 		return !!object3d._3xDomEvent;
 	},
-	_objectCtxGet : function( object3d ){
+	_objectCtxGet : function( object3d ) {
 		return object3d._3xDomEvent;
 	},
 	/********************************************************************************/
@@ -51072,7 +51072,7 @@ Object.assign( DomEvents.prototype,  {
 		return this._camera;
 	},
 
-	addEventListener : function( object3d, eventName, callback, opt ){
+	addEventListener : function( object3d, eventName, callback, opt ) {
 		opt = opt || {};
 
 		var _this = this;
@@ -51137,7 +51137,8 @@ Object.assign( DomEvents.prototype,  {
 		}
 	},
 
-	removeEventListener	: function( object3d, eventName, callback, useCapture ){
+	removeEventListener	: function( object3d, eventName, callback, useCapture ) {
+		
 		if ( eventName === null || eventName === undefined ){
 			eventName = DomEvents.eventNames;
 			return;
@@ -51274,8 +51275,9 @@ Object.assign( DomEvents.prototype,  {
 
 		if ( object3d.type !== "Mesh" && object3d.type !== "Object3D" ){
 
+			//event object?
 			if ( object3d.target ) {
-				object3d= object3d.target;
+				object3d = object3d.target;
 			} else {
 				console.warn("object3d is nit instance of THREE.Object3D", object3d );
 				return;
@@ -51292,9 +51294,9 @@ Object.assign( DomEvents.prototype,  {
 
 				scope.bind( obj, eventName, eventName, false );
 				
-				if ( options.bindFunctions 
-					&& DomEvents.eventMapping[eventName] 
-					&& typeof obj[ DomEvents.eventMapping[eventName] ] === "function" ) 
+				if ( options.bindFunctions && 
+					DomEvents.eventMapping[eventName] && 
+					typeof obj[ DomEvents.eventMapping[eventName] ] === "function" ) 
 				{	
 					scope.bind( obj, eventName, obj[DomEvents.eventMapping[eventName]], options.useCapture );
 				}
@@ -51334,28 +51336,51 @@ Object.assign( DomEvents.prototype,  {
 		if ( options.observe ) {
 			this._observe( object3d );
 		}
-		
+	},
 
+	deactivate : function( object3d ) {
+		var scope = this;
+
+		if ( object3d._previousFunctions ){
+			if ( typeof object3d._previousFunctions.add === "function") { 
+				object3d.add = object3d._previousFunctions.add;
+			}
+			if ( typeof object3d._previousFunctions.remove === "function") {
+				object3d.remove = object3d._previousFunctions.remove;
+			}
+		}
+
+		if( object3d.children.length > 0 ){ 
+			object3d.children.forEach( function( child ){ 
+				scope.deactivate( child );
+			});
+		}
 	},
 
 	_observe : function( object3d ){
 
 		var scope = this;
 
-		var add = object3d.add;
+		if ( ! object3d._previousFunctions ) {
+			object3d._previousFunctions = {};
+		}
+
+		object3d._previousFunctions.add = object3d.add;
 		object3d.add = function( child ){
 
 			scope.activate( child );
 			
-			add.apply( object3d, arguments );
+			object3d._previousFunctions.add.apply( object3d, arguments );
 		};
-
-		var rem = object3d.remove;
+		
+		object3d._previousFunctions.remove = object3d.remove;
 		object3d.remove = function( child ){
+
+			scope.deactivate( child );
 
 			scope.removeFromDom( child );
 
-			rem.apply( object3d, arguments );
+			object3d._previousFunctions.remove.apply( object3d, arguments );
 		};
 
 		//wenn kindelemente vorhanden
@@ -51453,9 +51478,9 @@ Object.assign( DomEvents.prototype,  {
 		// parameter check
 		console.assert( arguments.length === 4 );
 
-		// do bubbling
+		// if no handler do bubbling
 		if( !objectCtx || !handlers || handlers.length === 0 ){ 
-			object3d.parent && this._notify( eventName, object3d.parent, origDomEvent, intersect );
+			if ( object3d.parent ) { this._notify( eventName, object3d.parent, origDomEvent, intersect ); }
 			return;
 		}
 
@@ -51463,8 +51488,15 @@ Object.assign( DomEvents.prototype,  {
 		handlers = objectCtx[eventName+'Handlers'];
 		var toPropagate	= true;
 		var capture = false;
+
+		var stopPropagation = function () {
+			toPropagate = false;
+		};
+		var preventDefault = function() {
+			capture = true;
+		};
 		
-		for( var i = 0; i < handlers.length; i++ ){
+		for( var i = 0; i < handlers.length; i++ ) {
 
 			var handler	= handlers[i];
 
@@ -51475,12 +51507,8 @@ Object.assign( DomEvents.prototype,  {
 					target: object3d,
 					origDomEvent: origDomEvent,
 					intersect: intersect,
-					stopPropagation: function () {
-						toPropagate = false;
-					},
-					preventDefault : function() {
-						capture = true;
-					}
+					stopPropagation: stopPropagation,
+					preventDefault : preventDefault
 				});
 			}
 			else if ( typeof handler.callback === "string" && typeof object3d.dispatchEvent === "function" ) {
@@ -51489,12 +51517,8 @@ Object.assign( DomEvents.prototype,  {
 					target: object3d,
 					origDomEvent: origDomEvent,
 					intersect: intersect,
-					stopPropagation: function () {
-						toPropagate = false;
-					},
-					preventDefault : function() {
-						capture = true;
-					}
+					stopPropagation: stopPropagation,
+					preventDefault : preventDefault
 				});
 			}
 			
@@ -51504,8 +51528,8 @@ Object.assign( DomEvents.prototype,  {
 		}
 
 		// do bubbling
-		if( toPropagate ) {
-			object3d.parent && this._notify( eventName, object3d.parent, origDomEvent, intersect );
+		if( toPropagate && object3d.parent ) {
+			this._notify( eventName, object3d.parent, origDomEvent, intersect );
 		}
 	}
 
