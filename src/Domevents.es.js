@@ -338,7 +338,7 @@ Object.assign( DomEvents.prototype,  {
 		if ( object3d.type !== "Mesh" && object3d.type !== "Object3D" ){
 
 			if ( object3d.target ) {
-				object3d= object3d.target
+				object3d= object3d.target;
 			} else {
 				console.warn("object3d is not instance of THREE.Object3D");
 				return;
@@ -421,9 +421,9 @@ Object.assign( DomEvents.prototype,  {
 
 				scope.bind( obj, eventName, eventName, false );
 				
-				if ( options.bindFunctions 
-					&& DomEvents.eventMapping[eventName] 
-					&& typeof obj[ DomEvents.eventMapping[eventName] ] === "function" ) 
+				if ( options.bindFunctions && 
+					DomEvents.eventMapping[eventName] && 
+					typeof obj[ DomEvents.eventMapping[eventName] ] === "function" ) 
 				{	
 					scope.bind( obj, eventName, obj[DomEvents.eventMapping[eventName]], options.useCapture );
 				}
@@ -609,7 +609,7 @@ Object.assign( DomEvents.prototype,  {
 
 		// do bubbling
 		if( !objectCtx || !handlers || handlers.length === 0 ){ 
-			object3d.parent && this._notify( eventName, object3d.parent, origDomEvent, intersect );
+			if ( object3d.parent ) this._notify( eventName, object3d.parent, origDomEvent, intersect );
 			return;
 		}
 
@@ -617,6 +617,13 @@ Object.assign( DomEvents.prototype,  {
 		handlers = objectCtx[eventName+'Handlers'];
 		let toPropagate	= true;
 		let capture = false;
+
+		const stopPropagation = function () {
+			toPropagate = false;
+		};
+		const preventDefault = function() {
+			capture = true;
+		};
 		
 		for( let i = 0; i < handlers.length; i++ ){
 
@@ -629,12 +636,8 @@ Object.assign( DomEvents.prototype,  {
 					target: object3d,
 					origDomEvent: origDomEvent,
 					intersect: intersect,
-					stopPropagation: function () {
-						toPropagate = false;
-					},
-					preventDefault : function() {
-						capture = true;
-					}
+					stopPropagation: stopPropagation,
+					preventDefault : preventDefault
 				});
 			}
 			else if ( typeof handler.callback === "string" && typeof object3d.dispatchEvent === "function" ) {
@@ -643,12 +646,8 @@ Object.assign( DomEvents.prototype,  {
 					target: object3d,
 					origDomEvent: origDomEvent,
 					intersect: intersect,
-					stopPropagation: function () {
-						toPropagate = false;
-					},
-					preventDefault : function() {
-						capture = true;
-					}
+					stopPropagation: stopPropagation,
+					preventDefault : preventDefault
 				});
 			}
 			
@@ -658,8 +657,8 @@ Object.assign( DomEvents.prototype,  {
 		}
 
 		// do bubbling
-		if( toPropagate ) {
-			object3d.parent && this._notify( eventName, object3d.parent, origDomEvent, intersect );
+		if( toPropagate && object3d.parent ) {
+			this._notify( eventName, object3d.parent, origDomEvent, intersect );
 		}
 	}
 
