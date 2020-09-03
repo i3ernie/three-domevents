@@ -51208,7 +51208,7 @@ Object.assign( DomEvents.prototype,  {
 		var options = Object.assign({recursive : true}, opt);
 		var scope = this;
 
-		if ( object3d.type !== "Mesh" && object3d.type !== "Object3D" ){
+		if ( !( object3d instanceof THREE.Object3D ) ){
 
 			if ( object3d.target ) {
 				object3d= object3d.target;
