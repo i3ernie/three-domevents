@@ -1,4 +1,4 @@
-import {Raycaster, Vector3} from "../node_modules/three/build/three.module.js";
+import {Raycaster, Vector3, Object3D} from "../node_modules/three/build/three.module.js";
 
 import DomeventClick from "./domevents/DomeventMouse.es.js";
 import DomeventTouch from "./domevents/DomeventTouch.es.js";
@@ -335,7 +335,7 @@ Object.assign( DomEvents.prototype,  {
 		let options = Object.assign({recursive : true}, opt);
 		let scope = this;
 
-		if ( !( object3d instanceof THREE.Object3D ) ){
+		if ( !( object3d instanceof Object3D ) ){
 
 			if ( object3d.target ) {
 				object3d= object3d.target;

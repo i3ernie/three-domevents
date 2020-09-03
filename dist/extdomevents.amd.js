@@ -51208,7 +51208,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 			var options = Object.assign({recursive : true}, opt);
 			var scope = this;
 
-			if ( !( object3d instanceof THREE.Object3D ) ){
+			if ( !( object3d instanceof Object3D ) ){
 
 				if ( object3d.target ) {
 					object3d= object3d.target;

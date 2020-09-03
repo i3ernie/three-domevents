@@ -1,4 +1,4 @@
-import { Vector3, Raycaster } from '../../three/build/three.module.js';
+import { Vector3, Raycaster, Object3D } from '../../three/build/three.module.js';
 
 var getRelativeMouseXY = function( domEvent ) {
 
@@ -721,7 +721,7 @@ Object.assign( DomEvents.prototype,  {
 		var options = Object.assign({recursive : true}, opt);
 		var scope = this;
 
-		if ( !( object3d instanceof THREE.Object3D ) ){
+		if ( !( object3d instanceof Object3D ) ){
 
 			if ( object3d.target ) {
 				object3d= object3d.target;
