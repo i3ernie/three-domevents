@@ -170,9 +170,11 @@ const DomeventClick = {
     initialize : function( ){
         let _this = this; 
 
+        
         this.stateMouse = this.stateMouse || {};
         this.stateMouse.mousedown = false;
     
+        this._onMove = function(){ _onMove.apply( _this, arguments ); };  
 
         this._$onMouseDown	= function(){ _onMouseDown.apply( _this, arguments ); };
 	    this._$onMouseUp	= function(){ _onMouseUp.apply( _this, arguments );	};
