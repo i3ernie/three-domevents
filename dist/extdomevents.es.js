@@ -50707,6 +50707,7 @@ var DomeventClick = {
         this.stateMouse.mousedown = false;
     
         this._onMove = function(){ _onMove.apply( _this, arguments ); };  
+        this._onMouseEvent = function(){ _onMouseEvent.apply( _this, arguments ); };
 
         this._$onMouseDown	= function(){ _onMouseDown.apply( _this, arguments ); };
 	    this._$onMouseUp	= function(){ _onMouseUp.apply( _this, arguments );	};
@@ -50780,7 +50781,7 @@ var _onTouchEnd = function( event ) {
         return this._onMouseEvent('mouseup', event);
     } else {
 
-        if (time <= TOUCH_MS) {
+        if ( time <= TOUCH_MS ) {
             evt = new MouseEvent("click", {
                 bubbles: true,
                 cancelable: true,
@@ -50816,14 +50817,6 @@ var _onTouchStart	= function( event ){
 };
 
 
-
-
-/************************************************/
-/*		handle touch events						*/
-/************************************************/
-// # handle touch events
-
-
 var _onTouchMove = function( domEvent )
 {
     if( domEvent.touches.length !== 1 )	{ return; }
@@ -50836,6 +50829,12 @@ var _onTouchMove = function( domEvent )
     this._onMove('mouseover', mouseX, mouseY, domEvent);
     this._onMove('mouseout' , mouseX, mouseY, domEvent);
 };
+
+
+/************************************************/
+/*		handle touch events						*/
+/************************************************/
+// # handle touch events
 
 var _onTouchEvent = function( eventName, domEvent )
 {

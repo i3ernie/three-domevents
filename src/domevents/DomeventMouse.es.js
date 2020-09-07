@@ -175,6 +175,7 @@ const DomeventClick = {
         this.stateMouse.mousedown = false;
     
         this._onMove = function(){ _onMove.apply( _this, arguments ); };  
+        this._onMouseEvent = function(){ _onMouseEvent.apply( _this, arguments ); };
 
         this._$onMouseDown	= function(){ _onMouseDown.apply( _this, arguments ); };
 	    this._$onMouseUp	= function(){ _onMouseUp.apply( _this, arguments );	};

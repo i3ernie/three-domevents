@@ -38,7 +38,7 @@ const _onTouchEnd = function( event ) {
         return this._onMouseEvent('mouseup', event);
     } else {
 
-        if (time <= TOUCH_MS) {
+        if ( time <= TOUCH_MS ) {
             evt = new MouseEvent("click", {
                 bubbles: true,
                 cancelable: true,
@@ -74,14 +74,6 @@ const _onTouchStart	= function( event ){
 };
 
 
-
-
-/************************************************/
-/*		handle touch events						*/
-/************************************************/
-// # handle touch events
-
-
 const _onTouchMove = function( domEvent )
 {
     if( domEvent.touches.length !== 1 )	return;
@@ -94,6 +86,12 @@ const _onTouchMove = function( domEvent )
     this._onMove('mouseover', mouseX, mouseY, domEvent);
     this._onMove('mouseout' , mouseX, mouseY, domEvent);
 };
+
+
+/************************************************/
+/*		handle touch events						*/
+/************************************************/
+// # handle touch events
 
 const _onTouchEvent = function( eventName, domEvent )
 {
