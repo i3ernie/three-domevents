@@ -593,8 +593,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
 			var useCapture = opt.useCapture || false;
 			var scope = this;
-
-			extensions.forEach(function( ext ){ 
+	console.log("++addEventListener", eventName);
+			extensions.forEach(function( ext ){ console.log(ext);
 				if ( ext.addEventListener ) { ext.addEventListener.call( _this, object3d, eventName, callback, opt ); }
 			});
 
@@ -787,7 +787,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 			var options = Object.assign({recursive : true, useCapture: false, bindFunctions : true}, opt);
 			var scope = this;
 
-			if ( object3d.type !== "Mesh" && object3d.type !== "Object3D" ){
+			if ( !( object3d instanceof three_module_js.Object3D ) ) {
 
 				//event object?
 				if ( object3d.target ) {

@@ -51080,8 +51080,8 @@ Object.assign( DomEvents.prototype,  {
 
 		var useCapture = opt.useCapture || false;
 		var scope = this;
-
-		extensions.forEach(function( ext ){ 
+console.log("++addEventListener", eventName);
+		extensions.forEach(function( ext ){ console.log(ext);
 			if ( ext.addEventListener ) { ext.addEventListener.call( _this, object3d, eventName, callback, opt ); }
 		});
 
@@ -51274,7 +51274,7 @@ Object.assign( DomEvents.prototype,  {
 		var options = Object.assign({recursive : true, useCapture: false, bindFunctions : true}, opt);
 		var scope = this;
 
-		if ( object3d.type !== "Mesh" && object3d.type !== "Object3D" ){
+		if ( !( object3d instanceof Object3D ) ) {
 
 			//event object?
 			if ( object3d.target ) {
@@ -51536,7 +51536,7 @@ Object.assign( DomEvents.prototype,  {
 
 });
 
-var _onMousedown = function( event ){ 
+var _onMousedown = function( event ){ console.log("down");
     if ( event.intersect.object.id === event.target.id ){
         this._mousedownd[event.target.id] = event.target;
     }
@@ -51546,7 +51546,7 @@ var _onMouseupDrag = function( event ){
 
     if ( this.stateMouse.dragging ){ 
         this.stateMouse.dragging = false;
-        
+
         for ( var key in this._draggingObjs ) { 
             this._notify ( "dragend", this._draggingObjs[key], event, {object:this._draggingObjs[key]} );
         }
@@ -51556,10 +51556,10 @@ var _onMouseupDrag = function( event ){
 };
 
 var _onMousemove = function( event ){ 
-    if ( this._mousedownd[event.target.id] ) {
+    if ( this._mousedownd[event.target.id] ) { 
 
-        if ( !this._draggingObjs[event.target.id] ) {
-            
+        if ( !this._draggingObjs[event.target.id] ) { 
+
             this.stateMouse.dragging = true;
             this._draggingObjs[event.target.id] = event.target;
 
@@ -51593,7 +51593,7 @@ var DomeventDrag = {
 
     initialize : function( ){
         var _this = this; 
-
+        
         this.stateMouse = this.stateMouse || {};    
         this.stateMouse.dragging = false;
 
@@ -51608,8 +51608,8 @@ var DomeventDrag = {
 
     addEventListener : function( object3d, eventName, callback, opt ) { 
         var scope = this;
-
-        if ( eventName === "drag" ){   
+console.log("addEventListener", eventName);
+        if ( eventName === "drag" ) {
             if( !this.hasListener(object3d, "mousedown") ){
                 this.addEventListener( object3d, "mousedown", "mousedown" );
             }
