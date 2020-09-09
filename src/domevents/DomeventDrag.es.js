@@ -1,8 +1,17 @@
 import getRelativeMouseXY from "../PointerTools.es.js";
 
-const _onMousedown = function( event ){ 
+
+
+/*const _onMousedown = function( event ){ console.log("down");
     if ( event.intersect.object.id === event.target.id ){
         this._mousedownd[event.target.id] = event.target;
+    }
+}; */
+
+const _onMousedown = function( event ){ console.log("down", event);
+    this.stateMouse.mousedown = true;
+    if ( event ){
+        
     }
 };
 
@@ -10,20 +19,24 @@ const _onMouseupDrag = function( event ){
 
     if ( this.stateMouse.dragging ){ 
         this.stateMouse.dragging = false;
-        
+
         for ( let key in this._draggingObjs ) { 
             this._notify ( "dragend", this._draggingObjs[key], event, {object:this._draggingObjs[key]} );
         }
     }
     this._draggingObjs = {};
     this._mousedownd = {};
-}
+};
 
 const _onMousemove = function( event ){ 
-    if ( this._mousedownd[event.target.id] ) {
+    if ( this.stateMouse.mousedown ) {
+        console.log("drag");
+    } 
+    return;
+    if ( this._mousedownd[event.target.id] ) { 
 
-        if ( !this._draggingObjs[event.target.id] ) {
-            
+        if ( !this._draggingObjs[event.target.id] ) { 
+
             this.stateMouse.dragging = true;
             this._draggingObjs[event.target.id] = event.target;
 
@@ -57,23 +70,24 @@ const DomeventDrag = {
 
     initialize : function( ){
         let _this = this; 
-
+        
         this.stateMouse = this.stateMouse || {};    
         this.stateMouse.dragging = false;
 
         this._mousedownd = {};
-
         this._draggingObjs = {};
 
-        this._$onDragStart	= function(){ _onMousedown.apply( _this, arguments ); };
+        this._$onMouseDownDrag = function(){ _onMousedown.apply( _this, arguments ); };
+        //this._$onDragStart	= function(){ _onMousedown.apply( _this, arguments ); };
         this._$onDragging	= function(){ _onMousemove.apply(_this, arguments);	};
         this._$onMouseUpDrag = function(){ _onMouseupDrag.apply( _this, arguments );	};
+        this._$onMouseMoveDrag = function(){  _onMousemove.apply( _this, arguments ); };
     },
 
     addEventListener : function( object3d, eventName, callback, opt ) { 
         let scope = this;
 
-        if ( eventName === "drag" ){   
+        if ( eventName === "drag" ) {
             if( !this.hasListener(object3d, "mousedown") ){
                 this.addEventListener( object3d, "mousedown", "mousedown" );
             }
@@ -87,16 +101,16 @@ const DomeventDrag = {
     },
 
     enable : function() { 
-        //this._domElement.addEventListener( 'mousedown'	, this._$onMouseDown	, false );
+        this._domElement.addEventListener( 'mousedown'	, this._$onMouseDownDrag	, false );
         this._domElement.addEventListener( 'mouseup'	, this._$onMouseUpDrag		, false );
-        //this._domElement.addEventListener( 'mousemove'	, this._$onMouseMove	, false );
+        this._domElement.addEventListener( 'mousemove'	, this._$onMouseMoveDrag	, false );
         
     },
 
     disable : function() {
-        //this._domElement.removeEventListener( 'mousedown', this._$onMouseDown	, false );
+        this._domElement.removeEventListener( 'mousedown', this._$onMouseDownDrag	, false );
         this._domElement.removeEventListener( 'mouseup', this._$onMouseUpDrag		, false );
-        //this._domElement.removeEventListener( 'mousemove', this._$onMouseMove	, false );
+        this._domElement.removeEventListener( 'mousemove', this._$onMouseMoveDrag	, false );
         
     }
 };

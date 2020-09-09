@@ -22,8 +22,8 @@ const onDragend = function( ev ){
 init();
 
 function init() {
-    
-    
+
+
     VP = new Viewport();
 
     VP.init();
@@ -32,12 +32,12 @@ function init() {
     VP.camera.position.z = 400;
 
     DEH = new DomEvents( VP.camera, VP.renderer.domElement, {trigger:true} );
-    
-    
+
+
     let mesh1 = new WoodBox(100,100,100);
     mesh1.name = "box_klein";
     mesh1.position.set(-200,-50,0);
-    
+
     mesh1.onDrag = onDrag; 
     mesh1.onDragend = onDragend; 
     mesh1.onDragstart = onDragstart; 

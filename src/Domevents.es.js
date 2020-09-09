@@ -206,8 +206,8 @@ Object.assign( DomEvents.prototype,  {
 
 		let useCapture = opt.useCapture || false;
 		let scope = this;
-
-		extensions.forEach(function( ext ){ 
+console.log("++addEventListener", eventName);
+		extensions.forEach(function( ext ){ console.log(ext);
 			if ( ext.addEventListener ) ext.addEventListener.call( _this, object3d, eventName, callback, opt );
 		});
 
@@ -400,7 +400,7 @@ Object.assign( DomEvents.prototype,  {
 		let options = Object.assign({recursive : true, useCapture: false, bindFunctions : true}, opt);
 		let scope = this;
 
-		if ( object3d.type !== "Mesh" && object3d.type !== "Object3D" ){
+		if ( !( object3d instanceof Object3D ) ) {
 
 			//event object?
 			if ( object3d.target ) {
