@@ -51080,8 +51080,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
 			var useCapture = opt.useCapture || false;
 			var scope = this;
-	console.log("++addEventListener", eventName);
-			extensions.forEach(function( ext ){ console.log(ext);
+
+			extensions.forEach(function( ext ){ 
 				if ( ext.addEventListener ) { ext.addEventListener.call( _this, object3d, eventName, callback, opt ); }
 			});
 
@@ -51287,11 +51287,15 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
 			function add ( obj ){
 
-				if( obj.userData.preventDomevents ) { return; }
+				if( obj.userData.preventDomevents ) {
+					return;
+				}
 
 				DomEvents.eventNames.forEach( function( eventName ) {
 
-					if( scope.hasListener( obj, eventName ) ) { return; }
+					if( scope.hasListener( obj, eventName ) ) {
+						return;
+					}
 
 					scope.bind( obj, eventName, eventName, false );
 					
@@ -51436,6 +51440,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 		//console.log('eventName', eventName, 'boundObjs', this._boundObjs[eventName])
 			// get objects bound to this event
 			var boundObjs	= this._boundObjs[eventName];
+			var i = 0;
+
 			if( boundObjs === undefined || boundObjs.length === 0 )	{ return; }
 			// compute the intersection
 			var vector	= new Vector3( mouseX, mouseY, 0.5 );
@@ -51468,7 +51474,18 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 				return;
 			}
 
-			this._notify(eventName, object3d, origDomEvent, intersect);
+			var doIntersect = this._notify(eventName, object3d, origDomEvent, intersect);
+			
+			while ( doIntersect && intersects[i+1] ){
+				i++;
+				intersect = intersects[i];
+				var object3d$1	= intersect.object;
+				var objectCtx$1	= this._objectCtxGet(object3d$1);
+				if( !objectCtx$1 ) { 
+					return;
+				}
+				doIntersect = this._notify(eventName, object3d$1, origDomEvent, intersect);
+			}
 		},
 
 		_notify	: function( eventName, object3d, origDomEvent, intersect )
@@ -51482,12 +51499,13 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 			// if no handler do bubbling
 			if( !objectCtx || !handlers || handlers.length === 0 ){ 
 				if ( object3d.parent ) { this._notify( eventName, object3d.parent, origDomEvent, intersect ); }
-				return;
+				return false;
 			}
 
 			// notify all handlers
 			handlers = objectCtx[eventName+'Handlers'];
 			var toPropagate	= true;
+			var toIntersect = false;
 			var capture = false;
 
 			var stopPropagation = function () {
@@ -51495,6 +51513,9 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 			};
 			var preventDefault = function() {
 				capture = true;
+			};
+			var nextIntersect = function(){
+				toIntersect = true;
 			};
 			
 			for( var i = 0; i < handlers.length; i++ ) {
@@ -51509,7 +51530,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 						origDomEvent: origDomEvent,
 						intersect: intersect,
 						stopPropagation: stopPropagation,
-						preventDefault : preventDefault
+						preventDefault : preventDefault,
+						nextIntersect : nextIntersect
 					});
 				}
 				else if ( typeof handler.callback === "string" && typeof object3d.dispatchEvent === "function" ) {
@@ -51519,7 +51541,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 						origDomEvent: origDomEvent,
 						intersect: intersect,
 						stopPropagation: stopPropagation,
-						preventDefault : preventDefault
+						preventDefault : preventDefault,
+						nextIntersect : nextIntersect
 					});
 				}
 				
@@ -51532,14 +51555,19 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 			if( toPropagate && object3d.parent ) {
 				this._notify( eventName, object3d.parent, origDomEvent, intersect );
 			}
+			return toIntersect;
 		}
 
 	});
 
-	var _onMousedown = function( event ){ console.log("down");
+	/*const _onMousedown = function( event ){ console.log("down");
 	    if ( event.intersect.object.id === event.target.id ){
 	        this._mousedownd[event.target.id] = event.target;
 	    }
+	}; */
+
+	var _onMousedown = function( event ){ console.log("down", event);
+	    this.stateMouse.mousedown = true;
 	};
 
 	var _onMouseupDrag = function( event ){
@@ -51556,24 +51584,10 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 	};
 
 	var _onMousemove = function( event ){ 
-	    if ( this._mousedownd[event.target.id] ) { 
-
-	        if ( !this._draggingObjs[event.target.id] ) { 
-
-	            this.stateMouse.dragging = true;
-	            this._draggingObjs[event.target.id] = event.target;
-
-	            _onMouseEvent$1.call(this, 'dragstart', event.origDomEvent);
-	        }
-
-	        _onMouseEvent$1.call(this, 'drag', event.origDomEvent);
-	    }
-	};
-
-	var _onMouseEvent$1	= function( eventName, domEvent )
-	{
-	    var mouseCoords = getRelativeMouseXY( domEvent );
-	    this._onEvent(eventName, mouseCoords.x, mouseCoords.y, domEvent);
+	    if ( this.stateMouse.mousedown ) {
+	        console.log("drag");
+	    } 
+	    return;
 	};
 
 
@@ -51598,17 +51612,18 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 	        this.stateMouse.dragging = false;
 
 	        this._mousedownd = {};
-
 	        this._draggingObjs = {};
 
-	        this._$onDragStart	= function(){ _onMousedown.apply( _this, arguments ); };
+	        this._$onMouseDownDrag = function(){ _onMousedown.apply( _this, arguments ); };
+	        //this._$onDragStart	= function(){ _onMousedown.apply( _this, arguments ); };
 	        this._$onDragging	= function(){ _onMousemove.apply(_this, arguments);	};
 	        this._$onMouseUpDrag = function(){ _onMouseupDrag.apply( _this, arguments );	};
+	        this._$onMouseMoveDrag = function(){  _onMousemove.apply( _this, arguments ); };
 	    },
 
 	    addEventListener : function( object3d, eventName, callback, opt ) { 
 	        var scope = this;
-	console.log("addEventListener", eventName);
+	console.log("ääää");
 	        if ( eventName === "drag" ) {
 	            if( !this.hasListener(object3d, "mousedown") ){
 	                this.addEventListener( object3d, "mousedown", "mousedown" );
@@ -51623,16 +51638,16 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 	    },
 
 	    enable : function() { 
-	        //this._domElement.addEventListener( 'mousedown'	, this._$onMouseDown	, false );
+	        this._domElement.addEventListener( 'mousedown'	, this._$onMouseDownDrag	, false );
 	        this._domElement.addEventListener( 'mouseup'	, this._$onMouseUpDrag		, false );
-	        //this._domElement.addEventListener( 'mousemove'	, this._$onMouseMove	, false );
+	        this._domElement.addEventListener( 'mousemove'	, this._$onMouseMoveDrag	, false );
 	        
 	    },
 
 	    disable : function() {
-	        //this._domElement.removeEventListener( 'mousedown', this._$onMouseDown	, false );
+	        this._domElement.removeEventListener( 'mousedown', this._$onMouseDownDrag	, false );
 	        this._domElement.removeEventListener( 'mouseup', this._$onMouseUpDrag		, false );
-	        //this._domElement.removeEventListener( 'mousemove', this._$onMouseMove	, false );
+	        this._domElement.removeEventListener( 'mousemove', this._$onMouseMoveDrag	, false );
 	        
 	    }
 	};

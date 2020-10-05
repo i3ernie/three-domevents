@@ -593,8 +593,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
 			var useCapture = opt.useCapture || false;
 			var scope = this;
-	console.log("++addEventListener", eventName);
-			extensions.forEach(function( ext ){ console.log(ext);
+
+			extensions.forEach(function( ext ){ 
 				if ( ext.addEventListener ) { ext.addEventListener.call( _this, object3d, eventName, callback, opt ); }
 			});
 
@@ -800,11 +800,15 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
 			function add ( obj ){
 
-				if( obj.userData.preventDomevents ) { return; }
+				if( obj.userData.preventDomevents ) {
+					return;
+				}
 
 				DomEvents.eventNames.forEach( function( eventName ) {
 
-					if( scope.hasListener( obj, eventName ) ) { return; }
+					if( scope.hasListener( obj, eventName ) ) {
+						return;
+					}
 
 					scope.bind( obj, eventName, eventName, false );
 					
@@ -949,6 +953,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 		//console.log('eventName', eventName, 'boundObjs', this._boundObjs[eventName])
 			// get objects bound to this event
 			var boundObjs	= this._boundObjs[eventName];
+			var i = 0;
+
 			if( boundObjs === undefined || boundObjs.length === 0 )	{ return; }
 			// compute the intersection
 			var vector	= new three_module_js.Vector3( mouseX, mouseY, 0.5 );
@@ -981,7 +987,18 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 				return;
 			}
 
-			this._notify(eventName, object3d, origDomEvent, intersect);
+			var doIntersect = this._notify(eventName, object3d, origDomEvent, intersect);
+			
+			while ( doIntersect && intersects[i+1] ){
+				i++;
+				intersect = intersects[i];
+				var object3d$1	= intersect.object;
+				var objectCtx$1	= this._objectCtxGet(object3d$1);
+				if( !objectCtx$1 ) { 
+					return;
+				}
+				doIntersect = this._notify(eventName, object3d$1, origDomEvent, intersect);
+			}
 		},
 
 		_notify	: function( eventName, object3d, origDomEvent, intersect )
@@ -995,12 +1012,13 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 			// if no handler do bubbling
 			if( !objectCtx || !handlers || handlers.length === 0 ){ 
 				if ( object3d.parent ) { this._notify( eventName, object3d.parent, origDomEvent, intersect ); }
-				return;
+				return false;
 			}
 
 			// notify all handlers
 			handlers = objectCtx[eventName+'Handlers'];
 			var toPropagate	= true;
+			var toIntersect = false;
 			var capture = false;
 
 			var stopPropagation = function () {
@@ -1008,6 +1026,9 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 			};
 			var preventDefault = function() {
 				capture = true;
+			};
+			var nextIntersect = function(){
+				toIntersect = true;
 			};
 			
 			for( var i = 0; i < handlers.length; i++ ) {
@@ -1022,7 +1043,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 						origDomEvent: origDomEvent,
 						intersect: intersect,
 						stopPropagation: stopPropagation,
-						preventDefault : preventDefault
+						preventDefault : preventDefault,
+						nextIntersect : nextIntersect
 					});
 				}
 				else if ( typeof handler.callback === "string" && typeof object3d.dispatchEvent === "function" ) {
@@ -1032,7 +1054,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 						origDomEvent: origDomEvent,
 						intersect: intersect,
 						stopPropagation: stopPropagation,
-						preventDefault : preventDefault
+						preventDefault : preventDefault,
+						nextIntersect : nextIntersect
 					});
 				}
 				
@@ -1045,6 +1068,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 			if( toPropagate && object3d.parent ) {
 				this._notify( eventName, object3d.parent, origDomEvent, intersect );
 			}
+			return toIntersect;
 		}
 
 	});
