@@ -206,8 +206,8 @@ Object.assign( DomEvents.prototype,  {
 
 		let useCapture = opt.useCapture || false;
 		let scope = this;
-console.log("++addEventListener", eventName);
-		extensions.forEach(function( ext ){ console.log(ext);
+
+		extensions.forEach(function( ext ){ 
 			if ( ext.addEventListener ) ext.addEventListener.call( _this, object3d, eventName, callback, opt );
 		});
 
@@ -413,11 +413,15 @@ console.log("++addEventListener", eventName);
 
 		function add ( obj ){
 
-			if( obj.userData.preventDomevents ) return;
+			if( obj.userData.preventDomevents ) {
+				return;
+			}
 
 			DomEvents.eventNames.forEach( function( eventName ) {
 
-				if( scope.hasListener( obj, eventName ) ) return;
+				if( scope.hasListener( obj, eventName ) ) {
+					return;
+				}
 
 				scope.bind( obj, eventName, eventName, false );
 				
@@ -564,6 +568,8 @@ console.log("++addEventListener", eventName);
 	//console.log('eventName', eventName, 'boundObjs', this._boundObjs[eventName])
 		// get objects bound to this event
 		let boundObjs	= this._boundObjs[eventName];
+		let i = 0;
+
 		if( boundObjs === undefined || boundObjs.length === 0 )	return;
 		// compute the intersection
 		let vector	= new Vector3( mouseX, mouseY, 0.5 );
@@ -596,7 +602,18 @@ console.log("++addEventListener", eventName);
 			return;
 		}
 
-		this._notify(eventName, object3d, origDomEvent, intersect);
+		let doIntersect = this._notify(eventName, object3d, origDomEvent, intersect);
+		
+		while ( doIntersect && intersects[i+1] ){
+			i++;
+			intersect = intersects[i];
+			let object3d	= intersect.object;
+			let objectCtx	= this._objectCtxGet(object3d);
+			if( !objectCtx ) { 
+				return;
+			}
+			doIntersect = this._notify(eventName, object3d, origDomEvent, intersect);
+		}
 	},
 
 	_notify	: function( eventName, object3d, origDomEvent, intersect )
@@ -610,12 +627,13 @@ console.log("++addEventListener", eventName);
 		// if no handler do bubbling
 		if( !objectCtx || !handlers || handlers.length === 0 ){ 
 			if ( object3d.parent ) this._notify( eventName, object3d.parent, origDomEvent, intersect );
-			return;
+			return false;
 		}
 
 		// notify all handlers
 		handlers = objectCtx[eventName+'Handlers'];
 		let toPropagate	= true;
+		let toIntersect = false;
 		let capture = false;
 
 		const stopPropagation = function () {
@@ -623,6 +641,9 @@ console.log("++addEventListener", eventName);
 		};
 		const preventDefault = function() {
 			capture = true;
+		};
+		const nextIntersect = function(){
+			toIntersect = true;
 		};
 		
 		for( let i = 0; i < handlers.length; i++ ) {
@@ -637,7 +658,8 @@ console.log("++addEventListener", eventName);
 					origDomEvent: origDomEvent,
 					intersect: intersect,
 					stopPropagation: stopPropagation,
-					preventDefault : preventDefault
+					preventDefault : preventDefault,
+					nextIntersect : nextIntersect
 				});
 			}
 			else if ( typeof handler.callback === "string" && typeof object3d.dispatchEvent === "function" ) {
@@ -647,7 +669,8 @@ console.log("++addEventListener", eventName);
 					origDomEvent: origDomEvent,
 					intersect: intersect,
 					stopPropagation: stopPropagation,
-					preventDefault : preventDefault
+					preventDefault : preventDefault,
+					nextIntersect : nextIntersect
 				});
 			}
 			
@@ -660,6 +683,7 @@ console.log("++addEventListener", eventName);
 		if( toPropagate && object3d.parent ) {
 			this._notify( eventName, object3d.parent, origDomEvent, intersect );
 		}
+		return toIntersect;
 	}
 
 });
