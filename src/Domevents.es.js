@@ -332,7 +332,11 @@ Object.assign( DomEvents.prototype,  {
 
 	removeFromDom : function( object3d, opt ) {
 
-		let options = Object.assign({recursive : true}, opt);
+		let defaults = {
+			recursive : true
+		};
+
+		let options = Object.assign(defaults, opt);
 		let scope = this;
 
 		if ( !( object3d instanceof Object3D ) ){
@@ -397,7 +401,13 @@ Object.assign( DomEvents.prototype,  {
 	 */
 	addToDom : function( object3d, opt ){
 
-		let options = Object.assign({recursive : true, useCapture: false, bindFunctions : true}, opt);
+		let defaults = {
+			recursive : true, 
+			useCapture: false, 
+			bindFunctions : true
+		};
+
+		let options = Object.assign( defaults, opt );
 		let scope = this;
 
 		if ( !( object3d instanceof Object3D ) ) {
@@ -429,7 +439,7 @@ Object.assign( DomEvents.prototype,  {
 					DomEvents.eventMapping[eventName] && 
 					typeof obj[ DomEvents.eventMapping[eventName] ] === "function" ) 
 				{	
-					scope.bind( obj, eventName, obj[DomEvents.eventMapping[eventName]], options.useCapture );
+					scope.bind( obj, eventName, obj[DomEvents.eventMapping[eventName]].bind(obj), options.useCapture );
 				}
 
 			});
