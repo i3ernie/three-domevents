@@ -86,7 +86,7 @@ const DomeventDrag = {
 
     addEventListener : function( object3d, eventName, callback, opt ) { 
         let scope = this;
-
+console.log("ääää");
         if ( eventName === "drag" ) {
             if( !this.hasListener(object3d, "mousedown") ){
                 this.addEventListener( object3d, "mousedown", "mousedown" );
