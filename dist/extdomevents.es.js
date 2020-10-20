@@ -50944,6 +50944,73 @@ var DomeventTouch = {
 	/** @namespace */
 var extensions = [];
 
+var _addEvents = function ( obj, options ) {
+	var scope = this;
+
+	if( obj.userData.preventDomevents ) {
+		return;
+	}
+
+	DomEvents.eventNames.forEach( function( eventName ) {
+
+		if( scope.hasListener( obj, eventName ) ) {
+			return;
+		}
+
+		scope.bind( obj, eventName, eventName, false );
+		
+		if ( options.bindFunctions && 
+			DomEvents.eventMapping[eventName] && 
+			typeof obj[ DomEvents.eventMapping[eventName] ] === "function" ) 
+		{	
+			scope.bind( obj, eventName, obj[DomEvents.eventMapping[eventName]].bind(obj), options.useCapture );
+		}
+
+	});
+
+	if ( options.recursive && obj.children.length > 0 ) {
+		obj.children.forEach( function( child ){
+			_addEvents.call(scope, child, options );
+		});
+	}
+};
+
+var _removeEvents = function( obj, options ){
+
+	var scope = this;
+
+	if ( this._objectCtxIsInit( obj ) ) {
+		this._objectCtxDeinit( obj );
+	}
+
+	var index;
+	var boundObjs;
+
+	DomEvents.eventNames.forEach( function( eventName ) {
+
+		boundObjs = scope._boundObjs[eventName];
+
+		if( boundObjs ) {
+
+			index = boundObjs.indexOf( obj );
+
+			while ( index > -1 ) {
+
+				boundObjs.splice( index, 1 );
+				index = boundObjs.indexOf( obj );
+			}
+		}
+	});
+	
+	//das ganze fuer alle kinder 
+	if ( options.recursive && obj.children.length > 0 ) {
+
+		obj.children.forEach( function( child ) {
+			_removeEvents.call( scope, child, options );
+		});
+	}
+};
+
 
 // # Constructor
 var DomEvents = function( camera, domElement )
@@ -51210,9 +51277,6 @@ Object.assign( DomEvents.prototype,  {
 			recursive : true
 		};
 
-		var options = Object.assign(defaults, opt);
-		var scope = this;
-
 		if ( !( object3d instanceof Object3D ) ){
 
 			if ( object3d.target ) {
@@ -51223,42 +51287,9 @@ Object.assign( DomEvents.prototype,  {
 			}
 		}
 
-		function _remove( obj ){
-
-			if ( obj._3xDomEvent ) {
-				scope._objectCtxDeinit( obj );
-			}
-
-			var index;
-			var boundObjs;
-
-			DomEvents.eventNames.forEach( function( eventName ) {
-
-				boundObjs = scope._boundObjs[eventName];
-
-				if( boundObjs ) {
-
-					index = boundObjs.indexOf( obj );
-
-					while ( index > -1 ) {
-
-						boundObjs.splice( index, 1 );
-						index = boundObjs.indexOf( obj );
-					}
-				}
-			});
-			
-			//das ganze fuer alle kinder 
-			if ( options.recursive && obj.children.length > 0 ) {
-
-				obj.children.forEach( function( child ){
-					_remove( child );
-				});
-			}
-		}
 		
 		//und los gehts aufraeumen...
-		_remove( object3d );
+		_removeEvents.call(this, object3d, Object.assign({}, defaults, opt ) );
 	
 	},
 
@@ -51281,9 +51312,6 @@ Object.assign( DomEvents.prototype,  {
 			bindFunctions : true
 		};
 
-		var options = Object.assign( defaults, opt );
-		var scope = this;
-
 		if ( !( object3d instanceof Object3D ) ) {
 
 			//event object?
@@ -51295,38 +51323,8 @@ Object.assign( DomEvents.prototype,  {
 			}
 		}
 
-		function add ( obj ){
-
-			if( obj.userData.preventDomevents ) {
-				return;
-			}
-
-			DomEvents.eventNames.forEach( function( eventName ) {
-
-				if( scope.hasListener( obj, eventName ) ) {
-					return;
-				}
-
-				scope.bind( obj, eventName, eventName, false );
-				
-				if ( options.bindFunctions && 
-					DomEvents.eventMapping[eventName] && 
-					typeof obj[ DomEvents.eventMapping[eventName] ] === "function" ) 
-				{	
-					scope.bind( obj, eventName, obj[DomEvents.eventMapping[eventName]].bind(obj), options.useCapture );
-				}
-
-			});
-
-			if ( options.recursive && obj.children.length > 0 ) {
-				obj.children.forEach( function( child ){
-					add( child );
-				});
-			}
-		}
-
 		//start register all known events
-		add( object3d );
+		_addEvents.call(this, object3d, Object.assign({}, defaults, opt ) );
 	},
 
 	removeMappedListener :function ( object3d ){
@@ -51343,8 +51341,8 @@ Object.assign( DomEvents.prototype,  {
 	},
 
 	activate : function( object3d, opt ){
-		var options = Object.assign({observe:true}, opt);
 
+		var options = Object.assign({observe:true}, opt);
 		
 		this.addToDom( object3d, opt );
 		
