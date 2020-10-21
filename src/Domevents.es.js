@@ -156,11 +156,18 @@ const DomEvents = function( camera, domElement )
 	this.firstClick 	= false;
 	this.delay = 300;
 
-	this._boundDomEvents = { };
-	this._boundDomEvents[defaults.defaultEventGroup] = {};
+	let name = defaults.defaultEventGroup;
 
-	this.aktEventGroupName = defaults.defaultEventGroup;
-	this.aktEventGroup = this._boundDomEvents[defaults.defaultEventGroup];
+	this._boundDomEvents = {};
+	this._boundObjsGroup = {};
+	
+	this._boundDomEvents[name] = {};
+	this._boundObjsGroup[name] = {};
+
+	
+	this.aktEventGroupName = name;
+	this.aktEventGroup = this._boundDomEvents[name];
+	this._boundObjs = this._boundObjsGroup[name];
 
 	this.timeStamp = null;
 
@@ -247,6 +254,7 @@ Object.assign( DomEvents.prototype,  {
 	// handle domevent context in object3d instance
 
 	addEventGroup : function( name ) {
+
 		if ( defaults.defaultEventGroup === name ){
 			console.warn( "no valid name!" );
 			return this;
@@ -257,6 +265,9 @@ Object.assign( DomEvents.prototype,  {
 		}
 
 		this._boundDomEvents[name] = {};
+		this._boundObjsGroup[name] = {};
+		//this._boundObjs
+		return this;
 	},
 	
 	deleteEventGroup : function( name ){
@@ -267,13 +278,18 @@ Object.assign( DomEvents.prototype,  {
 		if ( this._boundDomEvents[name] ) {
 			this.aktEventGroupName = name;
 			this.aktEventGroup = this._boundDomEvents[name];
+			this._boundObjs = this._boundObjsGroup[name];
 		}
 		return this;
 	},
 	
 	resetEventGroup : function() {
-		this.aktEventGroupName = defaults.defaultEventGroup;
-		this.aktEventGroup = this._boundDomEvents[defaults.defaultEventGroup];
+		let name = defaults.defaultEventGroup;
+		
+		this.aktEventGroupName = name;
+		this.aktEventGroup = this._boundDomEvents[name];
+		this._boundObjs = this._boundObjsGroup[name];
+
 		return this;
 	},
 	
@@ -646,7 +662,7 @@ Object.assign( DomEvents.prototype,  {
 		if( intersects.length === 0 ) {
 			return;
 		}
-		
+
 		// init some vairables
 		let intersect	= intersects[0];
 		let object3d	= intersect.object;
