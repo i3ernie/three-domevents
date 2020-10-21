@@ -687,7 +687,7 @@ Object.assign( DomEvents.prototype,  {
 
 		// do bubbling
 		if( toPropagate && object3d.parent ) {
-			this._notify( eventName, object3d.parent, origDomEvent, intersect );
+			toIntersect = this._notify( eventName, object3d.parent, origDomEvent, intersect );
 		}
 		return toIntersect;
 	}
