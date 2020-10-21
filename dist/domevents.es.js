@@ -112,33 +112,49 @@ var _onMove = function( eventName, mouseX, mouseY, origDomEvent )
     var notifyOver, notifyOut, notifyMove;
     var intersect;
     var newSelected;
+    var i = 0;
+    var doIntersect = true;
 
-    if( intersects.length > 0 ){
-        intersect	= intersects[ 0 ];
-        newSelected	= intersect.object;
+    while ( doIntersect ) {
+        
+        doIntersect = false;
 
-        this._selected	= newSelected;
-        // if newSelected bound mousemove, notify it
-        notifyMove	= this._bound('mousemove', newSelected);
+        if ( intersects.length > 0 ){
+            intersect	= intersects[ i ];
+            newSelected	= intersect.object;
 
-        if( oldSelected !== newSelected ){
-            // if newSelected bound mouseenter, notify it
-            notifyOver	= this._bound('mouseover', newSelected);
+            this._selected	= newSelected;
+            // if newSelected bound mousemove, notify it
+            notifyMove	= this._bound('mousemove', newSelected);
+
+            if ( oldSelected !== newSelected ) {
+                // if newSelected bound mouseenter, notify it
+                notifyOver	= this._bound('mouseover', newSelected);
+                // if there is a oldSelect and oldSelected bound mouseleave, notify it
+                notifyOut	= oldSelected && this._bound('mouseout', oldSelected);
+            }
+
+        } else {
             // if there is a oldSelect and oldSelected bound mouseleave, notify it
             notifyOut	= oldSelected && this._bound('mouseout', oldSelected);
+            this._selected	= null;
         }
-    }else {
-        // if there is a oldSelect and oldSelected bound mouseleave, notify it
-        notifyOut	= oldSelected && this._bound('mouseout', oldSelected);
-        this._selected	= null;
-    }
+        i++;
 
-    // notify mouseMove - done at the end with a copy of the list to allow callback to remove handlers
-    notifyMove && this._notify('mousemove', newSelected, origDomEvent, intersect);
-    // notify mouseEnter - done at the end with a copy of the list to allow callback to remove handlers
-    notifyOver && this._notify('mouseover', newSelected, origDomEvent, intersect);
-    // notify mouseLeave - done at the end with a copy of the list to allow callback to remove handlers
-    notifyOut  && this._notify('mouseout' , oldSelected, origDomEvent, intersect);
+        // notify mouseMove - done at the end with a copy of the list to allow callback to remove handlers
+        if (notifyMove) {
+            doIntersect = this._notify('mousemove', newSelected, origDomEvent, intersect);
+        }
+        // notify mouseEnter - done at the end with a copy of the list to allow callback to remove handlers
+        if (notifyOver) {
+            this._notify('mouseover', newSelected, origDomEvent, intersect);
+        }
+        // notify mouseLeave - done at the end with a copy of the list to allow callback to remove handlers
+        if (notifyOut) {
+            this._notify('mouseout' , oldSelected, origDomEvent, intersect);
+        }
+       
+    }
 };
 
 
@@ -524,6 +540,10 @@ var _removeEvents = function( obj, options ){
 	}
 };
 
+var defaults = {
+	"defaultEventGroup" : "_default"
+};
+
 
 // # Constructor
 var DomEvents = function( camera, domElement )
@@ -538,6 +558,12 @@ var DomEvents = function( camera, domElement )
 	var _this			= this;
 	this.firstClick 	= false;
 	this.delay = 300;
+
+	this._boundDomEvents = { };
+	this._boundDomEvents[defaults.defaultEventGroup] = {};
+
+	this.aktEventGroupName = defaults.defaultEventGroup;
+	this.aktEventGroup = this._boundDomEvents[defaults.defaultEventGroup];
 
 	this.timeStamp = null;
 
@@ -623,21 +649,63 @@ Object.assign( DomEvents.prototype,  {
 
 	// handle domevent context in object3d instance
 
-	_objectCtxInit	: function( object3d ) {
-		object3d._3xDomEvent = {};
+	addEventGroup : function( name ) {
+		if ( defaults.defaultEventGroup === name ){
+			console.warn( "no valid name!" );
+			return this;
+		}
+		if ( this._boundDomEvents[name] ) {
+			console.warn( "event group allready exists!" );
+			return this;
+		}
 
-		DomEvents.eventNames.forEach(function( eventName ){
-			object3d._3xDomEvent[eventName]	= [];
+		this._boundDomEvents[name] = {};
+	},
+	
+	deleteEventGroup : function( name ){
+		delete this._boundDomEvents[name];
+	},
+
+	switchEventGroup : function( name ) {
+		if ( this._boundDomEvents[name] ) {
+			this.aktEventGroupName = name;
+			this.aktEventGroup = this._boundDomEvents[name];
+		}
+		return this;
+	},
+	
+	resetEventGroup : function() {
+		this.aktEventGroupName = defaults.defaultEventGroup;
+		this.aktEventGroup = this._boundDomEvents[defaults.defaultEventGroup];
+		return this;
+	},
+	
+	hasEventGroup : function( name ){
+		return this._boundDomEvents.hasOwnProperty( name );
+	},
+
+	getEventGroupName : function(){
+		return this.aktEventGroupName;
+	},
+
+	_objectCtxInit	: function( object3d ) {
+		var scope = this;
+		this.aktEventGroup[object3d.id] = {};
+
+
+		DomEvents.eventNames.forEach( function( eventName ){
+			scope.aktEventGroup[object3d.id][eventName] = [];
+
 		});
 	},
 	_objectCtxDeinit : function( object3d ) {
-		delete object3d._3xDomEvent;
+		delete this.aktEventGroup[object3d.id];
 	},
 	_objectCtxIsInit : function( object3d ) {
-		return !!object3d._3xDomEvent;
+		return !!this.aktEventGroup[object3d.id];
 	},
-	_objectCtxGet : function( object3d ) {
-		return object3d._3xDomEvent;
+	_objectCtxGet : function( object3d ) { 
+		return this.aktEventGroup[object3d.id];
 	},
 	/********************************************************************************/
 	/*										*/
@@ -977,13 +1045,11 @@ Object.assign( DomEvents.prototype,  {
 			return;
 		}
 
-		//console.log("RHinter ",eventName, " ", intersects );
-
-
 		// if there are no intersections, return now
 		if( intersects.length === 0 ) {
 			return;
 		}
+		
 		// init some vairables
 		var intersect	= intersects[0];
 		var object3d	= intersect.object;
@@ -1074,7 +1140,7 @@ Object.assign( DomEvents.prototype,  {
 
 		// do bubbling
 		if( toPropagate && object3d.parent ) {
-			this._notify( eventName, object3d.parent, origDomEvent, intersect );
+			toIntersect = this._notify( eventName, object3d.parent, origDomEvent, intersect );
 		}
 		return toIntersect;
 	}
