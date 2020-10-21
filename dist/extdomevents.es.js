@@ -50902,6 +50902,75 @@ var DomeventTouch = {
     }
 };
 
+var defaults = {
+	"defaultEventGroup" : "_default"
+};
+
+var Eventgroups = {
+    interface : {
+        addEventGroup : function( name ) {
+
+            if ( defaults.defaultEventGroup === name ){
+                console.warn( "no valid name!" );
+                return this;
+            }
+            if ( this._boundDomEvents[name] ) {
+                console.warn( "event group allready exists!" );
+                return this;
+            }
+    
+            this._boundDomEvents[name] = {};
+            this._boundObjsGroup[name] = {};
+            
+            return this;
+        },
+        
+        deleteEventGroup : function( name ){
+            delete this._boundDomEvents[name];
+        },
+    
+        switchEventGroup : function( name ) {
+            if ( this._boundDomEvents[name] ) {
+                this.aktEventGroupName = name;
+                this.aktEventGroup = this._boundDomEvents[name];
+                this._boundObjs = this._boundObjsGroup[name];
+            }
+            return this;
+        },
+        
+        resetEventGroup : function() {
+            var name = defaults.defaultEventGroup;
+            
+            this.aktEventGroupName = name;
+            this.aktEventGroup = this._boundDomEvents[name];
+            this._boundObjs = this._boundObjsGroup[name];
+    
+            return this;
+        },
+        
+        hasEventGroup : function( name ){
+            return this._boundDomEvents.hasOwnProperty( name );
+        },
+    
+        getEventGroupName : function(){
+            return this.aktEventGroupName;
+        }
+    },
+    initialize : function( name ){
+        name = name || defaults.defaultEventGroup;
+        this._boundDomEvents = {};
+        this._boundObjsGroup = {};
+    
+        this._boundDomEvents[name] = {};
+        this._boundObjsGroup[name] = {};
+    
+        
+        this.aktEventGroupName = name;
+        this.aktEventGroup = this._boundDomEvents[name];
+        this._boundObjs = this._boundObjsGroup[name];
+    }
+};
+
 /** This THREEx helper makes it easy to handle the mouse events in your 3D scene
 
    * CHANGES NEEDED
@@ -51027,10 +51096,6 @@ var _removeEvents = function( obj, options ){
 	}
 };
 
-var defaults = {
-	"defaultEventGroup" : "_default"
-};
-
 
 // # Constructor
 var DomEvents = function( camera, domElement )
@@ -51046,14 +51111,10 @@ var DomEvents = function( camera, domElement )
 	this.firstClick 	= false;
 	this.delay = 300;
 
-	this._boundDomEvents = { };
-	this._boundDomEvents[defaults.defaultEventGroup] = {};
 
-	this.aktEventGroupName = defaults.defaultEventGroup;
-	this.aktEventGroup = this._boundDomEvents[defaults.defaultEventGroup];
+	Eventgroups.initialize.call( this );
 
 	this.timeStamp = null;
-
 	
 	this.onRemove = function(){ _this.removeFromDom.apply( _this, arguments ); };
 	this.onAdd = function(){ _this.addToDom.apply( _this, arguments ); };
@@ -51100,7 +51161,7 @@ DomEvents.hasEvent = function( eventName ) {
 	return DomEvents.eventNames.indexOf( eventName ) !== -1;
 };
 
-Object.assign( DomEvents.prototype,  {
+Object.assign( DomEvents.prototype, Eventgroups.interface, {
 
 	enable : function() {
 
@@ -51135,45 +51196,6 @@ Object.assign( DomEvents.prototype,  {
 	/********************************************************************************/
 
 	// handle domevent context in object3d instance
-
-	addEventGroup : function( name ) {
-		if ( defaults.defaultEventGroup === name ){
-			console.warn( "no valid name!" );
-			return this;
-		}
-		if ( this._boundDomEvents[name] ) {
-			console.warn( "event group allready exists!" );
-			return this;
-		}
-
-		this._boundDomEvents[name] = {};
-	},
-	
-	deleteEventGroup : function( name ){
-		delete this._boundDomEvents[name];
-	},
-
-	switchEventGroup : function( name ) {
-		if ( this._boundDomEvents[name] ) {
-			this.aktEventGroupName = name;
-			this.aktEventGroup = this._boundDomEvents[name];
-		}
-		return this;
-	},
-	
-	resetEventGroup : function() {
-		this.aktEventGroupName = defaults.defaultEventGroup;
-		this.aktEventGroup = this._boundDomEvents[defaults.defaultEventGroup];
-		return this;
-	},
-	
-	hasEventGroup : function( name ){
-		return this._boundDomEvents.hasOwnProperty( name );
-	},
-
-	getEventGroupName : function(){
-		return this.aktEventGroupName;
-	},
 
 	_objectCtxInit	: function( object3d ) {
 		var scope = this;
@@ -51536,7 +51558,7 @@ Object.assign( DomEvents.prototype,  {
 		if( intersects.length === 0 ) {
 			return;
 		}
-		
+
 		// init some vairables
 		var intersect	= intersects[0];
 		var object3d	= intersect.object;
