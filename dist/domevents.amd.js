@@ -434,6 +434,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 	    
 	            this._boundDomEvents[name] = {};
 	            this._boundObjsGroup[name] = {};
+
 	            
 	            return this;
 	        },
@@ -479,8 +480,10 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 	    
 	        
 	        this.aktEventGroupName = name;
+
 	        this.aktEventGroup = this._boundDomEvents[name];
 	        this._boundObjs = this._boundObjsGroup[name];
+
 	    }
 	};
 
@@ -619,6 +622,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 		this._selected		= null;
 		this._boundObjs		= {};
 		this.enabled = false;
+		
 		// Bind dom event for mouse and touch
 		var _this			= this;
 		this.firstClick 	= false;

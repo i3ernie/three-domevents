@@ -144,16 +144,13 @@ function init() {
 }
 
 
-
-
 function logEvent( ev ){
     console.log( "eventListener: " + ev.type + " for " + ev.target.name + " <--on-- ", ev.intersect.object.name );
 }
 function logOnClick( ev ){
-    console.log("this: ", this, "target.name " + ev.target.name + " = this.name " + this.name );
+    console.log( "target.name " + ev.target.name + " = this.name " + this.name );
     console.log( ev.target.name + ".onClick: " );
 }
-
 
 
 function remove( ev ){

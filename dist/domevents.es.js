@@ -434,6 +434,7 @@ var Eventgroups = {
     
             this._boundDomEvents[name] = {};
             this._boundObjsGroup[name] = {};
+
             
             return this;
         },
@@ -479,8 +480,10 @@ var Eventgroups = {
     
         
         this.aktEventGroupName = name;
+
         this.aktEventGroup = this._boundDomEvents[name];
         this._boundObjs = this._boundObjsGroup[name];
+
     }
 };
 
@@ -619,6 +622,7 @@ var DomEvents = function( camera, domElement )
 	this._selected		= null;
 	this._boundObjs		= {};
 	this.enabled = false;
+	
 	// Bind dom event for mouse and touch
 	var _this			= this;
 	this.firstClick 	= false;

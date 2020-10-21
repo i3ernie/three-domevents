@@ -17,6 +17,7 @@ const Eventgroups = {
     
             this._boundDomEvents[name] = {};
             this._boundObjsGroup[name] = {};
+
             
             return this;
         },
@@ -62,8 +63,10 @@ const Eventgroups = {
     
         
         this.aktEventGroupName = name;
+
         this.aktEventGroup = this._boundDomEvents[name];
         this._boundObjs = this._boundObjsGroup[name];
+
     }
 };
 

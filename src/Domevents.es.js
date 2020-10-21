@@ -152,6 +152,7 @@ const DomEvents = function( camera, domElement )
 	this._selected		= null;
 	this._boundObjs		= {};
 	this.enabled = false;
+	
 	// Bind dom event for mouse and touch
 	let _this			= this;
 	this.firstClick 	= false;
