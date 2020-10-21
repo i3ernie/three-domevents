@@ -55,6 +55,14 @@ function init() {
 
     mesh1.addEventListener("click", logEvent );
     mesh1.onClick = logOnClick;
+    mesh1.onMouseout = function( ev ){
+        console.log("out", ev.target.name, ev.intersect);
+        ev.stopPropagation();
+    };
+    mesh1.onMouseover = function( ev ){
+        console.log("over", ev.target.name, ev.intersect);
+        ev.stopPropagation();
+    };
 
 
 
