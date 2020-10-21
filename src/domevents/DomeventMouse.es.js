@@ -67,33 +67,49 @@ const _onMove = function( eventName, mouseX, mouseY, origDomEvent )
     let notifyOver, notifyOut, notifyMove;
     let intersect;
     let newSelected;
+    let i = 0;
+    let doIntersect = true;
 
-    if( intersects.length > 0 ){
-        intersect	= intersects[ 0 ];
-        newSelected	= intersect.object;
+    while ( doIntersect ) {
+        
+        doIntersect = false;
 
-        this._selected	= newSelected;
-        // if newSelected bound mousemove, notify it
-        notifyMove	= this._bound('mousemove', newSelected);
+        if ( intersects.length > 0 ){
+            intersect	= intersects[ i ];
+            newSelected	= intersect.object;
 
-        if( oldSelected !== newSelected ){
-            // if newSelected bound mouseenter, notify it
-            notifyOver	= this._bound('mouseover', newSelected);
+            this._selected	= newSelected;
+            // if newSelected bound mousemove, notify it
+            notifyMove	= this._bound('mousemove', newSelected);
+
+            if ( oldSelected !== newSelected ) {
+                // if newSelected bound mouseenter, notify it
+                notifyOver	= this._bound('mouseover', newSelected);
+                // if there is a oldSelect and oldSelected bound mouseleave, notify it
+                notifyOut	= oldSelected && this._bound('mouseout', oldSelected);
+            }
+
+        } else {
             // if there is a oldSelect and oldSelected bound mouseleave, notify it
             notifyOut	= oldSelected && this._bound('mouseout', oldSelected);
+            this._selected	= null;
         }
-    }else{
-        // if there is a oldSelect and oldSelected bound mouseleave, notify it
-        notifyOut	= oldSelected && this._bound('mouseout', oldSelected);
-        this._selected	= null;
-    }
+        i++;
 
-    // notify mouseMove - done at the end with a copy of the list to allow callback to remove handlers
-    notifyMove && this._notify('mousemove', newSelected, origDomEvent, intersect);
-    // notify mouseEnter - done at the end with a copy of the list to allow callback to remove handlers
-    notifyOver && this._notify('mouseover', newSelected, origDomEvent, intersect);
-    // notify mouseLeave - done at the end with a copy of the list to allow callback to remove handlers
-    notifyOut  && this._notify('mouseout' , oldSelected, origDomEvent, intersect);
+        // notify mouseMove - done at the end with a copy of the list to allow callback to remove handlers
+        if (notifyMove) {
+            doIntersect = this._notify('mousemove', newSelected, origDomEvent, intersect);
+        }
+        // notify mouseEnter - done at the end with a copy of the list to allow callback to remove handlers
+        if (notifyOver) {
+            this._notify('mouseover', newSelected, origDomEvent, intersect);
+        }
+        // notify mouseLeave - done at the end with a copy of the list to allow callback to remove handlers
+        if (notifyOut) {
+            this._notify('mouseout' , oldSelected, origDomEvent, intersect);
+        }
+       
+    }
 };
 
 

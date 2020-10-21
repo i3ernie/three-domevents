@@ -137,6 +137,10 @@ const _removeEvents = function( obj, options ){
 	}
 };
 
+const defaults = {
+	"defaultEventGroup" : "_default"
+};
+
 
 // # Constructor
 const DomEvents = function( camera, domElement )
@@ -151,6 +155,12 @@ const DomEvents = function( camera, domElement )
 	let _this			= this;
 	this.firstClick 	= false;
 	this.delay = 300;
+
+	this._boundDomEvents = { };
+	this._boundDomEvents[defaults.defaultEventGroup] = {};
+
+	this.aktEventGroupName = defaults.defaultEventGroup;
+	this.aktEventGroup = this._boundDomEvents[defaults.defaultEventGroup];
 
 	this.timeStamp = null;
 
@@ -236,21 +246,63 @@ Object.assign( DomEvents.prototype,  {
 
 	// handle domevent context in object3d instance
 
-	_objectCtxInit	: function( object3d ) {
-		object3d._3xDomEvent = {};
+	addEventGroup : function( name ) {
+		if ( defaults.defaultEventGroup === name ){
+			console.warn( "no valid name!" );
+			return this;
+		}
+		if ( this._boundDomEvents[name] ) {
+			console.warn( "event group allready exists!" );
+			return this;
+		}
 
-		DomEvents.eventNames.forEach(function( eventName ){
-			object3d._3xDomEvent[eventName]	= [];
+		this._boundDomEvents[name] = {};
+	},
+	
+	deleteEventGroup : function( name ){
+		delete this._boundDomEvents[name];
+	},
+
+	switchEventGroup : function( name ) {
+		if ( this._boundDomEvents[name] ) {
+			this.aktEventGroupName = name;
+			this.aktEventGroup = this._boundDomEvents[name];
+		}
+		return this;
+	},
+	
+	resetEventGroup : function() {
+		this.aktEventGroupName = defaults.defaultEventGroup;
+		this.aktEventGroup = this._boundDomEvents[defaults.defaultEventGroup];
+		return this;
+	},
+	
+	hasEventGroup : function( name ){
+		return this._boundDomEvents.hasOwnProperty( name );
+	},
+
+	getEventGroupName : function(){
+		return this.aktEventGroupName;
+	},
+
+	_objectCtxInit	: function( object3d ) {
+		let scope = this;
+		this.aktEventGroup[object3d.id] = {};
+
+
+		DomEvents.eventNames.forEach( function( eventName ){
+			scope.aktEventGroup[object3d.id][eventName] = [];
+
 		});
 	},
 	_objectCtxDeinit : function( object3d ) {
-		delete object3d._3xDomEvent;
+		delete this.aktEventGroup[object3d.id];
 	},
 	_objectCtxIsInit : function( object3d ) {
-		return !!object3d._3xDomEvent;
+		return !!this.aktEventGroup[object3d.id];
 	},
-	_objectCtxGet : function( object3d ) {
-		return object3d._3xDomEvent;
+	_objectCtxGet : function( object3d ) { 
+		return this.aktEventGroup[object3d.id];
 	},
 	/********************************************************************************/
 	/*										*/
@@ -590,13 +642,11 @@ Object.assign( DomEvents.prototype,  {
 			return;
 		}
 
-		//console.log("RHinter ",eventName, " ", intersects );
-
-
 		// if there are no intersections, return now
 		if( intersects.length === 0 ) {
 			return;
 		}
+		
 		// init some vairables
 		let intersect	= intersects[0];
 		let object3d	= intersect.object;
