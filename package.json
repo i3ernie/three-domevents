@@ -45,8 +45,9 @@
     "LICENSE",
     "README.md",
     "dist/domevents.es.js",
-    "dist/extdomevents.es.js",
     "dist/domevents.amd.js",
+    "dist/DomeventDrag.es.js",
+    "dist/DomeventDrag.amd.js",
     "package.json"
   ],
   "scripts": {
