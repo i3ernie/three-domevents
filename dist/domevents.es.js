@@ -636,9 +636,11 @@ var DomEvents = function( camera, domElement )
 	this.onRemove = function(){ _this.removeFromDom.apply( _this, arguments ); };
 	this.onAdd = function(){ _this.addToDom.apply( _this, arguments ); };
 
+	//init extensions
 	extensions.forEach(function( ext ){
 		ext.initialize.apply( _this, arguments );
 	});
+
 	DomEvents.eventNames.forEach(function( eventName ){
 		_this._boundObjs[eventName]	= [];
 	});

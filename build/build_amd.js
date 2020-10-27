@@ -47,7 +47,7 @@ const build_domevents = function( done ){
 const build_extdomevents = function( done ){
    
     rollup.rollup({
-        input : 'src/ExtendedDomevents.es.js',
+        input : 'src/domevents/DomeventDrag.es.js',
         external: ['../node_modules/three/build/three.module.js', 'three'],
         
         plugins:[
@@ -63,7 +63,7 @@ const build_extdomevents = function( done ){
         ]
     }).then(( bundle ) => { 
         bundle.write({
-            file: './dist/extdomevents.amd.js',
+            file: './dist/DomeventDrag.amd.js',
 
 
             plugins:[

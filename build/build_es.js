@@ -43,7 +43,7 @@ const build_domeventsES = function( done ){
 const build_extDomeventsES = function( done ){
    
     rollup.rollup({
-        input : 'src/ExtendedDomevents.es.js',
+        input : 'src/domevents/DomeventDrag.es.js',
         external: ['../node_modules/three/build/three.module.js'],
         
         plugins:[
@@ -59,7 +59,7 @@ const build_extDomeventsES = function( done ){
         ]
     }).then(( bundle ) => { 
         bundle.write({
-            file: './dist/extdomevents.es.js',
+            file: './dist/DomeventsDrag.es.js',
             plugins:[
                 replace({
                     "../node_modules/three/" : "../../three/"
@@ -73,7 +73,9 @@ const build_extDomeventsES = function( done ){
           });
           done();
     }).catch(
-        (err)=>{console.error(err);}
+        ( err ) => {
+            console.error(err);
+        }
     );
 };
 

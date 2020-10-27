@@ -1,21 +1,17 @@
-import getRelativeMouseXY from "../PointerTools.es.js";
-
-
-
 /*const _onMousedown = function( event ){ console.log("down");
     if ( event.intersect.object.id === event.target.id ){
         this._mousedownd[event.target.id] = event.target;
     }
 }; */
 
-const _onMousedown = function( ev ) { 
+var _onMousedown = function( ev ) { 
     this.stateMouse.mousedown = true;
     console.log("down", ev);
     //this._mousedownd[ ev.target.id ] = ev.target;
     
 };
 
-const _onMouseupDrag = function( event ){
+var _onMouseupDrag = function( event ){
 
     if ( this.stateMouse.dragging ) { 
         
@@ -23,7 +19,7 @@ const _onMouseupDrag = function( event ){
         this._onMouseEvent( "dragend", event );
 
         
-        for ( let key in this._draggingObjs ) { 
+        for ( var key in this._draggingObjs ) { 
             this._notify( "dragend", this._draggingObjs[key], event, null );
         }
         
@@ -32,7 +28,7 @@ const _onMouseupDrag = function( event ){
     this._mousedownd = {};
 };
 
-const _onMousemove = function( event ){ 
+var _onMousemove = function( event ){ 
     if ( this.stateMouse.mousedown && !this.stateMouse.dragging ) { 
         
         this.stateMouse.dragging = true;
@@ -42,14 +38,8 @@ const _onMousemove = function( event ){
     return;
 };
 
-const _onMouseEvent	= function( eventName, domEvent )
-{
-    let mouseCoords = getRelativeMouseXY( domEvent );
-    this._onEvent(eventName, mouseCoords.x, mouseCoords.y, domEvent);
-};
 
-
-const DomeventDrag = {
+var DomeventDrag = {
 
     eventNames : [
         "drag",
@@ -64,7 +54,7 @@ const DomeventDrag = {
     },
 
     initialize : function( ){
-        let _this = this; 
+        var _this = this; 
         
         this.stateMouse = this.stateMouse || {};    
         this.stateMouse.dragging = false;
@@ -78,15 +68,15 @@ const DomeventDrag = {
         this._$onMouseUpDrag = function(){ _onMouseupDrag.apply( _this, arguments );	};
         this._$onMouseMoveDrag = function(){  _onMousemove.apply( _this, arguments ); };
         
-        let addEventListener = this.addEventListener;
+        var addEventListener = this.addEventListener;
         this.addEventListener = DomeventDrag.addEventListener.call(this, addEventListener );
-        let _notify = this._notify;
+        var _notify = this._notify;
         this._notify = DomeventDrag._notify.call(this, _notify );
     },
 
     _notify : function( _notify ){ 
 
-        let ret = null;
+        var ret = null;
 
         return function( eventName, object3d, origDomEvent, intersect ){   
             if ( eventName === "dragstart" ) {
@@ -102,7 +92,7 @@ const DomeventDrag = {
             }
             ret = _notify.call(this, eventName, object3d, origDomEvent, intersect );
             if ( this.stateMouse.mousedown && this.stateMouse.dragging && eventName === "mousemove" ) {
-                if ( this._draggingObjs[object3d.id] ) ret = _notify.call( this, 'drag', object3d, origDomEvent, intersect );
+                if ( this._draggingObjs[object3d.id] ) { ret = _notify.call( this, 'drag', object3d, origDomEvent, intersect ); }
             }
             return ret;
         };
@@ -110,7 +100,7 @@ const DomeventDrag = {
 
     addEventListener : function( addEventListener ){ 
         return function( object3d, eventName, callback, opt ) { 
-            let scope = this;
+            var scope = this;
 
             if ( eventName === "drag" ) {
                 if( !this.hasListener(object3d, "mousedown") ){
@@ -143,6 +133,6 @@ const DomeventDrag = {
     }
 };
 
-
 export default DomeventDrag;
 export { DomeventDrag };
+//# sourceMappingURL=DomeventsDrag.es.js.map

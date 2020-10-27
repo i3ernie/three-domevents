@@ -1,17 +1,21 @@
 
 import * as THREE from '../../node_modules/three/build/three.module.js';
-import DomEvents from "../../src/ExtendedDomevents.es.js";
+import DomEvents from "../../src/Domevents.es.js";
+import DomeventDrag from "../../src/domevents/DomeventDrag.es.js";
 import Viewport from "../../node_modules/three-viewport/dist/viewport.es.js";
 import WoodBox from "../WoodBox.js";
 
 var VP;
 var DEH;
 
+DomEvents.extend( DomeventDrag );
+
 const onDrag = function( ev ){
     console.log("** dragging", ev.target.name);
 };
 
 const onDragstart = function( ev ){
+    ev.stopPropagation();
     console.log("** dragging start", ev.target.name);
 };
 
@@ -34,7 +38,7 @@ function init() {
     DEH = new DomEvents( VP.camera, VP.renderer.domElement, {trigger:true} );
 
 
-    let mesh1 = new WoodBox(100,100,100);
+    let mesh1 = new WoodBox( 100, 100, 100 );
     mesh1.name = "box_klein";
     mesh1.position.set(-200,-50,0);
 
