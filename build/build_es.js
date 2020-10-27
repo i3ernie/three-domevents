@@ -59,7 +59,7 @@ const build_extDomeventsES = function( done ){
         ]
     }).then(( bundle ) => { 
         bundle.write({
-            file: './dist/DomeventsDrag.es.js',
+            file: './dist/DomeventDrag.es.js',
             plugins:[
                 replace({
                     "../node_modules/three/" : "../../three/"

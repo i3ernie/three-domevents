@@ -135,4 +135,4 @@ var DomeventDrag = {
 
 export default DomeventDrag;
 export { DomeventDrag };
-//# sourceMappingURL=DomeventsDrag.es.js.map
+//# sourceMappingURL=DomeventDrag.es.js.map
