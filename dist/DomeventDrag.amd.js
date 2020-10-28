@@ -116,7 +116,7 @@ define(['exports'], function (exports) { 'use strict';
                     object3d.addEventListener("mousemove", scope._$onDragging );
                 }
 
-                addEventListener( object3d, eventName, callback, opt );
+                addEventListener.call(scope, object3d, eventName, callback, opt );
             } 
         },
 
