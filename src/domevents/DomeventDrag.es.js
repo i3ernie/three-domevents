@@ -87,39 +87,47 @@ const DomeventDrag = {
     _notify : function( _notify ){ 
 
         let ret = null;
+        let scope = this;
 
         return function( eventName, object3d, origDomEvent, intersect ){   
             if ( eventName === "dragstart" ) {
                 console.log( eventName, object3d );
-                this._draggingObjs[object3d.id] = object3d;
+                scope._draggingObjs[object3d.id] = object3d;
             }
             if ( eventName === "dragend" ){
-                if ( this._draggingObjs[object3d.id] ) { 
-                    delete this._draggingObjs[object3d.id];
-                    return _notify.call(this, eventName, object3d, origDomEvent, intersect );
+                if ( scope._draggingObjs[object3d.id] ) { 
+                    delete scope._draggingObjs[object3d.id];
+                    return _notify.call(scope, eventName, object3d, origDomEvent, intersect );
                 }
                 return false;
             }
-            ret = _notify.call(this, eventName, object3d, origDomEvent, intersect );
-            if ( this.stateMouse.mousedown && this.stateMouse.dragging && eventName === "mousemove" ) {
-                if ( this._draggingObjs[object3d.id] ) ret = _notify.call( this, 'drag', object3d, origDomEvent, intersect );
+            if ( eventName === "drag"){
+                return _notify.call( scope, eventName, object3d, origDomEvent, intersect )
             }
+            
+            ret = _notify.call(scope, eventName, object3d, origDomEvent, intersect );
+
+            if ( scope.stateMouse.mousedown && scope.stateMouse.dragging && eventName === "mousemove" ) {
+                if ( scope._draggingObjs[object3d.id] ) scope._notify.call( scope, 'drag', object3d, origDomEvent, intersect );
+            }
+
             return ret;
         };
     },
 
     addEventListener : function( addEventListener ){ 
-        return function( object3d, eventName, callback, opt ) { 
-            let scope = this;
+        let scope = this;
 
+        return function( object3d, eventName, callback, opt ) { 
+           
             if ( eventName === "drag" ) {
-                if( !this.hasListener(object3d, "mousedown") ){
-                    this.addEventListener( object3d, "mousedown", "mousedown" );
+                if( !scope.hasListener(object3d, "mousedown") ){
+                    scope.addEventListener( object3d, "mousedown", "mousedown" );
                 }
                 object3d.addEventListener("mousedown", scope._$onDragStart );
 
-                if( !this.hasListener(object3d, "mousemove") ){
-                    this.addEventListener( object3d, "mousemove", "mousemove" );
+                if( !scope.hasListener(object3d, "mousemove") ){
+                    scope.addEventListener( object3d, "mousemove", "mousemove" );
                 }
                 object3d.addEventListener("mousemove", scope._$onDragging );
             }
