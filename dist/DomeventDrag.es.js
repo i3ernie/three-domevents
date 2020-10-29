@@ -91,14 +91,11 @@ var DomeventDrag = {
                 }
                 return false;
             }
-            if ( eventName === "drag"){
-                return _notify.call( scope, eventName, object3d, origDomEvent, intersect )
-            }
             
             ret = _notify.call(scope, eventName, object3d, origDomEvent, intersect );
 
             if ( scope.stateMouse.mousedown && scope.stateMouse.dragging && eventName === "mousemove" ) {
-                if ( scope._draggingObjs[object3d.id] ) { scope._notify.call( scope, 'drag', object3d, origDomEvent, intersect ); }
+                if ( scope._draggingObjs[object3d.id] ) { _notify.call( scope, 'drag', object3d, origDomEvent, intersect ); }
             }
 
             return ret;

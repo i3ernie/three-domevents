@@ -52,7 +52,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
 	var _onMouseDown	= function( event ){
 	    this.stateMouse.mousedown = true;
-
+	console.log( "down", event );
 	    if ( event.buttons && event.buttons > 1 ) {
 	        if ( event.button === 1 ) {
 	            return _onMouseEvent.call(this, 'mousemiddledown', event);
@@ -68,6 +68,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 	};
 
 	var _onMouseUp	= function( event ){
+	    console.log( "up", event );
 	    this.stateMouse.mousedown = false;
 
 	    if ( event.buttons && event.buttons > 1 ) {
@@ -212,6 +213,9 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 	        "mousedown",
 	        "mouseup",
 
+	        //"pointerdown",
+	        //"pointerup",
+
 	        "mousemove",
 		    "contextmenu",
 	        
@@ -222,10 +226,14 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 	    ],
 
 	    eventMapping : {
-	        "mousedown" : "onMousedown",
-	        "mouseup" 	: "onMouseup",
-	        "mousemove" : "onMousemove",
-	        "click" : "onClick"
+	        "mousedown"     : "onMousedown",
+	        "mouseup" 	    : "onMouseup",
+
+	        //"pointerdown"   : "onMousedown",
+	        //"pointerup"     : "onMouseup",
+
+	        "mousemove"     : "onMousemove",
+	        "click"         : "onClick"
 	    },
 
 	    initialize : function( ){
@@ -251,6 +259,9 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 	    enable : function(){ 
 	        this._domElement.addEventListener( 'mousedown'	, this._$onMouseDown	, false );
 	        this._domElement.addEventListener( 'mouseup'	, this._$onMouseUp		, false );
+
+	        //this._domElement.addEventListener( 'pointerdown', this._$onMouseDown, false );
+	        //this._domElement.addEventListener( 'pointerup', this._$onMouseUp, false );
 	        
 	        this._domElement.addEventListener( 'click'		, this._$onClick		, false );
 	        this._domElement.addEventListener( 'dblclick'	, this._$onDblClick		, false );  
@@ -263,6 +274,9 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 	        this._domElement.removeEventListener( 'mousedown'	, this._$onMouseDown	, false );
 	        this._domElement.removeEventListener( 'mouseup'		, this._$onMouseUp		, false );
 	        
+	        //this._domElement.removeEventListener( 'pointerdown'	, this._$onMouseDown	, false );
+	        //this._domElement.removeEventListener( 'pointerup'	, this._$onMouseUp		, false );
+
 	        this._domElement.removeEventListener( 'click'		, this._$onClick		, false );
 	        this._domElement.removeEventListener( 'dblclick'	, this._$onDblClick		, false );
 	        
@@ -1113,7 +1127,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
 			// if no handler do bubbling
 			if( !objectCtx || !handlers || handlers.length === 0 ){ 
-				if ( object3d.parent ) { this._notify( eventName, object3d.parent, origDomEvent, intersect ); }
+				if ( object3d.parent ) { return this._notify( eventName, object3d.parent, origDomEvent, intersect ); }
 				return false;
 			}
 
