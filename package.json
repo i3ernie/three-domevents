@@ -1,6 +1,6 @@
 {
   "name": "three-domevents",
-  "version": "0.20.1027",
+  "version": "0.122.201101",
   "license": "MIT",
   "description": "domevents for three.js",
   "author": "i3ernie",
@@ -13,12 +13,13 @@
     "Domevents"
   ],
   "dependencies": {
-    "three": "^0.119"
+    "three": "^0.122"
   },
   "devDependencies": {
     "@rollup/plugin-alias": "latest",
     "@rollup/plugin-inject": "latest",
     "@rollup/plugin-replace": "^2.3.4",
+    "async": "latest",
     "customevent-polyfill": "git://github.com/d4tocchini/customevent-polyfill.git",
     "gulp": "^4.0.2",
     "gulp-better-rollup": "latest",
@@ -48,6 +49,8 @@
     "dist/domevents.amd.js",
     "dist/DomeventDrag.es.js",
     "dist/DomeventDrag.amd.js",
+    "dist/DomeventMouse.es.js",
+    "dist/DomeventTouch.es.js",
     "package.json"
   ],
   "scripts": {

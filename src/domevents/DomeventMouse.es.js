@@ -7,7 +7,7 @@ const CLICK_TIMEOUT = 500;
 
 const _onMouseDown	= function( event ){
     this.stateMouse.mousedown = true;
-console.log( "down", event );
+
     if ( event.buttons && event.buttons > 1 ) {
         if ( event.button === 1 ) {
             return _onMouseEvent.call(this, 'mousemiddledown', event);
@@ -23,7 +23,7 @@ console.log( "down", event );
 };
 
 const _onMouseUp	= function( event ){
-    console.log( "up", event );
+    
     this.stateMouse.mousedown = false;
 
     if ( event.buttons && event.buttons > 1 ) {
@@ -168,24 +168,17 @@ const DomeventClick = {
         "mousedown",
         "mouseup",
 
-        //"pointerdown",
-        //"pointerup",
 
         "mousemove",
 	    "contextmenu",
         
         "click",
-        "dblclick",
-        
-        "drag"
+        "dblclick"
     ],
 
     eventMapping : {
         "mousedown"     : "onMousedown",
         "mouseup" 	    : "onMouseup",
-
-        //"pointerdown"   : "onMousedown",
-        //"pointerup"     : "onMouseup",
 
         "mousemove"     : "onMousemove",
         "click"         : "onClick"
@@ -215,9 +208,6 @@ const DomeventClick = {
         this._domElement.addEventListener( 'mousedown'	, this._$onMouseDown	, false );
         this._domElement.addEventListener( 'mouseup'	, this._$onMouseUp		, false );
 
-        //this._domElement.addEventListener( 'pointerdown', this._$onMouseDown, false );
-        //this._domElement.addEventListener( 'pointerup', this._$onMouseUp, false );
-        
         this._domElement.addEventListener( 'click'		, this._$onClick		, false );
         this._domElement.addEventListener( 'dblclick'	, this._$onDblClick		, false );  
 
@@ -229,8 +219,6 @@ const DomeventClick = {
         this._domElement.removeEventListener( 'mousedown'	, this._$onMouseDown	, false );
         this._domElement.removeEventListener( 'mouseup'		, this._$onMouseUp		, false );
         
-        //this._domElement.removeEventListener( 'pointerdown'	, this._$onMouseDown	, false );
-        //this._domElement.removeEventListener( 'pointerup'	, this._$onMouseUp		, false );
 
         this._domElement.removeEventListener( 'click'		, this._$onClick		, false );
         this._domElement.removeEventListener( 'dblclick'	, this._$onDblClick		, false );

@@ -1,7 +1,5 @@
 import {Raycaster, Vector3, Object3D} from "../node_modules/three/build/three.module.js";
 
-import DomeventClick from "./domevents/DomeventMouse.es.js";
-import DomeventTouch from "./domevents/DomeventTouch.es.js";
 import EventGroups from "./EventGroups.es.js";
 
 /** This THREEx helper makes it easy to handle the mouse events in your 3D scene
@@ -202,8 +200,8 @@ DomEvents.extend = function( obj ) {
 	DomEvents.eventNames = DomEvents.eventNames.concat( obj.eventNames );
 };
 
-DomEvents.extend( DomeventClick );
-DomEvents.extend( DomeventTouch );
+//DomEvents.extend( DomeventClick );
+//DomEvents.extend( DomeventTouch );
 //
 
 DomEvents.hasEvent = function( eventName ) {
@@ -640,13 +638,13 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 
 		// parameter check
 		console.assert( arguments.length === 4 );
-
+		
 		// if no handler do bubbling
 		if( !objectCtx || !handlers || handlers.length === 0 ){ 
 			if ( object3d.parent ) return this._notify( eventName, object3d.parent, origDomEvent, intersect );
 			return false;
 		}
-
+		
 		// notify all handlers
 		handlers = objectCtx[eventName+'Handlers'];
 		let toPropagate	= true;
@@ -662,7 +660,8 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		const nextIntersect = function(){
 			toIntersect = true;
 		};
-		
+		if (eventName === "mousedown"|| eventName === "mouseup") 
+			
 		for( let i = 0; i < handlers.length; i++ ) {
 
 			let handler	= handlers[i];
@@ -679,7 +678,9 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 					nextIntersect : nextIntersect
 				});
 			}
-			else if ( typeof handler.callback === "string" && typeof object3d.dispatchEvent === "function" ) {
+			else if ( typeof handler.callback === "string" && typeof object3d.dispatchEvent === "function" ) { 
+				if (eventName === "mousedown"|| eventName === "mouseup") 
+					
 				object3d.dispatchEvent( {
 					type: handler.callback,
 					target: object3d,
