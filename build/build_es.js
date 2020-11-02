@@ -4,6 +4,47 @@ const buble = require('rollup-plugin-buble');
 const replace = require("./replace.js");
 const async = require("async");
 
+const transforms = {
+    arrow: false,
+    classes: true,
+    letConst : false
+};
+
+const build_domeventsPack = function( done ){
+   
+    rollup.rollup({
+        input : 'src/domevents.pack.es.js',
+        external: ['../node_modules/three/build/three.module.js', '../../node_modules/three/build/three.module.js'],
+        
+        plugins:[
+            
+            resolve(),
+            
+            buble({
+				transforms: transforms
+            })
+        ]
+    }).then(( bundle ) => { 
+        bundle.write({
+            file: './dist/domevents.pack.es.js',
+            plugins:[
+                
+                replace({
+                    "../node_modules/three/" : "../../three/"
+                })
+            ],
+            
+            format: 'es',
+            name: 'three',
+            exports: 'named',
+            sourcemap: true
+          });
+          build_extDomeventsES( done );
+    }).catch(
+        (err)=>{console.error(err);}
+    );
+};
+
 const build_domeventsES = function( done ){
    
     rollup.rollup({
@@ -15,16 +56,14 @@ const build_domeventsES = function( done ){
             resolve(),
             
             buble({
-				transforms: {
-					arrow: false,
-					classes: true
-				}
+				transforms: transforms
             })
         ]
     }).then(( bundle ) => { 
         bundle.write({
             file: './dist/domevents.es.js',
             plugins:[
+                
                 replace({
                     "../node_modules/three/" : "../../three/"
                 })
@@ -52,10 +91,7 @@ const build_extDomeventsES = function( done ){
             resolve(),
             
             buble({
-				transforms: {
-					arrow: false,
-					classes: true
-				}
+				transforms: transforms
             })
         ]
     }).then(( bundle ) => { 
@@ -91,10 +127,7 @@ const build_DomeventMouseES = function( done ){
             resolve(),
             
             buble({
-				transforms: {
-					arrow: false,
-					classes: true
-				}
+				transforms: transforms
             })
         ]
     }).then(( bundle ) => { 
@@ -123,6 +156,7 @@ const build_DomeventMouseES = function( done ){
 module.exports = function( done ){
     async.series([
         build_domeventsES,
+        build_domeventsPack,
         build_extDomeventsES,
         build_DomeventMouseES
     ], function( err, data ){

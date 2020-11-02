@@ -1,13 +1,17 @@
 import * as THREE from '../../node_modules/three/build/three.module.js';
-import DomEvents from "../../dist/domevents.es.js";
-import DomeventMouse from "../../dist/DomeventMouse.es.js";
-//import DomeventTouch from "../../src/domevents/DomeventTouch.es.js";
+
+import DomEvents from "../../src/Domevents.es.js";
+
+import DomeventPointer from "../../src/domevents/DomeventPointer.es.js";
+
+
 import Viewport from "../../node_modules/three-viewport/dist/viewport.es.js";
 import WoodBox from "../WoodBox.js";
 import Grassground from "./Grassground.es.js";
 
-DomEvents.extend( DomeventMouse );
-//DomEvents.extend( DomeventTouch );
+//DomEvents.extend( DomeventPointer );
+DomEvents.extend( DomeventPointer.config({emulateMouse : true}) );
+
 
 var VP;
 var DEH;
@@ -45,21 +49,50 @@ function init() {
 
     DEH.activate( activeWorld ); //or for global ( VP.Scene )
 
+
+    
+
     //box number one
     let mesh1 = new WoodBox(100, 100, 100);
-    mesh1.name = "box_1";
+    mesh1.name = "woodbox_1";
     mesh1.position.set(-200, 50, 0);
 
 
     let box = new THREE.Mesh( new THREE.BoxGeometry(40,40,40),new THREE.MeshBasicMaterial({color:"yellow"}) );
     box.name = "box_yellow_1.1";
     box.position.set(0, 50, 0);
-    
     mesh1.add( box );
 
 
     mesh1.addEventListener("click", logEvent );
     mesh1.onClick = logOnClick;
+
+    mesh1.onPointerdown = function( ev ){
+        console.log("down", ev.target.name, ev.intersect);
+        ev.stopPropagation();
+    };
+    mesh1.onMousedown = function( ev ){
+        console.log("onMousedown", ev.target.name, ev.intersect);
+        ev.stopPropagation();
+    };
+
+    mesh1.onPointerup = function( ev ){
+        console.log("onPointerup", ev.target.name, ev.intersect);
+        ev.stopPropagation();
+    };
+    mesh1.onMouseup = function( ev ){
+        console.log("onMouseup", ev.target.name, ev.intersect);
+        ev.stopPropagation();
+    };
+
+    mesh1.onPointerout = function( ev ){
+        console.log("out", ev.target.name, ev.intersect);
+        ev.stopPropagation();
+    };
+    mesh1.onPointerover = function( ev ){
+        console.log("over", ev.target.name, ev.intersect);
+        ev.stopPropagation();
+    };
 
 
 
@@ -154,6 +187,7 @@ function logEvent( ev ){
     console.log( "eventListener: " + ev.type + " for " + ev.target.name + " <--on-- ", ev.intersect.object.name );
 }
 function logOnClick( ev ){
+    console.log("this: ", this, "target.name " + ev.target.name + " = this.name " + this.name );
     console.log( ev.target.name + ".onClick: " );
 }
 

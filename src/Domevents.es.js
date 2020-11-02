@@ -600,16 +600,17 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 			this._onMove( eventName, mouseX, mouseY, origDomEvent );
 			return;
 		}
-
+		
 		// if there are no intersections, return now
 		if( intersects.length === 0 ) {
 			return;
 		}
-
+		
 		// init some vairables
 		let intersect	= intersects[0];
 		let object3d	= intersect.object;
 		let objectCtx	= this._objectCtxGet(object3d);
+		
 		if( !objectCtx )	return;
 
 		// notify handlers
@@ -660,8 +661,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		const nextIntersect = function(){
 			toIntersect = true;
 		};
-		if (eventName === "mousedown"|| eventName === "mouseup") 
-			
+		
 		for( let i = 0; i < handlers.length; i++ ) {
 
 			let handler	= handlers[i];
@@ -679,7 +679,6 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 				});
 			}
 			else if ( typeof handler.callback === "string" && typeof object3d.dispatchEvent === "function" ) { 
-				if (eventName === "mousedown"|| eventName === "mouseup") 
 					
 				object3d.dispatchEvent( {
 					type: handler.callback,

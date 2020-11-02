@@ -1,10 +1,10 @@
 import { Raycaster, Object3D, Vector3 } from '../../three/build/three.module.js';
 
-var defaults = {
+const defaults = {
 	"defaultEventGroup" : "_default"
 };
 
-var Eventgroups = {
+const Eventgroups = {
     interface : {
         addEventGroup : function( name ) {
 
@@ -38,7 +38,7 @@ var Eventgroups = {
         },
         
         resetEventGroup : function() {
-            var name = defaults.defaultEventGroup;
+            let name = defaults.defaultEventGroup;
             
             this.aktEventGroupName = name;
             this.aktEventGroup = this._boundDomEvents[name];
@@ -128,10 +128,10 @@ var Eventgroups = {
  */
 
 	/** @namespace */
-var extensions = [];
+const extensions = [];
 
-var _addEvents = function ( obj, options ) {
-	var scope = this;
+const _addEvents = function ( obj, options ) {
+	let scope = this;
 
 	if( obj.userData.preventDomevents ) {
 		return;
@@ -161,16 +161,16 @@ var _addEvents = function ( obj, options ) {
 	}
 };
 
-var _removeEvents = function( obj, options ){
+const _removeEvents = function( obj, options ){
 
-	var scope = this;
+	let scope = this;
 
 	if ( this._objectCtxIsInit( obj ) ) {
 		this._objectCtxDeinit( obj );
 	}
 
-	var index;
-	var boundObjs;
+	let index;
+	let boundObjs;
 
 	DomEvents.eventNames.forEach( function( eventName ) {
 
@@ -199,7 +199,7 @@ var _removeEvents = function( obj, options ){
 
 
 // # Constructor
-var DomEvents = function( camera, domElement )
+const DomEvents = function( camera, domElement )
 {
 	this._camera		= camera || null;
 	this._domElement 	= domElement || document;
@@ -209,7 +209,7 @@ var DomEvents = function( camera, domElement )
 	this.enabled = false;
 	
 	// Bind dom event for mouse and touch
-	var _this			= this;
+	let _this			= this;
 	this.firstClick 	= false;
 	this.delay = 300;
 
@@ -269,7 +269,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 
 	enable : function() {
 
-		var scope = this;
+		let scope = this;
 
 		extensions.forEach(function( ext ) {
 			ext.enable.apply( scope, arguments );
@@ -302,7 +302,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 	// handle domevent context in object3d instance
 
 	_objectCtxInit	: function( object3d ) {
-		var scope = this;
+		let scope = this;
 		this.aktEventGroup[object3d.id] = {};
 
 
@@ -337,17 +337,17 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 	addEventListener : function( object3d, eventName, callback, opt ) {
 		opt = opt || {};
 
-		var _this = this;
+		let _this = this;
 
-		var useCapture = opt.useCapture || false;
-		var scope = this;
+		let useCapture = opt.useCapture || false;
+		let scope = this;
 
 		extensions.forEach(function( ext ){ 
 			if ( ext.addEventListener ) { ext.addEventListener.call( _this, object3d, eventName, callback, opt ); }
 		});
 
 		if ( typeof eventName === "object" ) {
-			for ( var i = 0; i < eventName.length; i++ ){
+			for ( let i = 0; i < eventName.length; i++ ){
 				this.bind( object3d, eventName[i], callback, useCapture );
 			}
 		} else {
@@ -362,10 +362,10 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 	},
 
 	hasListener : function( object3d, eventName ) {
-		var objectCtx = this._objectCtxGet( object3d );
+		let objectCtx = this._objectCtxGet( object3d );
 		if ( !objectCtx ) { return false; }
 		
-		var listener = objectCtx[eventName+'Handlers'];
+		let listener = objectCtx[eventName+'Handlers'];
 		if ( !listener ) { return false; }
 
 		return (listener.length > 0);
@@ -382,7 +382,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 			this._objectCtxInit( object3d );
 		}
 
-		var objectCtx = this._objectCtxGet( object3d );
+		let objectCtx = this._objectCtxGet( object3d );
 		if( !objectCtx[eventName+'Handlers'] )	{ objectCtx[eventName+'Handlers']	= []; }
 
 		objectCtx[eventName+'Handlers'].push({
@@ -406,7 +406,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 			return;
 		}
 		if ( typeof eventName == "object"){
-			for ( var i = 0; i<eventName.length; i++){
+			for ( let i = 0; i<eventName.length; i++){
 				this.unbind(object3d, eventName[i], callback, useCapture);
 			}
 			return;
@@ -423,30 +423,30 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 
 		console.assert( DomEvents.hasEvent( eventName ), "not available events:"+eventName );
 
-		var boundObjs = this._boundObjs[eventName];
+		let boundObjs = this._boundObjs[eventName];
 		if (boundObjs == undefined) {
 			return;
 		}
 
 		if( !this._objectCtxIsInit(object3d) )	{ this._objectCtxInit(object3d); }
 
-		var objectCtx	= this._objectCtxGet( object3d );
+		let objectCtx	= this._objectCtxGet( object3d );
 		if( !objectCtx[eventName+'Handlers'] )	{ return; }
 
-		var handlers = objectCtx[eventName+'Handlers'];
+		let handlers = objectCtx[eventName+'Handlers'];
 
 		if ( typeof callback !== "function" ) {   // kill all events of this type
 			objectCtx[eventName+'Handlers'] = [];
 
-			var index$1 = boundObjs.indexOf( object3d );
-			if ( index$1 > -1 ) {
-				boundObjs.splice( index$1, 1 );
+			let index = boundObjs.indexOf( object3d );
+			if ( index > -1 ) {
+				boundObjs.splice( index, 1 );
 			}
 			return;
 		}
 
-		for( var i = 0; i < handlers.length; i++ ) {
-			var handler	= handlers[i];
+		for( let i = 0; i < handlers.length; i++ ) {
+			let handler	= handlers[i];
 
 			if( callback !== handler.callback )	{ continue; }
 			if( useCapture !== handler.useCapture )	{ continue; }
@@ -455,7 +455,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 		}
 
 		// from this object from this._boundObjs
-		var index = boundObjs.indexOf( object3d );
+		let index = boundObjs.indexOf( object3d );
 		if ( index === -1 ) {
 			return;
 		}
@@ -467,7 +467,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 
 	removeFromDom : function( object3d, opt ) {
 
-		var defaults = {
+		let defaults = {
 			recursive : true
 		};
 
@@ -500,7 +500,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 	 */
 	addToDom : function( object3d, opt ){
 
-		var defaults = {
+		const defaults = {
 			recursive : true, 
 			useCapture: false, 
 			bindFunctions : true
@@ -522,9 +522,9 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 	},
 
 	removeMappedListener :function ( object3d ){
-		var scope = this;
+		let scope = this;
 
-		for ( var key in DomEvents.eventMapping ){
+		for ( let key in DomEvents.eventMapping ){
 			this.removeEventListener( object3d, key);
 		}
 		if ( object3d.children.length > 0 ){
@@ -536,7 +536,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 
 	activate : function( object3d, opt ){
 
-		var options = Object.assign({observe:true}, opt);
+		let options = Object.assign({observe:true}, opt);
 		
 		this.addToDom( object3d, opt );
 		
@@ -546,7 +546,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 	},
 
 	deactivate : function( object3d ) {
-		var scope = this;
+		let scope = this;
 
 		if ( object3d._previousFunctions ){
 			if ( typeof object3d._previousFunctions.add === "function") { 
@@ -566,7 +566,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 
 	_observe : function( object3d ){
 
-		var scope = this;
+		let scope = this;
 
 		if ( ! object3d._previousFunctions ) {
 			object3d._previousFunctions = {};
@@ -602,19 +602,19 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 
 	clean : function( )
 	{
-		var a;
-		var eventName;
-		var boundObjs;
+		let a;
+		let eventName;
+		let boundObjs;
 
-		for( var i = 0; i < DomEvents.eventNames.length; i++ ) {
+		for( let i = 0; i < DomEvents.eventNames.length; i++ ) {
 			eventName = DomEvents.eventNames[i];
 			boundObjs = this._boundObjs[eventName];
 			a = [];
 
 			if (boundObjs){
-				for ( var i$1 = 0, l = boundObjs.length; i$1 < l; i$1 ++ ) {
+				for ( let i = 0, l = boundObjs.length; i < l; i ++ ) {
 
-					if ( boundObjs[i$1].geometry ) { a.push(boundObjs[i$1]); }
+					if ( boundObjs[i].geometry ) { a.push(boundObjs[i]); }
 
 				}
 				this._boundObjs[eventName] = a;
@@ -624,7 +624,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 
 	_bound	: function( eventName, object3d )
 	{
-		var objectCtx = this._objectCtxGet( object3d );
+		let objectCtx = this._objectCtxGet( object3d );
 		if( !objectCtx ) { return false; }
 		return !!objectCtx[eventName+'Handlers'];
 	},
@@ -641,15 +641,15 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 	{
 	//console.log('eventName', eventName, 'boundObjs', this._boundObjs[eventName])
 		// get objects bound to this event
-		var boundObjs	= this._boundObjs[eventName];
-		var i = 0;
+		let boundObjs	= this._boundObjs[eventName];
+		let i = 0;
 
 		if( boundObjs === undefined || boundObjs.length === 0 )	{ return; }
 		// compute the intersection
-		var vector	= new Vector3( mouseX, mouseY, 0.5 );
+		let vector	= new Vector3( mouseX, mouseY, 0.5 );
 		this._ray.setFromCamera( vector, this._camera );
 
-		var intersects = null;
+		let intersects = null;
 		try {
 			intersects  = this._ray.intersectObjects( boundObjs );
 		} catch( e ){
@@ -657,16 +657,17 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 			this._onMove( eventName, mouseX, mouseY, origDomEvent );
 			return;
 		}
-
+		
 		// if there are no intersections, return now
 		if( intersects.length === 0 ) {
 			return;
 		}
-
+		
 		// init some vairables
-		var intersect	= intersects[0];
-		var object3d	= intersect.object;
-		var objectCtx	= this._objectCtxGet(object3d);
+		let intersect	= intersects[0];
+		let object3d	= intersect.object;
+		let objectCtx	= this._objectCtxGet(object3d);
+		
 		if( !objectCtx )	{ return; }
 
 		// notify handlers
@@ -674,24 +675,24 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 			return;
 		}
 
-		var doIntersect = this._notify(eventName, object3d, origDomEvent, intersect);
+		let doIntersect = this._notify(eventName, object3d, origDomEvent, intersect);
 		
 		while ( doIntersect && intersects[i+1] ){
 			i++;
 			intersect = intersects[i];
-			var object3d$1	= intersect.object;
-			var objectCtx$1	= this._objectCtxGet(object3d$1);
-			if( !objectCtx$1 ) { 
+			let object3d	= intersect.object;
+			let objectCtx	= this._objectCtxGet(object3d);
+			if( !objectCtx ) { 
 				return;
 			}
-			doIntersect = this._notify(eventName, object3d$1, origDomEvent, intersect);
+			doIntersect = this._notify(eventName, object3d, origDomEvent, intersect);
 		}
 	},
 
 	_notify	: function( eventName, object3d, origDomEvent, intersect )
 	{
-		var objectCtx	= this._objectCtxGet( object3d );
-		var handlers	= objectCtx ? objectCtx[eventName+'Handlers'] : null;
+		let objectCtx	= this._objectCtxGet( object3d );
+		let handlers	= objectCtx ? objectCtx[eventName+'Handlers'] : null;
 
 		// parameter check
 		console.assert( arguments.length === 4 );
@@ -704,24 +705,23 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 		
 		// notify all handlers
 		handlers = objectCtx[eventName+'Handlers'];
-		var toPropagate	= true;
-		var toIntersect = false;
-		var capture = false;
+		let toPropagate	= true;
+		let toIntersect = false;
+		let capture = false;
 
-		var stopPropagation = function () {
+		const stopPropagation = function () {
 			toPropagate = false;
 		};
-		var preventDefault = function() {
+		const preventDefault = function() {
 			capture = true;
 		};
-		var nextIntersect = function(){
+		const nextIntersect = function(){
 			toIntersect = true;
 		};
-		if (eventName === "mousedown"|| eventName === "mouseup") 
-			
-		{ for( var i = 0; i < handlers.length; i++ ) {
+		
+		for( let i = 0; i < handlers.length; i++ ) {
 
-			var handler	= handlers[i];
+			let handler	= handlers[i];
 
 			capture = handler.useCapture;
 			if ( typeof handler.callback === "function") { 
@@ -736,9 +736,8 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 				});
 			}
 			else if ( typeof handler.callback === "string" && typeof object3d.dispatchEvent === "function" ) { 
-				if (eventName === "mousedown"|| eventName === "mouseup") 
 					
-				{ object3d.dispatchEvent( {
+				object3d.dispatchEvent( {
 					type: handler.callback,
 					target: object3d,
 					origDomEvent: origDomEvent,
@@ -746,13 +745,13 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 					stopPropagation: stopPropagation,
 					preventDefault : preventDefault,
 					nextIntersect : nextIntersect
-				}); }
+				});
 			}
 			
 			if( capture ){ 
 				break;
 			}
-		} }
+		}
 
 		// do bubbling
 		if( toPropagate && object3d.parent ) {

@@ -4,38 +4,47 @@ import {Vector3} from "../../node_modules/three/build/three.module.js";
 import getRelativeMouseXY from "../PointerTools.es.js";
 
 const CLICK_TIMEOUT = 500;
+let emulateMouse = false;
 
-const _onMouseDown	= function( event ){
-    this.stateMouse.mousedown = true;
-
-    if ( event.buttons && event.buttons > 1 ) {
-        if ( event.button === 1 ) {
-            return _onMouseEvent.call(this, 'mousemiddledown', event);
-        }
-        if ( event.button === 2 ) {
-            //rightdown
-            return _onMouseEvent.call(this, 'mouserightdown', event);
-        }
-    }
+const _onPointerDown	= function( event ){
+    
     this.timeStamp = event.timeStamp;
+    _onMouseEvent.call(this, 'pointerdown', event);
 
-    return _onMouseEvent.call(this, 'mousedown', event);
+    if ( emulateMouse && event.pointerType === "mouse" ) {
+        this.stateMouse.mousedown = true;
+
+        if ( event.buttons && event.buttons > 1 ) {
+            if ( event.button === 1 ) {
+                return _onMouseEvent.call(this, 'mousemiddledown', event);
+            }
+            if ( event.button === 2 ) {
+                //rightdown
+                return _onMouseEvent.call(this, 'mouserightdown', event);
+            }
+        }
+        _onMouseEvent.call(this, 'mousedown', event);
+    }
 };
 
-const _onMouseUp	= function( event ){
-    
-    this.stateMouse.mousedown = false;
+const _onPointerUp	= function( event ){
 
-    if ( event.buttons && event.buttons > 1 ) {
-        if ( event.button === 1 ) {
-            return _onMouseEvent.call(this, 'mousemiddleup', event);
+    _onMouseEvent.call(this, 'pointerup', event);
+
+    if ( emulateMouse && event.pointerType === "mouse" ) {
+        this.stateMouse.mousedown = false;
+
+        if ( event.buttons && event.buttons > 1 ) {
+            if ( event.button === 1 ) {
+                return _onMouseEvent.call(this, 'mousemiddleup', event);
+            }
+            if ( event.button === 2 ) {
+                //rightdown
+                return _onMouseEvent.call(this, 'mouserightup', event);
+            }
         }
-        if ( event.button === 2 ) {
-            //rightdown
-            return _onMouseEvent.call(this, 'mouserightup', event);
-        }
+        _onMouseEvent.call(this, 'mouseup'	, event);
     }
-    return _onMouseEvent.call(this, 'mouseup'	, event);
 };
 
 /********************************************************************************/
@@ -142,13 +151,18 @@ const _onMouseEvent	= function( eventName, domEvent )
     this._onEvent(eventName, mouseCoords.x, mouseCoords.y, domEvent);
 };
 
-const _onMouseMove	= function( domEvent )
+const _onPointerMove	= function( domEvent )
 {
     let mouseCoords = getRelativeMouseXY( domEvent );
+
+    _onMove.call(this, 'pointermove', mouseCoords.x, mouseCoords.y, domEvent);
     
-    _onMove.call(this, 'mousemove', mouseCoords.x, mouseCoords.y, domEvent);
-    _onMove.call(this, 'mouseover', mouseCoords.x, mouseCoords.y, domEvent);
-    _onMove.call(this, 'mouseout' , mouseCoords.x, mouseCoords.y, domEvent);
+    if ( emulateMouse ){
+        _onMove.call(this, 'mousemove', mouseCoords.x, mouseCoords.y, domEvent);
+    }
+    
+    //_onMove.call(this, 'mouseover', mouseCoords.x, mouseCoords.y, domEvent);
+    //_onMove.call(this, 'mouseout' , mouseCoords.x, mouseCoords.y, domEvent);
 };
 
 
@@ -159,74 +173,99 @@ const _onContextmenu = function( event )
 };
 
 
+const mouseEvents = [
+    "mousedown",
+    "mouseup",
+    "mousemove",
+    "contextmenu",
+
+    "click",
+    
+    "dblclick"
+];
+const mouseEventMapping = {
+    "mousedown"     : "onMousedown",
+    "mouseup" 	    : "onMouseup",
+
+    "click"         : "onClick",
+    "mousemove"     : "onMousemove",
+    "dblclick"      : "onDblclick"
+};
 
 
-
-const DomeventMouse = {
+const DomeventPointer = {
 
     eventNames : [
-        "mousedown",
-        "mouseup",
 
+        "pointerover",
+        "pointerenter",
 
-        "mousemove",
-	    "contextmenu",
-        
-        "click",
-        "dblclick"
+        "pointerdown",
+        "pointermove",
+        "pointerup",
+        "pointercancel",        
+        "pointerout",
+        "pointerleave"
     ],
 
     eventMapping : {
-        "mousedown"     : "onMousedown",
-        "mouseup" 	    : "onMouseup",
+        "pointerover"   : "onPointerover",
+        "pointerenter"  : "onPointerenter",
+        "pointerdown"   : "onPointerdown",
+        "pointermove"   : "onPointermove",
+        "pointerup"     : "onPointerup",
+        "pointercancel" : "onPointercancel"
+    },
 
-        "mousemove"     : "onMousemove",
-        "click"         : "onClick"
+    config : function( opt ){
+        if ( opt && opt.emulateMouse ) {
+            emulateMouse = true;
+            DomeventPointer.eventNames = DomeventPointer.eventNames.concat( mouseEvents );
+            Object.assign(DomeventPointer.eventMapping, mouseEventMapping);
+        }
+        return DomeventPointer;
     },
 
     initialize : function( ){
         let _this = this; 
 
-        
         this.stateMouse = this.stateMouse || {};
         this.stateMouse.mousedown = false;
     
-        this._onMove = function(){ _onMove.apply( _this, arguments ); };  
-        this._onMouseEvent = function(){ _onMouseEvent.apply( _this, arguments ); };
+        this._onMove            = function(){ _onMove.apply( _this, arguments ); };  
+        this._onMouseEvent      = function(){ _onMouseEvent.apply( _this, arguments ); };
 
-        this._$onMouseDown	= function(){ _onMouseDown.apply( _this, arguments ); };
-	    this._$onMouseUp	= function(){ _onMouseUp.apply( _this, arguments );	};
+        this._$onPointerDown	= function(){ _onPointerDown.apply( _this, arguments ); };
+	    this._$onPointerUp	    = function(){ _onPointerUp.apply( _this, arguments ); };
+  
 
-        this._$onDblClick	= function(){ _onDblClick.apply( _this, arguments);	};
-        this._$onClick		= function(){ _onClick.apply( _this, arguments); };
+        this._$onPointerMove	= function(){ _onPointerMove.apply(_this, arguments);	};
 
-        this._$onMouseMove	= function(){ _onMouseMove.apply(_this, arguments);	};
-        this._$onContextmenu	= function(){ _onContextmenu.apply(_this, arguments);	};
+        if ( emulateMouse ){
+            this._$onClick      = function(){ _onClick.apply( _this, arguments ); }
+        }
     },
 
     enable : function(){ 
-        this._domElement.addEventListener( 'mousedown'	, this._$onMouseDown	, false );
-        this._domElement.addEventListener( 'mouseup'	, this._$onMouseUp		, false );
 
-        this._domElement.addEventListener( 'click'		, this._$onClick		, false );
-        this._domElement.addEventListener( 'dblclick'	, this._$onDblClick		, false );  
+        this._domElement.addEventListener( 'pointerdown', this._$onPointerDown, false );
+        this._domElement.addEventListener( 'pointerup', this._$onPointerUp, false );
 
-        this._domElement.addEventListener( 'mousemove'	, this._$onMouseMove	, false );
-        this._domElement.addEventListener( 'contextmenu', this._$onContextmenu	, false );
+        this._domElement.addEventListener( 'pointermove'	, this._$onPointerMove	, false );
+
+        if ( emulateMouse ){ 
+            this._domElement.addEventListener( 'click'	, this._$onClick	, false );
+        }
     },
 
     disable : function(){
-        this._domElement.removeEventListener( 'mousedown'	, this._$onMouseDown	, false );
-        this._domElement.removeEventListener( 'mouseup'		, this._$onMouseUp		, false );
         
-
-        this._domElement.removeEventListener( 'click'		, this._$onClick		, false );
-        this._domElement.removeEventListener( 'dblclick'	, this._$onDblClick		, false );
+        this._domElement.removeEventListener( 'pointerdown'	, this._$onMouseDown	, false );
+        this._domElement.removeEventListener( 'pointerup'	, this._$onMouseUp		, false );
         
-        this._domElement.removeEventListener( 'mousemove'	, this._$onMouseMove	, false );
-        this._domElement.removeEventListener( 'contextmenu', this._$onContextmenu	, false );
+        this._domElement.removeEventListener( 'pointermove'	, this._$onMouseMove	, false );
     }
 };
 
-export default DomeventMouse;
-export { DomeventMouse };
+export default DomeventPointer;
+export { DomeventPointer };

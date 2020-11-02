@@ -1,8 +1,8 @@
 import { Vector3 } from '../../three/build/three.module.js';
 
-var getRelativeMouseXY = function( domEvent ) {
+const getRelativeMouseXY = function( domEvent ) {
 
-	var element = domEvent.target || domEvent.srcElement;
+	let element = domEvent.target || domEvent.srcElement;
 
 	if (element.nodeType === 3) {
 		element = element.parentNode; // Safari fix -- see http://www.quirksmode.org/js/events_properties.html
@@ -10,10 +10,10 @@ var getRelativeMouseXY = function( domEvent ) {
 
 	//get the real position of an element relative to the page starting point (0, 0)
 	//credits go to brainjam on answering http://stackoverflow.com/questions/5755312/getting-mouse-position-relative-to-content-area-of-an-element
-	var elPosition	= { x : 0 , y : 0};
-	var tmpElement	= element;
+	let elPosition	= { x : 0 , y : 0};
+	let tmpElement	= element;
 	//store padding
-	var style	= getComputedStyle(tmpElement, null);
+	let style	= getComputedStyle(tmpElement, null);
 	elPosition.y += parseInt(style.getPropertyValue("padding-top"), 10);
 	elPosition.x += parseInt(style.getPropertyValue("padding-left"), 10);
 
@@ -29,7 +29,7 @@ var getRelativeMouseXY = function( domEvent ) {
 		tmpElement = tmpElement.offsetParent;
 	} while( tmpElement );
 
-	var elDimension	= {
+	let elDimension	= {
 		width	: (element === window) ? window.innerWidth	: element.offsetWidth,
 		height	: (element === window) ? window.innerHeight	: element.offsetHeight
 	};
@@ -48,9 +48,9 @@ var getRelativeMouseXY = function( domEvent ) {
 	}
 };
 
-var CLICK_TIMEOUT = 500;
+const CLICK_TIMEOUT = 500;
 
-var _onMouseDown	= function( event ){
+const _onMouseDown	= function( event ){
     this.stateMouse.mousedown = true;
 
     if ( event.buttons && event.buttons > 1 ) {
@@ -67,7 +67,7 @@ var _onMouseDown	= function( event ){
     return _onMouseEvent.call(this, 'mousedown', event);
 };
 
-var _onMouseUp	= function( event ){
+const _onMouseUp	= function( event ){
     
     this.stateMouse.mousedown = false;
 
@@ -89,18 +89,18 @@ var _onMouseUp	= function( event ){
 
 // # handle mousemove kind of events
 
-var _onMove = function( eventName, mouseX, mouseY, origDomEvent )
+const _onMove = function( eventName, mouseX, mouseY, origDomEvent )
 {
     //console.log('eventName', eventName, 'boundObjs', this._boundObjs[eventName])
     // get objects bound to this event
-    var boundObjs	= this._boundObjs[eventName];
+    let boundObjs	= this._boundObjs[eventName];
     if( boundObjs === undefined || boundObjs.length === 0 )	{ return; }
 
     // compute the intersection
-    var vector = new Vector3( mouseX, mouseY, 0.5 );
+    let vector = new Vector3( mouseX, mouseY, 0.5 );
     this._ray.setFromCamera( vector, this._camera );
 
-    var intersects = null;
+    let intersects = null;
     try {
         intersects  = this._ray.intersectObjects( boundObjs );
     } catch( e ){
@@ -109,12 +109,12 @@ var _onMove = function( eventName, mouseX, mouseY, origDomEvent )
         return;
     }
 
-    var oldSelected	= this._selected;
-    var notifyOver, notifyOut, notifyMove;
-    var intersect;
-    var newSelected;
-    var i = 0;
-    var doIntersect = true;
+    let oldSelected	= this._selected;
+    let notifyOver, notifyOut, notifyMove;
+    let intersect;
+    let newSelected;
+    let i = 0;
+    let doIntersect = true;
 
     while ( doIntersect ) {
         
@@ -159,7 +159,7 @@ var _onMove = function( eventName, mouseX, mouseY, origDomEvent )
 };
 
 
-var _onClick = function( event )
+const _onClick = function( event )
 {
     // TODO handle touch ? 
     if ( this.timeStamp !== null && (event.timeStamp - this.timeStamp) > CLICK_TIMEOUT ){
@@ -169,7 +169,7 @@ var _onClick = function( event )
     _onMouseEvent.call(this, 'click', event );
 };
 
-var _onDblClick = function( event )
+const _onDblClick = function( event )
 {
     // TODO handle touch ?
     _onMouseEvent.call(this, 'dblclick', event);
@@ -181,15 +181,15 @@ var _onDblClick = function( event )
 /************************************************/
 // # handle mouse events
 
-var _onMouseEvent	= function( eventName, domEvent )
+const _onMouseEvent	= function( eventName, domEvent )
 {
-    var mouseCoords = getRelativeMouseXY( domEvent );
+    let mouseCoords = getRelativeMouseXY( domEvent );
     this._onEvent(eventName, mouseCoords.x, mouseCoords.y, domEvent);
 };
 
-var _onMouseMove	= function( domEvent )
+const _onMouseMove	= function( domEvent )
 {
-    var mouseCoords = getRelativeMouseXY( domEvent );
+    let mouseCoords = getRelativeMouseXY( domEvent );
     
     _onMove.call(this, 'mousemove', mouseCoords.x, mouseCoords.y, domEvent);
     _onMove.call(this, 'mouseover', mouseCoords.x, mouseCoords.y, domEvent);
@@ -197,7 +197,7 @@ var _onMouseMove	= function( domEvent )
 };
 
 
-var _onContextmenu = function( event )
+const _onContextmenu = function( event )
 {
     //TODO don't have a clue about how this should work with touch..
     _onMouseEvent.call(this, 'contextmenu', event);
@@ -207,7 +207,7 @@ var _onContextmenu = function( event )
 
 
 
-var DomeventClick = {
+const DomeventMouse = {
 
     eventNames : [
         "mousedown",
@@ -230,7 +230,7 @@ var DomeventClick = {
     },
 
     initialize : function( ){
-        var _this = this; 
+        let _this = this; 
 
         
         this.stateMouse = this.stateMouse || {};
@@ -273,6 +273,6 @@ var DomeventClick = {
     }
 };
 
-export default DomeventClick;
-export { DomeventClick };
+export default DomeventMouse;
+export { DomeventMouse };
 //# sourceMappingURL=DomeventMouse.es.js.map

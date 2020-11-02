@@ -3,6 +3,12 @@ const resolve =require('rollup-plugin-node-resolve');
 const buble = require('rollup-plugin-buble');
 const replace = require("./replace.js");
 
+const transforms = {
+    arrow: false,
+    classes: true,
+    letConst : false
+};
+
 const build_domevents = function( done ){
    
     rollup.rollup({
@@ -14,10 +20,7 @@ const build_domevents = function( done ){
             resolve(),
             
             buble({
-				transforms: {
-					arrow: false,
-					classes: true
-				}
+				transforms: transforms
 			})
         ]
     }).then(( bundle ) => { 
@@ -55,10 +58,7 @@ const build_extdomevents = function( done ){
             resolve(),
             
             buble({
-				transforms: {
-					arrow: false,
-					classes: true
-				}
+				transforms: transforms
 			})
         ]
     }).then(( bundle ) => { 
