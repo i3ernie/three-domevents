@@ -6,14 +6,14 @@ define(['exports'], function (exports) { 'use strict';
         }
     }; */
 
-    var _onMousedown = function( ev ) { 
+    const _onMousedown = function( ev ) { 
         this.stateMouse.mousedown = true;
         console.log("down", ev);
         //this._mousedownd[ ev.target.id ] = ev.target;
         
     };
 
-    var _onMouseupDrag = function( event ){
+    const _onMouseupDrag = function( event ){
 
         if ( this.stateMouse.dragging ) { 
             
@@ -21,7 +21,7 @@ define(['exports'], function (exports) { 'use strict';
             this._onMouseEvent( "dragend", event );
 
             
-            for ( var key in this._draggingObjs ) { 
+            for ( let key in this._draggingObjs ) { 
                 this._notify( "dragend", this._draggingObjs[key], event, null );
             }
             
@@ -30,7 +30,7 @@ define(['exports'], function (exports) { 'use strict';
         this._mousedownd = {};
     };
 
-    var _onMousemove = function( event ){ 
+    const _onMousemove = function( event ){ 
         if ( this.stateMouse.mousedown && !this.stateMouse.dragging ) { 
             
             this.stateMouse.dragging = true;
@@ -41,7 +41,7 @@ define(['exports'], function (exports) { 'use strict';
     };
 
 
-    var DomeventDrag = {
+    const DomeventDrag = {
 
         eventNames : [
             "drag",
@@ -56,7 +56,7 @@ define(['exports'], function (exports) { 'use strict';
         },
 
         initialize : function( ){
-            var _this = this; 
+            let _this = this; 
             
             this.stateMouse = this.stateMouse || {};    
             this.stateMouse.dragging = false;
@@ -70,16 +70,16 @@ define(['exports'], function (exports) { 'use strict';
             this._$onMouseUpDrag = function(){ _onMouseupDrag.apply( _this, arguments );	};
             this._$onMouseMoveDrag = function(){  _onMousemove.apply( _this, arguments ); };
             
-            var addEventListener = this.addEventListener;
+            let addEventListener = this.addEventListener;
             this.addEventListener = DomeventDrag.addEventListener.call(this, addEventListener );
-            var _notify = this._notify;
+            let _notify = this._notify;
             this._notify = DomeventDrag._notify.call(this, _notify );
         },
 
         _notify : function( _notify ){ 
 
-            var ret = null;
-            var scope = this;
+            let ret = null;
+            let scope = this;
 
             return function( eventName, object3d, origDomEvent, intersect ){   
                 if ( eventName === "dragstart" ) {
@@ -105,7 +105,7 @@ define(['exports'], function (exports) { 'use strict';
         },
 
         addEventListener : function( addEventListener ){ 
-            var scope = this;
+            let scope = this;
 
             return function( object3d, eventName, callback, opt ) { 
                
