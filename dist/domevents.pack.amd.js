@@ -811,11 +811,12 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     };
 
     const CLICK_TIMEOUT = 500;
-    let emulateMouse = false;
+    let emulateMouse = false, emulateClick = false;
 
     const _onPointerDown	= function( event ){
         
         this.timeStamp = event.timeStamp;
+        
         _onMouseEvent.call(this, 'pointerdown', event);
 
         if ( emulateMouse && event.pointerType === "mouse" ) {
@@ -1012,10 +1013,18 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
         },
 
         config : function( opt ){
-            if ( opt && opt.emulateMouse ) {
-                emulateMouse = true;
-                DomeventPointer.eventNames = DomeventPointer.eventNames.concat( mouseEvents );
-                Object.assign(DomeventPointer.eventMapping, mouseEventMapping);
+            if ( opt ){ 
+                if( opt.emulateMouse ) {
+                    emulateMouse = true;
+                    emulateClick = true;
+                    DomeventPointer.eventNames = DomeventPointer.eventNames.concat( mouseEvents );
+                    Object.assign(DomeventPointer.eventMapping, mouseEventMapping);
+                }
+                if ( opt.emulateClick ) {
+                    emulateClick = true;
+                    DomeventPointer.eventNames.push("click");
+                    Object.assign(DomeventPointer.eventMapping, {"click":"onClick"});
+                }
             }
             return DomeventPointer;
         },
@@ -1035,7 +1044,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
             this._$onPointerMove	= function(){ _onPointerMove.apply(_this, arguments);	};
 
-            if ( emulateMouse ){
+            if ( emulateClick ){
                 this._$onClick      = function(){ _onClick.apply( _this, arguments ); };
             }
         },
@@ -1047,7 +1056,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
             this._domElement.addEventListener( 'pointermove'	, this._$onPointerMove	, false );
 
-            if ( emulateMouse ){ 
+            if ( emulateClick ){ 
                 this._domElement.addEventListener( 'click'	, this._$onClick	, false );
             }
         },
@@ -1526,7 +1535,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
                 
                 ret = _notify.call(scope, eventName, object3d, origDomEvent, intersect );
 
-                if ( scope.stateMouse.mousedown && scope.stateMouse.dragging && eventName === "mousemove" ) {
+                if ( scope.stateMouse.mousedown && scope.stateMouse.dragging && eventName === "pointermove" ) {
                     if ( scope._draggingObjs[object3d.id] ) { _notify.call( scope, 'drag', object3d, origDomEvent, intersect ); }
                 }
 
@@ -1540,15 +1549,15 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
             return function( object3d, eventName, callback, opt ) { 
                
                 if ( eventName === "drag" ) {
-                    if( !scope.hasListener(object3d, "mousedown") ){
-                        scope.addEventListener( object3d, "mousedown", "mousedown" );
+                    if( !scope.hasListener(object3d, "pointerdown") ){
+                        scope.addEventListener( object3d, "pointerdown", "pointerdown" );
                     }
-                    object3d.addEventListener("mousedown", scope._$onDragStart );
+                    object3d.addEventListener("pointerdown", scope._$onDragStart );
 
-                    if( !scope.hasListener(object3d, "mousemove") ){
-                        scope.addEventListener( object3d, "mousemove", "mousemove" );
+                    if( !scope.hasListener(object3d, "pointermove") ){
+                        scope.addEventListener( object3d, "pointermove", "pointermove" );
                     }
-                    object3d.addEventListener("mousemove", scope._$onDragging );
+                    object3d.addEventListener("pointermove", scope._$onDragging );
                 }
 
                 addEventListener.call(scope, object3d, eventName, callback, opt );
@@ -1556,16 +1565,16 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
         },
 
         enable : function() { 
-            this._domElement.addEventListener( 'mousedown'	, this._$onMouseDownDrag	, false );
-            this._domElement.addEventListener( 'mouseup'	, this._$onMouseUpDrag		, false );
-            this._domElement.addEventListener( 'mousemove'	, this._$onMouseMoveDrag	, false );
+            this._domElement.addEventListener( 'pointerdown'	, this._$onMouseDownDrag	, false );
+            this._domElement.addEventListener( 'pointerup'	, this._$onMouseUpDrag		, false );
+            this._domElement.addEventListener( 'pointermove'	, this._$onMouseMoveDrag	, false );
             
         },
 
         disable : function() {
-            this._domElement.removeEventListener( 'mousedown', this._$onMouseDownDrag	, false );
-            this._domElement.removeEventListener( 'mouseup', this._$onMouseUpDrag		, false );
-            this._domElement.removeEventListener( 'mousemove', this._$onMouseMoveDrag	, false );
+            this._domElement.removeEventListener( 'pointerdown', this._$onMouseDownDrag	, false );
+            this._domElement.removeEventListener( 'pointerup', this._$onMouseUpDrag		, false );
+            this._domElement.removeEventListener( 'pointermove', this._$onMouseMoveDrag	, false );
             
         }
     };
