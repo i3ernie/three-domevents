@@ -8,7 +8,7 @@ let emulateMouse = false, emulateClick = false;
 
 const _onPointerDown	= function( event ){
     
-    this.timeStamp = event.timeStamp;
+    this.pointerDownTimeStamp = event.timeStamp;
 
     _onMouseEvent.call(this, 'pointerdown', event);
 
@@ -30,6 +30,8 @@ const _onPointerDown	= function( event ){
 
 const _onPointerUp	= function( event ){
 
+    this.pointerUpTimeStamp = event.timeStamp;
+
     _onMouseEvent.call(this, 'pointerup', event);
 
     if ( emulateMouse && ( event.pointerType === "mouse" || event.pointerType === "touch") ) {
@@ -45,6 +47,10 @@ const _onPointerUp	= function( event ){
             }
         }
         _onMouseEvent.call(this, 'mouseup'	, event);
+
+        if ( emulateClick ){
+            this._$onClick( event );
+        }
     }
 };
 
@@ -127,10 +133,10 @@ const _onMove = function( eventName, mouseX, mouseY, origDomEvent )
 const _onClick = function( event )
 {
     // TODO handle touch ? 
-    if ( this.timeStamp !== null && (event.timeStamp - this.timeStamp) > CLICK_TIMEOUT ){
+    if ( this.pointerDownTimeStamp !== null && (event.timeStamp - this.pointerDownTimeStamp) > CLICK_TIMEOUT ){
         return;
     }
-    this.timeStamp = null;
+    this.pointerDownTimeStamp = null;
     _onMouseEvent.call(this, 'click', event );
 };
 
@@ -261,10 +267,6 @@ const DomeventPointer = {
         this._domElement.addEventListener( 'pointerup', this._$onPointerUp, false );
 
         this._domElement.addEventListener( 'pointermove'	, this._$onPointerMove	, false );
-
-        if ( emulateClick ){ 
-            this._domElement.addEventListener( 'click'	, this._$onClick	, false );
-        }
     },
 
     disable : function(){
