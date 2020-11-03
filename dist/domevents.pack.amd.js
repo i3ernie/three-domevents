@@ -1454,6 +1454,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
     const _onMouseupDrag = function( event ){
 
+        this.stateMouse.mousedown = false;
+
         if ( this.stateMouse.dragging ) { 
             
             this.stateMouse.dragging = false;
@@ -1469,15 +1471,18 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
         this._mousedownd = {};
     };
 
-    const _onMousemove = function( event ){ 
-        if ( this.stateMouse.mousedown && !this.stateMouse.dragging ) { 
-            
-            this.stateMouse.dragging = true;
-            this._onMouseEvent('dragstart', event);
-            
-        } 
+    const _onPointermove = function( event ){ 
+        if ( this.stateMouse.mousedown){ 
+            if( this.stateMouse.dragging ) { 
+                this._onMouseEvent('drag', event);
+            } else {
+                this.stateMouse.dragging = true;
+                this._onMouseEvent('dragstart', event);
+            }
+        }
         return;
     };
+
 
 
     const DomeventDrag = {
@@ -1504,10 +1509,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
             this._draggingObjs = {};
 
             this._$onMouseDownDrag = function(){ _onMousedown.apply( _this, arguments ); };
-            //this._$onDragStart	= function(){ _onMousedown.apply( _this, arguments ); };
-            this._$onDragging	= function(){ _onMousemove.apply(_this, arguments);	};
             this._$onMouseUpDrag = function(){ _onMouseupDrag.apply( _this, arguments );	};
-            this._$onMouseMoveDrag = function(){  _onMousemove.apply( _this, arguments ); };
+            this._$onPointerMoveDrag = function(){  _onPointermove.apply( _this, arguments ); };
             
             let addEventListener = this.addEventListener;
             this.addEventListener = DomeventDrag.addEventListener.call(this, addEventListener );
@@ -1522,7 +1525,6 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
             return function( eventName, object3d, origDomEvent, intersect ){   
                 if ( eventName === "dragstart" ) {
-                    console.log( eventName, object3d );
                     scope._draggingObjs[object3d.id] = object3d;
                 }
                 if ( eventName === "dragend" ){
@@ -1534,10 +1536,6 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
                 }
                 
                 ret = _notify.call(scope, eventName, object3d, origDomEvent, intersect );
-
-                if ( scope.stateMouse.mousedown && scope.stateMouse.dragging && eventName === "pointermove" ) {
-                    if ( scope._draggingObjs[object3d.id] ) { _notify.call( scope, 'drag', object3d, origDomEvent, intersect ); }
-                }
 
                 return ret;
             };
@@ -1567,14 +1565,14 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
         enable : function() { 
             this._domElement.addEventListener( 'pointerdown'	, this._$onMouseDownDrag	, false );
             this._domElement.addEventListener( 'pointerup'	, this._$onMouseUpDrag		, false );
-            this._domElement.addEventListener( 'pointermove'	, this._$onMouseMoveDrag	, false );
+            this._domElement.addEventListener( 'pointermove'	, this._$onPointerMoveDrag	, false );
             
         },
 
         disable : function() {
             this._domElement.removeEventListener( 'pointerdown', this._$onMouseDownDrag	, false );
             this._domElement.removeEventListener( 'pointerup', this._$onMouseUpDrag		, false );
-            this._domElement.removeEventListener( 'pointermove', this._$onMouseMoveDrag	, false );
+            this._domElement.removeEventListener( 'pointermove', this._$onPointerMoveDrag	, false );
             
         }
     };

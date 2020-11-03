@@ -9,7 +9,7 @@ import WoodBox from "../WoodBox.js";
 var VP;
 var DEH;
 
-DomEvents.extend( DomEventPointer.config({emulateMouse:true}) );
+DomEvents.extend( DomEventPointer.config({emulateClick:true}) );
 DomEvents.extend( DomeventDrag );
 
 const onDrag = function( ev ){
