@@ -4,11 +4,12 @@ import {Vector3} from "../../node_modules/three/build/three.module.js";
 import getRelativeMouseXY from "../PointerTools.es.js";
 
 const CLICK_TIMEOUT = 500;
-let emulateMouse = false;
+let emulateMouse = false, emulateClick = false;
 
 const _onPointerDown	= function( event ){
     
     this.timeStamp = event.timeStamp;
+    
     _onMouseEvent.call(this, 'pointerdown', event);
 
     if ( emulateMouse && event.pointerType === "mouse" ) {
@@ -218,10 +219,18 @@ const DomeventPointer = {
     },
 
     config : function( opt ){
-        if ( opt && opt.emulateMouse ) {
-            emulateMouse = true;
-            DomeventPointer.eventNames = DomeventPointer.eventNames.concat( mouseEvents );
-            Object.assign(DomeventPointer.eventMapping, mouseEventMapping);
+        if ( opt ){ 
+            if( opt.emulateMouse ) {
+                emulateMouse = true;
+                emulateClick = true;
+                DomeventPointer.eventNames = DomeventPointer.eventNames.concat( mouseEvents );
+                Object.assign(DomeventPointer.eventMapping, mouseEventMapping);
+            }
+            if ( opt.emulateClick ) {
+                emulateClick = true;
+                DomeventPointer.eventNames.push("click");
+                Object.assign(DomeventPointer.eventMapping, {"click":"onClick"});
+            }
         }
         return DomeventPointer;
     },
@@ -241,7 +250,7 @@ const DomeventPointer = {
 
         this._$onPointerMove	= function(){ _onPointerMove.apply(_this, arguments);	};
 
-        if ( emulateMouse ){
+        if ( emulateClick ){
             this._$onClick      = function(){ _onClick.apply( _this, arguments ); }
         }
     },
@@ -253,7 +262,7 @@ const DomeventPointer = {
 
         this._domElement.addEventListener( 'pointermove'	, this._$onPointerMove	, false );
 
-        if ( emulateMouse ){ 
+        if ( emulateClick ){ 
             this._domElement.addEventListener( 'click'	, this._$onClick	, false );
         }
     },

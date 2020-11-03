@@ -9,8 +9,8 @@ import Viewport from "../../node_modules/three-viewport/dist/viewport.es.js";
 import WoodBox from "../WoodBox.js";
 import Grassground from "./Grassground.es.js";
 
-DomEvents.extend( DomeventPointer );
-//DomEvents.extend( DomeventPointer.config({emulateMouse : true}) );
+//DomEvents.extend( DomeventPointer );
+DomEvents.extend( DomeventPointer.config({emulateClick : true}) );
 
 
 var VP;
