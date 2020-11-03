@@ -104,7 +104,7 @@ const DomeventDrag = {
             
             ret = _notify.call(scope, eventName, object3d, origDomEvent, intersect );
 
-            if ( scope.stateMouse.mousedown && scope.stateMouse.dragging && eventName === "mousemove" ) {
+            if ( scope.stateMouse.mousedown && scope.stateMouse.dragging && eventName === "pointermove" ) {
                 if ( scope._draggingObjs[object3d.id] ) _notify.call( scope, 'drag', object3d, origDomEvent, intersect );
             }
 
@@ -118,15 +118,15 @@ const DomeventDrag = {
         return function( object3d, eventName, callback, opt ) { 
            
             if ( eventName === "drag" ) {
-                if( !scope.hasListener(object3d, "mousedown") ){
-                    scope.addEventListener( object3d, "mousedown", "mousedown" );
+                if( !scope.hasListener(object3d, "pointerdown") ){
+                    scope.addEventListener( object3d, "pointerdown", "pointerdown" );
                 }
-                object3d.addEventListener("mousedown", scope._$onDragStart );
+                object3d.addEventListener("pointerdown", scope._$onDragStart );
 
-                if( !scope.hasListener(object3d, "mousemove") ){
-                    scope.addEventListener( object3d, "mousemove", "mousemove" );
+                if( !scope.hasListener(object3d, "pointermove") ){
+                    scope.addEventListener( object3d, "pointermove", "pointermove" );
                 }
-                object3d.addEventListener("mousemove", scope._$onDragging );
+                object3d.addEventListener("pointermove", scope._$onDragging );
             }
 
             addEventListener.call(scope, object3d, eventName, callback, opt );
@@ -134,16 +134,16 @@ const DomeventDrag = {
     },
 
     enable : function() { 
-        this._domElement.addEventListener( 'mousedown'	, this._$onMouseDownDrag	, false );
-        this._domElement.addEventListener( 'mouseup'	, this._$onMouseUpDrag		, false );
-        this._domElement.addEventListener( 'mousemove'	, this._$onMouseMoveDrag	, false );
+        this._domElement.addEventListener( 'pointerdown'	, this._$onMouseDownDrag	, false );
+        this._domElement.addEventListener( 'pointerup'	, this._$onMouseUpDrag		, false );
+        this._domElement.addEventListener( 'pointermove'	, this._$onMouseMoveDrag	, false );
         
     },
 
     disable : function() {
-        this._domElement.removeEventListener( 'mousedown', this._$onMouseDownDrag	, false );
-        this._domElement.removeEventListener( 'mouseup', this._$onMouseUpDrag		, false );
-        this._domElement.removeEventListener( 'mousemove', this._$onMouseMoveDrag	, false );
+        this._domElement.removeEventListener( 'pointerdown', this._$onMouseDownDrag	, false );
+        this._domElement.removeEventListener( 'pointerup', this._$onMouseUpDrag		, false );
+        this._domElement.removeEventListener( 'pointermove', this._$onMouseMoveDrag	, false );
         
     }
 };

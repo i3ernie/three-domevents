@@ -1,6 +1,7 @@
 
 import * as THREE from '../../node_modules/three/build/three.module.js';
 import DomEvents from "../../src/Domevents.es.js";
+import DomEventPointer from "../../src/domevents/DomeventPointer.es.js";
 import DomeventDrag from "../../src/domevents/DomeventDrag.es.js";
 import Viewport from "../../node_modules/three-viewport/dist/viewport.es.js";
 import WoodBox from "../WoodBox.js";
@@ -8,6 +9,7 @@ import WoodBox from "../WoodBox.js";
 var VP;
 var DEH;
 
+DomEvents.extend( DomEventPointer.config({emulateMouse:true}) );
 DomEvents.extend( DomeventDrag );
 
 const onDrag = function( ev ){
