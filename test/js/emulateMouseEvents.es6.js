@@ -68,7 +68,7 @@ function init() {
     mesh1.onClick = logOnClick;
 
     mesh1.onPointerdown = function( ev ){
-        console.log("down", ev.target.name, ev.intersect);
+        console.log("onPointerdown", ev.target.name, ev.intersect);
         ev.stopPropagation();
     };
     mesh1.onMousedown = function( ev ){

@@ -816,10 +816,10 @@ let emulateMouse = false, emulateClick = false;
 const _onPointerDown	= function( event ){
     
     this.timeStamp = event.timeStamp;
-    
+
     _onMouseEvent.call(this, 'pointerdown', event);
 
-    if ( emulateMouse && event.pointerType === "mouse" ) {
+    if ( emulateMouse && ( event.pointerType === "mouse" || event.pointerType === "touch") ) {
         this.stateMouse.mousedown = true;
 
         if ( event.buttons && event.buttons > 1 ) {
@@ -839,7 +839,7 @@ const _onPointerUp	= function( event ){
 
     _onMouseEvent.call(this, 'pointerup', event);
 
-    if ( emulateMouse && event.pointerType === "mouse" ) {
+    if ( emulateMouse && ( event.pointerType === "mouse" || event.pointerType === "touch") ) {
         this.stateMouse.mousedown = false;
 
         if ( event.buttons && event.buttons > 1 ) {
