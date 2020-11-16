@@ -200,9 +200,6 @@ DomEvents.extend = function( obj ) {
 	DomEvents.eventNames = DomEvents.eventNames.concat( obj.eventNames );
 };
 
-//DomEvents.extend( DomeventClick );
-//DomEvents.extend( DomeventTouch );
-//
 
 DomEvents.hasEvent = function( eventName ) {
 	return DomEvents.eventNames.indexOf( eventName ) !== -1;
@@ -441,7 +438,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 	 * object3d.onClick = function( ev ){ ... };
 	 * this function will be autom. bound to the 'click' event
 	 */
-	addToDom : function( object3d, opt ){
+	addToDom : function( object3d, opts ){
 
 		const defaults = {
 			recursive : true, 
@@ -461,7 +458,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		}
 
 		//start register all known events
-		_addEvents.call(this, object3d, Object.assign({}, defaults, opt ) );
+		_addEvents.call(this, object3d, Object.assign({}, defaults, opts ) );
 	},
 
 	removeMappedListener :function ( object3d ){
@@ -481,10 +478,10 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 
 		let options = Object.assign({observe:true}, opt);
 		
-		this.addToDom( object3d, opt );
+		this.addToDom( object3d, options );
 		
 		if ( options.observe ) {
-			this._observe( object3d );
+			this._observe( object3d, options );
 		}
 	},
 
@@ -507,7 +504,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		}
 	},
 
-	_observe : function( object3d ){
+	_observe : function( object3d, opts ){
 
 		let scope = this;
 
@@ -518,7 +515,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		object3d._previousFunctions.add = object3d.add;
 		object3d.add = function( child ){
 
-			scope.activate( child );
+			scope.activate( child, opts );
 			
 			object3d._previousFunctions.add.apply( object3d, arguments );
 		};
@@ -528,7 +525,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 
 			scope.deactivate( child );
 
-			scope.removeFromDom( child );
+			scope.removeFromDom( child, opts );
 
 			object3d._previousFunctions.remove.apply( object3d, arguments );
 		};

@@ -46,6 +46,10 @@ const Eventgroups = {
     
             return this;
         },
+
+        defaultEventGroup : function(){
+            return this.aktEventGroupName === defaults.defaultEventGroup;
+        },
         
         hasEventGroup : function( name ){
             return this._boundDomEvents.hasOwnProperty( name );
@@ -69,6 +73,67 @@ const Eventgroups = {
         this.aktEventGroup = this._boundDomEvents[name];
         this._boundObjs = this._boundObjsGroup[name];
 
+        const addToDom = this.addToDom;
+        this.addToDom = Eventgroups.addToDom.call( this, addToDom );
+
+        const addEventListener = this.addEventListener;
+        this.addEventListener = Eventgroups.addEventListener.call( this, addEventListener );
+
+    },
+
+    
+    addEventListener : function( addEventListener ){
+        const scope = this;
+
+        return function( object3d, eventName, callback, opts ){
+            opts = opts || {};
+
+            let groupName = opts.eventGroup;
+            let aktGroupName = scope.getEventGroupName();
+
+            if ( groupName ){
+                object3d.userData._eventGroup = groupName;
+
+                if ( aktGroupName != groupName ){
+                
+                    if ( !scope.hasEventGroup(groupName) ) {
+                        scope.addEventGroup( groupName );
+                    }
+                    scope.switchEventGroup( groupName );
+                    addEventListener.call(scope, object3d, eventName, callback, opts );
+                    scope.switchEventGroup( aktGroupName );
+                    return;
+                } 
+            }
+            addEventListener.call(scope, object3d, eventName, callback, opts );
+        };
+    },
+    addToDom : function( addToDom ){
+        const scope = this;
+
+        return function( object3d, opts ){
+            opts = opts || {};
+
+            let groupName = opts.eventGroup;
+            let aktGroupName = scope.getEventGroupName();
+
+            if ( groupName ){
+                object3d.userData._eventGroup = groupName;
+                
+                if ( aktGroupName != groupName ){
+                
+                    if ( !scope.hasEventGroup(groupName) ) {
+                        scope.addEventGroup( groupName );
+                    }
+                    scope.switchEventGroup( groupName );
+                    addToDom.call( scope, object3d, opts );
+                    scope.switchEventGroup( aktGroupName );
+                    return;
+                } 
+            }
+
+            addToDom.call( scope, object3d, opts );
+        }
     }
 };
 
@@ -257,9 +322,6 @@ DomEvents.extend = function( obj ) {
 	DomEvents.eventNames = DomEvents.eventNames.concat( obj.eventNames );
 };
 
-//DomEvents.extend( DomeventClick );
-//DomEvents.extend( DomeventTouch );
-//
 
 DomEvents.hasEvent = function( eventName ) {
 	return DomEvents.eventNames.indexOf( eventName ) !== -1;
@@ -498,7 +560,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 	 * object3d.onClick = function( ev ){ ... };
 	 * this function will be autom. bound to the 'click' event
 	 */
-	addToDom : function( object3d, opt ){
+	addToDom : function( object3d, opts ){
 
 		const defaults = {
 			recursive : true, 
@@ -518,7 +580,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 		}
 
 		//start register all known events
-		_addEvents.call(this, object3d, Object.assign({}, defaults, opt ) );
+		_addEvents.call(this, object3d, Object.assign({}, defaults, opts ) );
 	},
 
 	removeMappedListener :function ( object3d ){
@@ -538,10 +600,10 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 
 		let options = Object.assign({observe:true}, opt);
 		
-		this.addToDom( object3d, opt );
+		this.addToDom( object3d, options );
 		
 		if ( options.observe ) {
-			this._observe( object3d );
+			this._observe( object3d, options );
 		}
 	},
 
@@ -564,7 +626,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 		}
 	},
 
-	_observe : function( object3d ){
+	_observe : function( object3d, opts ){
 
 		let scope = this;
 
@@ -575,7 +637,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 		object3d._previousFunctions.add = object3d.add;
 		object3d.add = function( child ){
 
-			scope.activate( child );
+			scope.activate( child, opts );
 			
 			object3d._previousFunctions.add.apply( object3d, arguments );
 		};
@@ -585,7 +647,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 
 			scope.deactivate( child );
 
-			scope.removeFromDom( child );
+			scope.removeFromDom( child, opts );
 
 			object3d._previousFunctions.remove.apply( object3d, arguments );
 		};
