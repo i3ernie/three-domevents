@@ -785,29 +785,27 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
     			let handler	= handlers[i];
 
+    			let ev = {
+    				type: eventName,
+    				target: object3d,
+    				origDomEvent: origDomEvent,
+    				intersect: intersect,
+    				stopPropagation: stopPropagation,
+    				preventDefault : preventDefault,
+    				nextIntersect : nextIntersect
+    			};
+
+    			if ( this.aktEventGroupName ) {
+    				ev.eventGroupName = this.aktEventGroupName;
+    			}
+
     			capture = handler.useCapture;
     			if ( typeof handler.callback === "function") { 
-    				handler.callback({
-    					type: eventName,
-    					target: object3d,
-    					origDomEvent: origDomEvent,
-    					intersect: intersect,
-    					stopPropagation: stopPropagation,
-    					preventDefault : preventDefault,
-    					nextIntersect : nextIntersect
-    				});
+    				handler.callback(ev);
     			}
     			else if ( typeof handler.callback === "string" && typeof object3d.dispatchEvent === "function" ) { 
     					
-    				object3d.dispatchEvent( {
-    					type: handler.callback,
-    					target: object3d,
-    					origDomEvent: origDomEvent,
-    					intersect: intersect,
-    					stopPropagation: stopPropagation,
-    					preventDefault : preventDefault,
-    					nextIntersect : nextIntersect
-    				});
+    				object3d.dispatchEvent( ev );
     			}
     			
     			if( capture ){ 
