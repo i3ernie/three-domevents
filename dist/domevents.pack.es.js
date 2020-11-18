@@ -805,6 +805,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 			}
 			else if ( typeof handler.callback === "string" && typeof object3d.dispatchEvent === "function" ) { 
 					
+				ev.type = handler.callback,
 				object3d.dispatchEvent( ev );
 			}
 			

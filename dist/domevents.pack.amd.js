@@ -805,6 +805,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     			}
     			else if ( typeof handler.callback === "string" && typeof object3d.dispatchEvent === "function" ) { 
     					
+    				ev.type = handler.callback,
     				object3d.dispatchEvent( ev );
     			}
     			
