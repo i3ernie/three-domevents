@@ -205,6 +205,7 @@ const _addEvents = function ( obj, options ) {
 	DomEvents.eventNames.forEach( function( eventName ) {
 
 		if( scope.hasListener( obj, eventName ) ) {
+			console.warn("object3d has listener allready registered for " + eventName );
 			return;
 		}
 
@@ -272,6 +273,8 @@ const DomEvents = function( camera, domElement )
 	this._selected		= null;
 	this._boundObjs		= {};
 	this.enabled = false;
+	this._previousFunctions = {};
+	this._registeredObjs		= {};
 	
 	// Bind dom event for mouse and touch
 	let _this			= this;
@@ -535,7 +538,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 
 		if ( !( object3d instanceof Object3D ) ){
 
-			if ( object3d.target ) {
+			if ( object3d.target && object3d.target instanceof Object3D ) {
 				object3d= object3d.target;
 			} else {
 				console.warn("object3d is not instance of THREE.Object3D");
@@ -543,7 +546,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 			}
 		}
 
-		
+		delete this._registeredObjs[object3d.id];
 		//und los gehts aufraeumen...
 		_removeEvents.call(this, object3d, Object.assign({}, defaults, opt ) );
 	
@@ -568,16 +571,23 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 			bindFunctions : true
 		};
 
+		if ( this._registeredObjs[object3d.id] ){
+			console.warn("object3d is allready registered ", object3d );
+			return;
+		}
+
 		if ( !( object3d instanceof Object3D ) ) {
 
 			//event object?
-			if ( object3d.target ) {
+			if ( object3d.target && object3d.target instanceof Object3D ) {
 				object3d = object3d.target;
 			} else {
 				console.warn("object3d is nit instance of THREE.Object3D", object3d );
 				return;
 			}
 		}
+
+		this._registeredObjs[object3d.id] = object3d.id;
 
 		//start register all known events
 		_addEvents.call(this, object3d, Object.assign({}, defaults, opts ) );
@@ -608,14 +618,17 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 	},
 
 	deactivate : function( object3d ) {
-		let scope = this;
+		const scope = this;
+		const id = object3d.id;
 
-		if ( object3d._previousFunctions ){
-			if ( typeof object3d._previousFunctions.add === "function") { 
-				object3d.add = object3d._previousFunctions.add;
+		if ( this._previousFunctions[id] ){
+			if ( typeof this._previousFunctions[id].add === "function") { 
+				object3d.add = this._previousFunctions[id].add;
+				delete this._previousFunctions[id].add;
 			}
-			if ( typeof object3d._previousFunctions.remove === "function") {
-				object3d.remove = object3d._previousFunctions.remove;
+			if ( typeof this._previousFunctions[id].remove === "function") {
+				object3d.remove = this._previousFunctions[id].remove;
+				delete this._previousFunctions[id].remove;
 			}
 		}
 
@@ -626,30 +639,35 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 		}
 	},
 
-	_observe : function( object3d, opts ){
+	_observe : function( object3d, opts ) {
 
-		let scope = this;
+		const scope = this;
+		const id = object3d.id;
 
-		if ( ! object3d._previousFunctions ) {
-			object3d._previousFunctions = {};
+		if ( ! this._previousFunctions[id] ) {
+			this._previousFunctions[id] = {};
 		}
 
-		object3d._previousFunctions.add = object3d.add;
+		if ( typeof scope._previousFunctions[id].add === "function" ){ 
+			return;
+		}
+
+		this._previousFunctions[id].add = object3d.add;
 		object3d.add = function( child ){
 
 			scope.activate( child, opts );
 			
-			object3d._previousFunctions.add.apply( object3d, arguments );
+			scope._previousFunctions[id].add.apply( object3d, arguments );
 		};
 		
-		object3d._previousFunctions.remove = object3d.remove;
+		this._previousFunctions[id].remove = object3d.remove;
 		object3d.remove = function( child ){
 
 			scope.deactivate( child );
 
 			scope.removeFromDom( child, opts );
 
-			object3d._previousFunctions.remove.apply( object3d, arguments );
+			scope._previousFunctions[id].remove.apply( object3d, arguments );
 		};
 
 		//wenn kindelemente vorhanden

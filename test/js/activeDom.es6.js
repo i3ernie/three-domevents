@@ -45,7 +45,7 @@ function init() {
     VP.scene.add( world );
 
     DEH.activate( activeWorld ); //or for global ( VP.Scene )
-
+    DEH.activate( activeWorld );
     //box number one
     let mesh1 = new WoodBox(100, 100, 100);
     mesh1.name = "box_1";
