@@ -280,9 +280,9 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 	addEventListener : function( object3d, eventName, callback, opt ) {
 		opt = opt || {};
 
-		let _this = this;
+		const _this = this;
 
-		let useCapture = opt.useCapture || false;
+		const useCapture = opt.useCapture || false;
 		let scope = this;
 
 		extensions.forEach(function( ext ){ 
@@ -342,18 +342,22 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		}
 	},
 
-	removeEventListener	: function( object3d, eventName, callback, useCapture ) {
-		
-		if ( eventName === null || eventName === undefined ){
+	removeEventListener	: function( object3d, eventName, callback, opts ) {
+		opts = opts || {};
+
+		const useCapture = opts.useCapture;
+
+		if ( eventName === null || eventName === undefined ) {
 			eventName = DomEvents.eventNames;
-			return;
 		}
-		if ( typeof eventName == "object"){
+		
+		if ( typeof eventName === "object" ){
 			for ( let i = 0; i<eventName.length; i++){
 				this.unbind(object3d, eventName[i], callback, useCapture);
 			}
 			return;
 		}
+		
 		this.unbind (object3d, eventName, callback, useCapture);
 	},
 

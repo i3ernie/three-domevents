@@ -130,13 +130,25 @@ function init() {
 
 
 
-    let mesh4 = new WoodBox( 100, 100, 100 );
+    let mesh4 = new WoodBox( 50, 50, 50 );
     mesh4.name = "box_4";
-    mesh4.position.set( 150, 50, -200 );
+    mesh4.position.set( 150, 25, -200 );
+
     DEH.addEventListener(mesh4, "click", function(){
-        DEH.switchEventGroup("test");
+        
+            DEH.switchEventGroup("test");
+      
+        alert("click 2");
+    }, {eventGroup:"test2"});
+
+    DEH.addEventListener(mesh4, "click", function(){
+
+        DEH.switchEventGroup("test2");
+
+        DEH.removeEventListener(mesh4, "click", null, {eventGroup:"test"});
+        
         alert("click");
-}, {eventGroup:"test2"});
+    }, {eventGroup:"test"});
 
 DEH.switchEventGroup("test2");
 

@@ -77,9 +77,35 @@ const Eventgroups = {
         const addEventListener = this.addEventListener;
         this.addEventListener = Eventgroups.addEventListener.call( this, addEventListener );
 
+        const removeEventListener = this.removeEventListener;
+        this.removeEventListener = Eventgroups.removeEventListener.call( this, removeEventListener );
+
     },
 
-    
+    removeEventListener : function( removeEventListener ) {
+        const scope = this;
+
+        return function( object3d, eventName, callback, opts ){
+            opts = opts || {};
+
+            let groupName = opts.eventGroup;
+            let aktGroupName = scope.getEventGroupName();
+            
+            if ( groupName && aktGroupName !== groupName ){
+            
+                if ( !scope.hasEventGroup(groupName) ) {
+                    return;
+                }
+                scope.switchEventGroup( groupName );
+                removeEventListener.call(scope, object3d, eventName, callback, opts );
+                scope.switchEventGroup( aktGroupName );
+                return;
+            } 
+
+            removeEventListener.call(scope, object3d, eventName, callback, opts );
+        };
+    },
+
     addEventListener : function( addEventListener ){
         const scope = this;
 
@@ -92,8 +118,8 @@ const Eventgroups = {
             if ( groupName ){
                 object3d.userData._eventGroup = groupName;
 
-                if ( aktGroupName != groupName ){
-                
+                if ( aktGroupName != groupName )
+                {
                     if ( !scope.hasEventGroup(groupName) ) {
                         scope.addEventGroup( groupName );
                     }

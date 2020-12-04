@@ -79,9 +79,35 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
             const addEventListener = this.addEventListener;
             this.addEventListener = Eventgroups.addEventListener.call( this, addEventListener );
 
+            const removeEventListener = this.removeEventListener;
+            this.removeEventListener = Eventgroups.removeEventListener.call( this, removeEventListener );
+
         },
 
-        
+        removeEventListener : function( removeEventListener ) {
+            const scope = this;
+
+            return function( object3d, eventName, callback, opts ){
+                opts = opts || {};
+
+                let groupName = opts.eventGroup;
+                let aktGroupName = scope.getEventGroupName();
+                
+                if ( groupName && aktGroupName !== groupName ){
+                
+                    if ( !scope.hasEventGroup(groupName) ) {
+                        return;
+                    }
+                    scope.switchEventGroup( groupName );
+                    removeEventListener.call(scope, object3d, eventName, callback, opts );
+                    scope.switchEventGroup( aktGroupName );
+                    return;
+                } 
+
+                removeEventListener.call(scope, object3d, eventName, callback, opts );
+            };
+        },
+
         addEventListener : function( addEventListener ){
             const scope = this;
 
@@ -94,8 +120,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
                 if ( groupName ){
                     object3d.userData._eventGroup = groupName;
 
-                    if ( aktGroupName != groupName ){
-                    
+                    if ( aktGroupName != groupName )
+                    {
                         if ( !scope.hasEventGroup(groupName) ) {
                             scope.addEventGroup( groupName );
                         }
@@ -402,9 +428,9 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     	addEventListener : function( object3d, eventName, callback, opt ) {
     		opt = opt || {};
 
-    		let _this = this;
+    		const _this = this;
 
-    		let useCapture = opt.useCapture || false;
+    		const useCapture = opt.useCapture || false;
     		let scope = this;
 
     		extensions.forEach(function( ext ){ 
@@ -464,18 +490,22 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     		}
     	},
 
-    	removeEventListener	: function( object3d, eventName, callback, useCapture ) {
-    		
-    		if ( eventName === null || eventName === undefined ){
+    	removeEventListener	: function( object3d, eventName, callback, opts ) {
+    		opts = opts || {};
+
+    		const useCapture = opts.useCapture;
+
+    		if ( eventName === null || eventName === undefined ) {
     			eventName = DomEvents.eventNames;
-    			return;
     		}
-    		if ( typeof eventName == "object"){
+    		
+    		if ( typeof eventName === "object" ){
     			for ( let i = 0; i<eventName.length; i++){
     				this.unbind(object3d, eventName[i], callback, useCapture);
     			}
     			return;
     		}
+    		
     		this.unbind (object3d, eventName, callback, useCapture);
     	},
 
