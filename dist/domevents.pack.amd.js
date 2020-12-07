@@ -507,6 +507,12 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     		}
     		
     		this.unbind (object3d, eventName, callback, useCapture);
+
+    		if ( opt.recursive ) {
+    			_.each( object3d.children, function( object3d ){
+    				scope.removeEventListener( object3d, eventName, callback, opt );
+    			});
+    		}
     	},
 
     	unbind : function( object3d, eventName, callback, useCapture )
