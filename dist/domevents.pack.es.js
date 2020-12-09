@@ -4,6 +4,15 @@ const defaults = {
 	"defaultEventGroup" : "_default"
 };
 
+const registerGroup = function( object3d, name ){
+    if ( !object3d.userData.eventGroups ) {
+        object3d.userData.eventGroups = [];
+    }
+    if ( object3d.userData.eventGroups.indexOf(name) < 0 ) {
+        object3d.userData.eventGroups.push(name);
+    }
+};
+
 const Eventgroups = {
     interface : {
         addEventGroup : function( name ) {
@@ -118,7 +127,7 @@ const Eventgroups = {
             let aktGroupName = scope.getEventGroupName();
 
             if ( groupName ){
-                object3d.userData._eventGroup = groupName;
+                registerGroup(object3d, groupName);
 
                 if ( aktGroupName != groupName )
                 {
@@ -144,7 +153,7 @@ const Eventgroups = {
             let aktGroupName = scope.getEventGroupName();
 
             if ( groupName ){
-                object3d.userData._eventGroup = groupName;
+                registerGroup( object3d, groupName );
                 
                 if ( aktGroupName != groupName ){
                 
@@ -156,6 +165,24 @@ const Eventgroups = {
                     scope.switchEventGroup( aktGroupName );
                     return;
                 } 
+            }
+
+            let groupList = object3d.userData.eventGroups;
+            if ( groupList ) {
+                if ( typeof groupList === "string" ) { 
+                    groupList = [groupList];
+                }
+                groupList.forEach(function( groupName ) {
+                    if ( aktGroupName != groupName ){
+                
+                        if ( !scope.hasEventGroup(groupName) ) {
+                            scope.addEventGroup( groupName );
+                        }
+                        scope.switchEventGroup( groupName );
+                        addToDom.call( scope, object3d, opts );
+                        scope.switchEventGroup( aktGroupName );
+                    } 
+                });
             }
 
             addToDom.call( scope, object3d, opts );
@@ -492,6 +519,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 
 	removeEventListener	: function( object3d, eventName, callback, opts ) {
 		opts = opts || {};
+		const scope = this;
 
 		const useCapture = opts.useCapture;
 
@@ -508,9 +536,9 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 		
 		this.unbind (object3d, eventName, callback, useCapture);
 
-		if ( opt.recursive ) {
+		if ( opts.recursive ) {
 			_.each( object3d.children, function( object3d ){
-				scope.removeEventListener( object3d, eventName, callback, opt );
+				scope.removeEventListener( object3d, eventName, callback, opts );
 			});
 		}
 	},
@@ -608,7 +636,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 		};
 
 		if ( this._registeredObjs[object3d.id] ){
-			console.warn("object3d is allready registered ", object3d );
+			console.warn("Domevents: object3d is allready registered ", object3d );
 			return;
 		}
 
@@ -618,7 +646,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 			if ( object3d.target && object3d.target instanceof Object3D ) {
 				object3d = object3d.target;
 			} else {
-				console.warn("object3d is nit instance of THREE.Object3D", object3d );
+				console.warn("Domevents: object3d is nit instance of THREE.Object3D", object3d );
 				return;
 			}
 		}

@@ -344,6 +344,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 
 	removeEventListener	: function( object3d, eventName, callback, opts ) {
 		opts = opts || {};
+		const scope = this;
 
 		const useCapture = opts.useCapture;
 
@@ -360,9 +361,9 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		
 		this.unbind (object3d, eventName, callback, useCapture);
 
-		if ( opt.recursive ) {
+		if ( opts.recursive ) {
 			_.each( object3d.children, function( object3d ){
-				scope.removeEventListener( object3d, eventName, callback, opt );
+				scope.removeEventListener( object3d, eventName, callback, opts );
 			});
 		}
 	},
@@ -460,7 +461,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		};
 
 		if ( this._registeredObjs[object3d.id] ){
-			console.warn("object3d is allready registered ", object3d );
+			console.warn("Domevents: object3d is allready registered ", object3d );
 			return;
 		}
 
@@ -470,7 +471,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 			if ( object3d.target && object3d.target instanceof Object3D ) {
 				object3d = object3d.target;
 			} else {
-				console.warn("object3d is nit instance of THREE.Object3D", object3d );
+				console.warn("Domevents: object3d is nit instance of THREE.Object3D", object3d );
 				return;
 			}
 		}

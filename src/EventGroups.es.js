@@ -2,6 +2,15 @@ const defaults = {
 	"defaultEventGroup" : "_default"
 };
 
+const registerGroup = function( object3d, name ){
+    if ( !object3d.userData.eventGroups ) {
+        object3d.userData.eventGroups = [];
+    }
+    if ( object3d.userData.eventGroups.indexOf(name) < 0 ) {
+        object3d.userData.eventGroups.push(name);
+    }
+};
+
 const Eventgroups = {
     interface : {
         addEventGroup : function( name ) {
@@ -116,7 +125,7 @@ const Eventgroups = {
             let aktGroupName = scope.getEventGroupName();
 
             if ( groupName ){
-                object3d.userData._eventGroup = groupName;
+                registerGroup(object3d, groupName);
 
                 if ( aktGroupName != groupName )
                 {
@@ -142,7 +151,7 @@ const Eventgroups = {
             let aktGroupName = scope.getEventGroupName();
 
             if ( groupName ){
-                object3d.userData._eventGroup = groupName;
+                registerGroup( object3d, groupName );
                 
                 if ( aktGroupName != groupName ){
                 
@@ -154,6 +163,24 @@ const Eventgroups = {
                     scope.switchEventGroup( aktGroupName );
                     return;
                 } 
+            }
+
+            let groupList = object3d.userData.eventGroups;
+            if ( groupList ) {
+                if ( typeof groupList === "string" ) { 
+                    groupList = [groupList];
+                }
+                groupList.forEach(function( groupName ) {
+                    if ( aktGroupName != groupName ){
+                
+                        if ( !scope.hasEventGroup(groupName) ) {
+                            scope.addEventGroup( groupName );
+                        }
+                        scope.switchEventGroup( groupName );
+                        addToDom.call( scope, object3d, opts );
+                        scope.switchEventGroup( aktGroupName );
+                    } 
+                });
             }
 
             addToDom.call( scope, object3d, opts );
