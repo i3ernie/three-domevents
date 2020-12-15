@@ -273,11 +273,6 @@ const _addEvents = function ( obj, options ) {
 
 	});
 
-	if ( options.recursive && obj.children.length > 0 ) {
-		obj.children.forEach( function( child ){
-			_addEvents.call(scope, child, options );
-		});
-	}
 };
 
 const _removeEvents = function( obj, options ){
@@ -635,6 +630,8 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 			bindFunctions : true
 		};
 
+		const scope = this;
+
 		if ( this._registeredObjs[object3d.id] ){
 			console.warn("Domevents: object3d is allready registered ", object3d );
 			return;
@@ -655,6 +652,12 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 
 		//start register all known events
 		_addEvents.call(this, object3d, Object.assign({}, defaults, opts ) );
+
+		if ( opts.recursive && object3d.children.length > 0 ) {
+			object3d.children.forEach( function( child ){
+				scope.addToDom.call(scope, child, opts );
+			});
+		}
 	},
 
 	removeMappedListener :function ( object3d ){
