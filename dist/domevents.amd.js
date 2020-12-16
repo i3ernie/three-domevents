@@ -28,6 +28,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
         
                 this._boundDomEvents[name] = {};
                 this._boundObjsGroup[name] = {};
+                this._registeredObjsGroup[name] = {};
+                
 
                 
                 return this;
@@ -35,6 +37,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
             
             deleteEventGroup : function( name ){
                 delete this._boundDomEvents[name];
+                return this;
             },
         
             switchEventGroup : function( name ) {
@@ -42,6 +45,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
                     this.aktEventGroupName = name;
                     this.aktEventGroup = this._boundDomEvents[name];
                     this._boundObjs = this._boundObjsGroup[name];
+                    this._registeredObjs = this._registeredObjsGroup[name];
                 }
                 return this;
             },
@@ -52,6 +56,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
                 this.aktEventGroupName = name;
                 this.aktEventGroup = this._boundDomEvents[name];
                 this._boundObjs = this._boundObjsGroup[name];
+                this._registeredObjs = this._registeredObjsGroup[name];
         
                 return this;
             },
@@ -75,6 +80,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
         
             this._boundDomEvents[name] = {};
             this._boundObjsGroup[name] = {};
+            this._registeredObjsGroup[name] = {};
         
             
             this.aktEventGroupName = name;
