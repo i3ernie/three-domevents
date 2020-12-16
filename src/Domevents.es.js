@@ -454,6 +454,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 			useCapture: false, 
 			bindFunctions : true
 		};
+		const options = Object.assign({}, defaults, opts);
 
 		const scope = this;
 
@@ -476,11 +477,11 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		this._registeredObjs[object3d.id] = object3d.id;
 
 		//start register all known events
-		_addEvents.call(this, object3d, Object.assign({}, defaults, opts ) );
+		_addEvents.call(this, object3d, options );
 
-		if ( opts.recursive && object3d.children.length > 0 ) {
+		if ( options.recursive && object3d.children.length > 0 ) {
 			object3d.children.forEach( function( child ){
-				scope.addToDom.call(scope, child, opts );
+				scope.addToDom.call(scope, child, options );
 			});
 		}
 	},
