@@ -75,8 +75,10 @@ const Eventgroups = {
     },
     initialize : function( name ){
         name = name || defaults.defaultEventGroup;
+        
         this._boundDomEvents = {};
         this._boundObjsGroup = {};
+        this._registeredObjsGroup = {};
     
         this._boundDomEvents[name] = {};
         this._boundObjsGroup[name] = {};

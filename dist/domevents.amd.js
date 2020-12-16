@@ -75,8 +75,10 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
         },
         initialize : function( name ){
             name = name || defaults.defaultEventGroup;
+            
             this._boundDomEvents = {};
             this._boundObjsGroup = {};
+            this._registeredObjsGroup = {};
         
             this._boundDomEvents[name] = {};
             this._boundObjsGroup[name] = {};
