@@ -93,8 +93,12 @@ const Eventgroups = {
         const addToDom = this.addToDom;
         this.addToDom = Eventgroups.addToDom.call( this, addToDom );
 
+        const removeFromDom = this.removeFromDom;
+        this.removeFromDom = Eventgroups.removeFromDom.call( this, removeFromDom );
+
         const addEventListener = this.addEventListener;
         this.addEventListener = Eventgroups.addEventListener.call( this, addEventListener );
+
 
         const removeEventListener = this.removeEventListener;
         this.removeEventListener = Eventgroups.removeEventListener.call( this, removeEventListener );
@@ -151,6 +155,28 @@ const Eventgroups = {
             addEventListener.call(scope, object3d, eventName, callback, opts );
         };
     },
+
+    removeFromDom : function( removeFromDom ) {
+        const scope = this;
+
+        return  function( object3d, opts ) {
+
+            const aktGroupName = scope.getEventGroupName();
+
+            for ( let groupName in this._boundDomEvents ){
+            
+                if ( aktGroupName !== groupName ){
+            
+                    scope.switchEventGroup( groupName );
+                    removeFromDom.call( scope, object3d, opts );
+                    scope.switchEventGroup( aktGroupName );
+                } 
+            }
+
+            removeFromDom.call( scope,object3d, opts );
+        };
+    },
+
     addToDom : function( addToDom ){
         const scope = this;
 
@@ -309,7 +335,7 @@ const _removeEvents = function( obj, options ){
 			}
 		}
 	});
-	
+
 	//das ganze fuer alle kinder 
 	if ( options.recursive && obj.children.length > 0 ) {
 
@@ -317,6 +343,7 @@ const _removeEvents = function( obj, options ){
 			_removeEvents.call( scope, child, options );
 		});
 	}
+	
 };
 
 
@@ -343,7 +370,10 @@ const DomEvents = function( camera, domElement )
 	this.timeStamp = null;
 	
 	this.onRemove = function(){ _this.removeFromDom.apply( _this, arguments ); };
-	this.onAdd = function(){ _this.addToDom.apply( _this, arguments ); };
+	this.onAdd = function( ev ) { console.log(ev.target);
+		const obj = ev.target? ev.target : ev; 
+		_this.addToDom.call( _this, obj ); 
+	};
 
 	//init extensions
 	extensions.forEach(function( ext ){
@@ -597,11 +627,12 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 
 	},
 
-	removeFromDom : function( object3d, opt ) {
+	removeFromDom : function( object3d, opts ) {
 
 		let defaults = {
 			recursive : true
 		};
+		const options = Object.assign( {}, defaults, opts );
 
 		if ( !( object3d instanceof Object3D ) ){
 
@@ -615,8 +646,8 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 
 		delete this._registeredObjs[object3d.id];
 		//und los gehts aufraeumen...
-		_removeEvents.call(this, object3d, Object.assign({}, defaults, opt ) );
-	
+		_removeEvents.call(this, object3d, options );
+
 	},
 
 	/**

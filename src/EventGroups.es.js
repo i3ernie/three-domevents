@@ -91,8 +91,12 @@ const Eventgroups = {
         const addToDom = this.addToDom;
         this.addToDom = Eventgroups.addToDom.call( this, addToDom );
 
+        const removeFromDom = this.removeFromDom;
+        this.removeFromDom = Eventgroups.removeFromDom.call( this, removeFromDom );
+
         const addEventListener = this.addEventListener;
         this.addEventListener = Eventgroups.addEventListener.call( this, addEventListener );
+
 
         const removeEventListener = this.removeEventListener;
         this.removeEventListener = Eventgroups.removeEventListener.call( this, removeEventListener );
@@ -149,6 +153,28 @@ const Eventgroups = {
             addEventListener.call(scope, object3d, eventName, callback, opts );
         };
     },
+
+    removeFromDom : function( removeFromDom ) {
+        const scope = this;
+
+        return  function( object3d, opts ) {
+
+            const aktGroupName = scope.getEventGroupName();
+
+            for ( let groupName in this._boundDomEvents ){
+            
+                if ( aktGroupName !== groupName ){
+            
+                    scope.switchEventGroup( groupName );
+                    removeFromDom.call( scope, object3d, opts );
+                    scope.switchEventGroup( aktGroupName );
+                } 
+            }
+
+            removeFromDom.call( scope,object3d, opts );
+        };
+    },
+
     addToDom : function( addToDom ){
         const scope = this;
 

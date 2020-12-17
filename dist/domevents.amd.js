@@ -93,8 +93,12 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
             const addToDom = this.addToDom;
             this.addToDom = Eventgroups.addToDom.call( this, addToDom );
 
+            const removeFromDom = this.removeFromDom;
+            this.removeFromDom = Eventgroups.removeFromDom.call( this, removeFromDom );
+
             const addEventListener = this.addEventListener;
             this.addEventListener = Eventgroups.addEventListener.call( this, addEventListener );
+
 
             const removeEventListener = this.removeEventListener;
             this.removeEventListener = Eventgroups.removeEventListener.call( this, removeEventListener );
@@ -151,6 +155,28 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
                 addEventListener.call(scope, object3d, eventName, callback, opts );
             };
         },
+
+        removeFromDom : function( removeFromDom ) {
+            const scope = this;
+
+            return  function( object3d, opts ) {
+
+                const aktGroupName = scope.getEventGroupName();
+
+                for ( let groupName in this._boundDomEvents ){
+                
+                    if ( aktGroupName !== groupName ){
+                
+                        scope.switchEventGroup( groupName );
+                        removeFromDom.call( scope, object3d, opts );
+                        scope.switchEventGroup( aktGroupName );
+                    } 
+                }
+
+                removeFromDom.call( scope,object3d, opts );
+            };
+        },
+
         addToDom : function( addToDom ){
             const scope = this;
 
@@ -309,7 +335,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     			}
     		}
     	});
-    	
+
     	//das ganze fuer alle kinder 
     	if ( options.recursive && obj.children.length > 0 ) {
 
@@ -317,6 +343,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     			_removeEvents.call( scope, child, options );
     		});
     	}
+    	
     };
 
 
@@ -343,7 +370,10 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     	this.timeStamp = null;
     	
     	this.onRemove = function(){ _this.removeFromDom.apply( _this, arguments ); };
-    	this.onAdd = function(){ _this.addToDom.apply( _this, arguments ); };
+    	this.onAdd = function( ev ) { console.log(ev.target);
+    		const obj = ev.target? ev.target : ev; 
+    		_this.addToDom.call( _this, obj ); 
+    	};
 
     	//init extensions
     	extensions.forEach(function( ext ){
@@ -597,11 +627,12 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
     	},
 
-    	removeFromDom : function( object3d, opt ) {
+    	removeFromDom : function( object3d, opts ) {
 
     		let defaults = {
     			recursive : true
     		};
+    		const options = Object.assign( {}, defaults, opts );
 
     		if ( !( object3d instanceof three_module_js.Object3D ) ){
 
@@ -615,8 +646,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
     		delete this._registeredObjs[object3d.id];
     		//und los gehts aufraeumen...
-    		_removeEvents.call(this, object3d, Object.assign({}, defaults, opt ) );
-    	
+    		_removeEvents.call(this, object3d, options );
+
     	},
 
     	/**
