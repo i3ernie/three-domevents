@@ -99,15 +99,15 @@ const _onMove = function( eventName, mouseX, mouseY, origDomEvent )
 
         // notify mouseMove - done at the end with a copy of the list to allow callback to remove handlers
         if (notifyMove) {
-            doIntersect = this._notify('mousemove', newSelected, origDomEvent, intersect);
+            doIntersect = this._notify('mousemove', newSelected, origDomEvent, intersect, intersects);
         }
         // notify mouseEnter - done at the end with a copy of the list to allow callback to remove handlers
         if (notifyOver) {
-            this._notify('mouseover', newSelected, origDomEvent, intersect);
+            this._notify('mouseover', newSelected, origDomEvent, intersect, intersects);
         }
         // notify mouseLeave - done at the end with a copy of the list to allow callback to remove handlers
         if (notifyOut) {
-            this._notify('mouseout' , oldSelected, origDomEvent, intersect);
+            this._notify('mouseout' , oldSelected, origDomEvent, intersect, intersects);
         }
        
     }
