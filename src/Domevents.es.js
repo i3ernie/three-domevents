@@ -680,7 +680,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		
 		// if no handler do bubbling
 		if( !objectCtx || !handlers || handlers.length === 0 ){ 
-			if ( object3d.parent ) return this._notify( eventName, object3d.parent, origDomEvent, intersect );
+			if ( object3d.parent ) return this._notify( eventName, object3d.parent, origDomEvent, intersect, intersects );
 			return false;
 		}
 		

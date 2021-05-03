@@ -883,11 +883,11 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     		let handlers	= objectCtx ? objectCtx[eventName+'Handlers'] : null;
 
     		// parameter check
-    		console.assert( arguments.length === 4 );
+    		console.assert( arguments.length >= 4 );
     		
     		// if no handler do bubbling
     		if( !objectCtx || !handlers || handlers.length === 0 ){ 
-    			if ( object3d.parent ) { return this._notify( eventName, object3d.parent, origDomEvent, intersect ); }
+    			if ( object3d.parent ) { return this._notify( eventName, object3d.parent, origDomEvent, intersect, intersects ); }
     			return false;
     		}
     		
