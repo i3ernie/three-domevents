@@ -172,7 +172,7 @@ function logEvent( ev ){
 }
 function logOnClick( ev ){
     console.log("this: ", this, "target.name " + ev.target.name + " = this.name " + this.name );
-    console.log( ev.target.name + ".onClick: " );
+    console.log( ev.target.name + ".onClick: ",ev );
 }
 
 

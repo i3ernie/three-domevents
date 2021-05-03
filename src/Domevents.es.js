@@ -123,6 +123,8 @@ const _removeEvents = function( obj, options ){
 		}
 	});
 
+	delete this._registeredObjs[obj.id];
+
 	//das ganze fuer alle kinder 
 	if ( options.recursive && obj.children.length > 0 ) {
 
@@ -437,7 +439,6 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 			}
 		}
 
-		delete this._registeredObjs[object3d.id];
 		//und los gehts aufraeumen...
 		_removeEvents.call(this, object3d, options );
 
@@ -655,7 +656,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 			return;
 		}
 
-		let doIntersect = this._notify(eventName, object3d, origDomEvent, intersect);
+		let doIntersect = this._notify(eventName, object3d, origDomEvent, intersect, intersects);
 		
 		while ( doIntersect && intersects[i+1] ){
 			i++;
@@ -665,17 +666,17 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 			if( !objectCtx ) { 
 				return;
 			}
-			doIntersect = this._notify(eventName, object3d, origDomEvent, intersect);
+			doIntersect = this._notify(eventName, object3d, origDomEvent, intersect, intersects);
 		}
 	},
 
-	_notify	: function( eventName, object3d, origDomEvent, intersect )
+	_notify	: function( eventName, object3d, origDomEvent, intersect, intersects )
 	{
 		let objectCtx	= this._objectCtxGet( object3d );
 		let handlers	= objectCtx ? objectCtx[eventName+'Handlers'] : null;
 
 		// parameter check
-		console.assert( arguments.length === 4 );
+		console.assert( arguments.length >= 4 );
 		
 		// if no handler do bubbling
 		if( !objectCtx || !handlers || handlers.length === 0 ){ 
@@ -708,6 +709,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 				target: object3d,
 				origDomEvent: origDomEvent,
 				intersect: intersect,
+				intersects: intersects,
 				stopPropagation: stopPropagation,
 				preventDefault : preventDefault,
 				nextIntersect : nextIntersect
