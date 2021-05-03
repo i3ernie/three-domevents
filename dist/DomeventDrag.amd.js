@@ -84,19 +84,19 @@ define(['exports'], function (exports) { 'use strict';
             let ret = null;
             let scope = this;
 
-            return function( eventName, object3d, origDomEvent, intersect ){   
+            return function( eventName, object3d, origDomEvent, intersect, intersects ){   
                 if ( eventName === "dragstart" ) {
                     scope._draggingObjs[object3d.id] = object3d;
                 }
                 if ( eventName === "dragend" ){
                     if ( scope._draggingObjs[object3d.id] ) { 
                         delete scope._draggingObjs[object3d.id];
-                        return _notify.call(scope, eventName, object3d, origDomEvent, intersect );
+                        return _notify.call(scope, eventName, object3d, origDomEvent, intersect, intersects );
                     }
                     return false;
                 }
                 
-                ret = _notify.call(scope, eventName, object3d, origDomEvent, intersect );
+                ret = _notify.call(scope, eventName, object3d, origDomEvent, intersect, intersects );
 
                 return ret;
             };

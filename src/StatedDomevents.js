@@ -27,7 +27,7 @@ StatedDomevents.prototype = Object.assign( Object.create( Domevents.prototype ),
         return this.options.states;
     },
 
-    _notify : function( eventName, object3d, origDomEvent, intersect ){
+    _notify : function( eventName, object3d, origDomEvent, intersect, intersects ){
         Domevents.prototype._notify.apply( this, arguments );
     }
     
