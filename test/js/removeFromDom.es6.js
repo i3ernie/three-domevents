@@ -8,8 +8,8 @@ import WoodBox from "../WoodBox.js";
 DomEvents.extend( DomeventMouse );
 DomEvents.extend( DomeventTouch );
 
-var VP;
-var DEH;
+let VP;
+let DEH;
 
 init();
 
@@ -34,7 +34,7 @@ function init() {
     let box = new THREE.Mesh( new THREE.BoxGeometry(40,40,40),new THREE.MeshBasicMaterial({color:"yellow"}) );
     box.name = "box_yellow_1.1";
     box.position.set(0, 50, 0);
-    
+
     mesh1.add( box );
 
 
