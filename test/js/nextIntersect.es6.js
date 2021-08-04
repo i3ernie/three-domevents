@@ -1,8 +1,13 @@
 import * as THREE from '../../node_modules/three/build/three.module.js';
 import DomEvents from "../../src/Domevents.es.js";
+import DomeventMouse from "../../src/domevents/DomeventMouse.es.js";
+import DomeventTouch from "../../src/domevents/DomeventTouch.es.js";
 import Viewport from "../../node_modules/three-viewport/dist/viewport.es.js";
 import WoodBox from "../WoodBox.js";
 import Grassground from "./Grassground.es.js";
+
+DomEvents.extend( DomeventMouse );
+DomEvents.extend( DomeventTouch );
 
 
 

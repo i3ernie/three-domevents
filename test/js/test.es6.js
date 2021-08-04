@@ -1,25 +1,27 @@
 
 import * as THREE from '../../node_modules/three/build/three.module.js';
 import DomEvents from "../../src/Domevents.es.js";
+import DomeventMouse from "../../src/domevents/DomeventMouse.es.js";
+import DomeventTouch from "../../src/domevents/DomeventTouch.es.js";
 import Viewport from "../../node_modules/three-viewport/dist/viewport.es.js";
 import WoodBox from "../WoodBox.js";
 
-var VP;
-var DEH;
+DomEvents.extend( DomeventMouse );
+DomEvents.extend( DomeventTouch );
 
 init();
 
 function init() {
     
     
-    VP = new Viewport();
+    const VP = new Viewport();
 
     VP.init();
     VP.start();
 
     VP.camera.position.z = 400;
 
-    DEH = new DomEvents( VP.camera, VP.renderer.domElement );
+    const DEH = new DomEvents( VP.camera, VP.renderer.domElement );
     
     
     let mesh1 = new WoodBox(100,100,100);

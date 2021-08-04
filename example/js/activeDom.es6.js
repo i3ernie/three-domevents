@@ -1,6 +1,6 @@
 import * as THREE from '../../node_modules/three/build/three.module.js';
-import DomEvents from "../../dist/domevents.es.js";
-import DomeventMouse from "../../dist/DomeventMouse.es.js";
+import DomEvents from "./domevents.es.js";
+import DomeventMouse from "./DomeventMouse.es.js";
 //import DomeventTouch from "../../src/domevents/DomeventTouch.es.js";
 import Viewport from "../../node_modules/three-viewport/dist/viewport.es.js";
 import WoodBox from "../WoodBox.js";
