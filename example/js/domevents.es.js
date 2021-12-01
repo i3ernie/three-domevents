@@ -1,4 +1,4 @@
-import { Raycaster, Object3D, Vector3 } from '../../node_modules/three/build/three.module.js';
+import { Raycaster, Object3D, Vector3 } from './vendor/three.module.js';
 
 const defaults = {
 	"defaultEventGroup" : "_default"
