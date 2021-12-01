@@ -1,4 +1,4 @@
-import { Vector3 } from '../../node_modules/three/build/three.module.js';
+import { Vector3 } from './vendor/three.module.js';
 
 const getRelativeMouseXY = function( domEvent ) {
 
