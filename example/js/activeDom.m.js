@@ -3,7 +3,7 @@ import DomEvents from "./domevents.es.js";
 import DomeventMouse from "./DomeventMouse.es.js";
 //import DomeventTouch from "../../src/domevents/DomeventTouch.es.js";
 import Viewport from "./vendor/viewport.es.js";
-import WoodBox from "../WoodBox.js";
+import WoodBox from "./WoodBox.js";
 import Grassground from "./Grassground.es.js";
 
 DomEvents.extend( DomeventMouse );
