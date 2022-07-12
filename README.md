@@ -4,9 +4,9 @@ You can use the [editor on GitHub](https://github.com/i3ernie/three-domevents/ed
 
 Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
 
-### Markdown
+### useage
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+easy-to-use
 
 ```javascript
     DEH = new DomEvents( VP.camera, VP.renderer.domElement );
