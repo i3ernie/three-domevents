@@ -8,22 +8,19 @@ Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://j
 
 Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
-```markdown
-Syntax highlighted code block
+```javascript
+    DEH = new DomEvents( VP.camera, VP.renderer.domElement );
 
-# Header 1
-## Header 2
-### Header 3
+    let activeWorld = new THREE.Object3D();
+    activeWorld.name = "active_world";
+    VP.scene.add( activeWorld );
 
-- Bulleted
-- List
 
-1. Numbered
-2. List
+    let world = new THREE.Object3D();
+    world.name = "world";
+    VP.scene.add( world );
 
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+    DEH.activate( activeWorld ); //or for global ( VP.Scene )
 ```
 
 ... [example](https://i3ernie.github.io/three-domevents/example).
