@@ -299,7 +299,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		}
 
 		if ( opt.recursive ) {
-			_.each( object3d.children, function( object3d ){
+			object3d.children.forEach( function( object3d ){
 				scope.addEventListener( object3d, eventName, callback, opt );
 			});
 		}
@@ -363,7 +363,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		this.unbind (object3d, eventName, callback, useCapture);
 
 		if ( opts.recursive ) {
-			_.each( object3d.children, function( object3d ){
+			object3d.children.forEach( function( object3d ){
 				scope.removeEventListener( object3d, eventName, callback, opts );
 			});
 		}
