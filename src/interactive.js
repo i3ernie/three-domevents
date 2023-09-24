@@ -1,4 +1,3 @@
-import {Raycaster, Vector3, Mesh} from "../node_modules/three/build/three.module.js";
 import DomEvents from "./domevents.es.js";
 
 const Interactive = {

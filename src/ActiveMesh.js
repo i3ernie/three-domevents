@@ -1,6 +1,5 @@
 import {Mesh} from "../node_modules/three/build/three.module.js";
 import interactive from "./interactive";
-import DomEvents from "./Domevents.es";
 
 const ActiveMesh = function( geo, mat, DEH ){
     
