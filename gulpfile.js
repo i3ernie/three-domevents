@@ -5,10 +5,7 @@
  */
 
 const gulp = require('gulp');
-const sourcemaps = require('gulp-sourcemaps');
-var plugins = require('gulp-load-plugins')(); // Load all gulp plugins
-                                              // automatically and attach
-                                              // them to the `plugins` object
+
 const build_domeventsES = require("./build/build_es");
 const build_domevents = require("./build/build_amd");
 

@@ -1,4 +1,4 @@
-import { Raycaster, Object3D, Vector3 } from '../../three/build/three.module.js';
+import { Raycaster, Object3D, Vector3 } from 'three';
 
 const defaults = {
 	"defaultEventGroup" : "_default"
@@ -483,7 +483,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 	 */
 	camera : function( value )
 	{
-		if( value )	{ this._camera = value; }
+		if( value )	this._camera = value;
 		return this._camera;
 	},
 
@@ -496,7 +496,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 		let scope = this;
 
 		extensions.forEach(function( ext ){ 
-			if ( ext.addEventListener ) { ext.addEventListener.call( _this, object3d, eventName, callback, opt ); }
+			if ( ext.addEventListener ) ext.addEventListener.call( _this, object3d, eventName, callback, opt );
 		});
 
 		if ( typeof eventName === "object" ) {
@@ -508,7 +508,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 		}
 
 		if ( opt.recursive ) {
-			_.each( object3d.children, function( object3d ){
+			object3d.children.forEach( function( object3d ){
 				scope.addEventListener( object3d, eventName, callback, opt );
 			});
 		}
@@ -516,10 +516,10 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 
 	hasListener : function( object3d, eventName ) {
 		let objectCtx = this._objectCtxGet( object3d );
-		if ( !objectCtx ) { return false; }
+		if ( !objectCtx ) return false;
 		
 		let listener = objectCtx[eventName+'Handlers'];
-		if ( !listener ) { return false; }
+		if ( !listener ) return false;
 
 		return (listener.length > 0);
 	},
@@ -536,7 +536,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 		}
 
 		let objectCtx = this._objectCtxGet( object3d );
-		if( !objectCtx[eventName+'Handlers'] )	{ objectCtx[eventName+'Handlers']	= []; }
+		if( !objectCtx[eventName+'Handlers'] )	objectCtx[eventName+'Handlers']	= [];
 
 		objectCtx[eventName+'Handlers'].push({
 			callback	: callback,
@@ -572,7 +572,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 		this.unbind (object3d, eventName, callback, useCapture);
 
 		if ( opts.recursive ) {
-			_.each( object3d.children, function( object3d ){
+			object3d.children.forEach( function( object3d ){
 				scope.removeEventListener( object3d, eventName, callback, opts );
 			});
 		}
@@ -592,10 +592,10 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 			return;
 		}
 
-		if( !this._objectCtxIsInit(object3d) )	{ this._objectCtxInit(object3d); }
+		if( !this._objectCtxIsInit(object3d) )	this._objectCtxInit(object3d);
 
 		let objectCtx	= this._objectCtxGet( object3d );
-		if( !objectCtx[eventName+'Handlers'] )	{ return; }
+		if( !objectCtx[eventName+'Handlers'] )	return;
 
 		let handlers = objectCtx[eventName+'Handlers'];
 
@@ -612,8 +612,8 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 		for( let i = 0; i < handlers.length; i++ ) {
 			let handler	= handlers[i];
 
-			if( callback !== handler.callback )	{ continue; }
-			if( useCapture !== handler.useCapture )	{ continue; }
+			if( callback !== handler.callback )	continue;
+			if( useCapture !== handler.useCapture )	continue;
 			handlers.splice(i, 1);
 			break;
 		}
@@ -813,7 +813,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 	_bound	: function( eventName, object3d )
 	{
 		let objectCtx = this._objectCtxGet( object3d );
-		if( !objectCtx ) { return false; }
+		if( !objectCtx ) return false;
 		return !!objectCtx[eventName+'Handlers'];
 	},
 
@@ -832,7 +832,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 		let boundObjs	= this._boundObjs[eventName];
 		let i = 0;
 
-		if( boundObjs === undefined || boundObjs.length === 0 )	{ return; }
+		if( boundObjs === undefined || boundObjs.length === 0 )	return;
 		// compute the intersection
 		let vector	= new Vector3( mouseX, mouseY, 0.5 );
 		this._ray.setFromCamera( vector, this._camera );
@@ -856,7 +856,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 		let object3d	= intersect.object;
 		let objectCtx	= this._objectCtxGet(object3d);
 		
-		if( !objectCtx )	{ return; }
+		if( !objectCtx )	return;
 
 		// notify handlers
 		if ( !object3d.geometry ){
@@ -887,7 +887,7 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 		
 		// if no handler do bubbling
 		if( !objectCtx || !handlers || handlers.length === 0 ){ 
-			if ( object3d.parent ) { return this._notify( eventName, object3d.parent, origDomEvent, intersect, intersects ); }
+			if ( object3d.parent ) return this._notify( eventName, object3d.parent, origDomEvent, intersect, intersects );
 			return false;
 		}
 		
@@ -1060,7 +1060,7 @@ const _onMove = function( eventName, mouseX, mouseY, origDomEvent )
     //console.log('eventName', eventName, 'boundObjs', this._boundObjs[eventName])
     // get objects bound to this event
     let boundObjs	= this._boundObjs[eventName];
-    if( boundObjs === undefined || boundObjs.length === 0 )	{ return; }
+    if( boundObjs === undefined || boundObjs.length === 0 )	return;
 
     // compute the intersection
     let vector = new Vector3( mouseX, mouseY, 0.5 );
@@ -1306,7 +1306,7 @@ const _onMove$1 = function( eventName, mouseX, mouseY, origDomEvent )
     //console.log('eventName', eventName, 'boundObjs', this._boundObjs[eventName])
     // get objects bound to this event
     let boundObjs	= this._boundObjs[eventName];
-    if( boundObjs === undefined || boundObjs.length === 0 )	{ return; }
+    if( boundObjs === undefined || boundObjs.length === 0 )	return;
 
     // compute the intersection
     let vector = new Vector3( mouseX, mouseY, 0.5 );
@@ -1562,7 +1562,7 @@ const _onTouchStart	= function( event ){
 
 const _onTouchMove = function( domEvent )
 {
-    if( domEvent.touches.length !== 1 )	{ return; }
+    if( domEvent.touches.length !== 1 )	return;
 
     domEvent.preventDefault();
     let mouseX	= +(domEvent.touches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
@@ -1581,7 +1581,7 @@ const _onTouchMove = function( domEvent )
 
 const _onTouchEvent = function( eventName, domEvent )
 {
-    if( domEvent.touches.length !== 1 )	{ return; }
+    if( domEvent.touches.length !== 1 )	return;
 
     domEvent.preventDefault();
 

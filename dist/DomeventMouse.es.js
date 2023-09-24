@@ -1,4 +1,4 @@
-import { Vector3 } from '../../three/build/three.module.js';
+import { Vector3 } from 'three';
 
 const getRelativeMouseXY = function( domEvent ) {
 
@@ -94,7 +94,7 @@ const _onMove = function( eventName, mouseX, mouseY, origDomEvent )
     //console.log('eventName', eventName, 'boundObjs', this._boundObjs[eventName])
     // get objects bound to this event
     let boundObjs	= this._boundObjs[eventName];
-    if( boundObjs === undefined || boundObjs.length === 0 )	{ return; }
+    if( boundObjs === undefined || boundObjs.length === 0 )	return;
 
     // compute the intersection
     let vector = new Vector3( mouseX, mouseY, 0.5 );

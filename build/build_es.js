@@ -1,14 +1,9 @@
 const rollup  = require('rollup');
-const resolve =require('rollup-plugin-node-resolve');
-const buble = require('rollup-plugin-buble');
+const resolve = require('rollup-plugin-node-resolve');
 const replace = require("./replace.js");
 const async = require("async");
 
-const transforms = {
-    arrow: false,
-    classes: true,
-    letConst : false
-};
+
 
 const build_domeventsPack = function( done ){
    
@@ -18,11 +13,8 @@ const build_domeventsPack = function( done ){
         
         plugins:[
             
-            resolve(),
+            resolve()
             
-            buble({
-				transforms: transforms
-            })
         ]
     }).then(( bundle ) => { 
         bundle.write({
@@ -30,7 +22,7 @@ const build_domeventsPack = function( done ){
             plugins:[
                 
                 replace({
-                    "../node_modules/three/" : "../../three/"
+                    "../node_modules/three/build/three.module.js" : "three"
                 })
             ],
             
@@ -53,11 +45,7 @@ const build_domeventsES = function( done ){
         
         plugins:[
             
-            resolve(),
-            
-            buble({
-				transforms: transforms
-            })
+            resolve()
         ]
     }).then(( bundle ) => { 
         bundle.write({
@@ -65,7 +53,7 @@ const build_domeventsES = function( done ){
             plugins:[
                 
                 replace({
-                    "../node_modules/three/" : "../../three/"
+                    "../node_modules/three/build/three.module.js" : "three"
                 })
             ],
             
@@ -88,18 +76,14 @@ const build_extDomeventsES = function( done ){
         
         plugins:[
             
-            resolve(),
-            
-            buble({
-				transforms: transforms
-            })
+            resolve()
         ]
     }).then(( bundle ) => { 
         bundle.write({
             file: './dist/DomeventDrag.es.js',
             plugins:[
                 replace({
-                    "../node_modules/three/" : "../../three/"
+                    "../node_modules/three/build/three.module.js" : "three"
                 })
             ],
             
@@ -124,19 +108,15 @@ const build_DomeventMouseES = function( done ){
         
         plugins:[
             
-            resolve(),
-            
-            buble({
-				transforms: transforms
-            })
+            resolve()
         ]
     }).then(( bundle ) => { 
         bundle.write({
             file: './dist/DomeventMouse.es.js',
             plugins:[
                 replace({
-                    "../../node_modules/three/" : "../../three/",
-                    "../node_modules/three/" : "../../three/"
+                    "../../node_modules/three/build/three.module.js" : "three",
+                    "../node_modules/three/build/three.module.js" : "three"
                 })
             ],
             

@@ -1,6 +1,6 @@
 {
   "name": "three-domevents",
-  "version": "0.122.201104",
+  "version": "0.151.230924",
   "license": "MIT",
   "description": "domevents for three.js",
   "author": "i3ernie",
@@ -23,18 +23,13 @@
     "customevent-polyfill": "git://github.com/d4tocchini/customevent-polyfill.git",
     "gulp": "^4.0.2",
     "gulp-better-rollup": "latest",
-    "gulp-load-plugins": "^2.0.5",
     "gulp-rollup": "latest",
-    "gulp-sourcemaps": "latest",
-    "gulp-uglify": "latest",
     "jshint": "^2.12.0",
     "lodash": "^4.17.20",
-    "requirejs-babel": "git://github.com/mikach/requirejs-babel.git",
-    "requirejs-plugins": "^1.0.2",
-    "rollup": "^2.32.1",
+    "rollup": "latest",
     "rollup-plugin-amd": "latest",
     "rollup-plugin-buble": "latest",
-    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-node-resolve": "latest",
     "three-viewport": "git+https://github.com/i3ernie/three-viewport.git"
   },
   "directories": {
