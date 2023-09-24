@@ -1,6 +1,6 @@
 {
   "name": "three-domevents",
-  "version": "0.122.201103",
+  "version": "0.122.201104",
   "license": "MIT",
   "description": "domevents for three.js",
   "author": "i3ernie",
@@ -13,7 +13,7 @@
     "Domevents"
   ],
   "dependencies": {
-    "three": "^0.135"
+    "three": "^0.151"
   },
   "devDependencies": {
     "@rollup/plugin-alias": "latest",
