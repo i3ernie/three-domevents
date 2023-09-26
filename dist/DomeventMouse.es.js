@@ -273,6 +273,5 @@ const DomeventMouse = {
     }
 };
 
-export default DomeventMouse;
-export { DomeventMouse };
+export { DomeventMouse, DomeventMouse as default };
 //# sourceMappingURL=DomeventMouse.es.js.map

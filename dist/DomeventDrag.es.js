@@ -136,6 +136,5 @@ const DomeventDrag = {
     }
 };
 
-export default DomeventDrag;
-export { DomeventDrag };
+export { DomeventDrag, DomeventDrag as default };
 //# sourceMappingURL=DomeventDrag.es.js.map

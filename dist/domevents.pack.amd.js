@@ -1,4 +1,4 @@
-define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
+define(['exports', 'three'], (function (exports, three) { 'use strict';
 
     const defaults = {
     	"defaultEventGroup" : "_default"
@@ -354,7 +354,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     {
     	this._camera		= camera || null;
     	this._domElement 	= domElement || document;
-    	this._ray 			= new three_module_js.Raycaster();
+    	this._ray 			= new three.Raycaster();
     	this._selected		= null;
     	this._boundObjs		= {};
     	this.enabled = false;
@@ -483,7 +483,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     	 */
     	camera : function( value )
     	{
-    		if( value )	{ this._camera = value; }
+    		if( value )	this._camera = value;
     		return this._camera;
     	},
 
@@ -496,7 +496,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     		let scope = this;
 
     		extensions.forEach(function( ext ){ 
-    			if ( ext.addEventListener ) { ext.addEventListener.call( _this, object3d, eventName, callback, opt ); }
+    			if ( ext.addEventListener ) ext.addEventListener.call( _this, object3d, eventName, callback, opt );
     		});
 
     		if ( typeof eventName === "object" ) {
@@ -516,10 +516,10 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
     	hasListener : function( object3d, eventName ) {
     		let objectCtx = this._objectCtxGet( object3d );
-    		if ( !objectCtx ) { return false; }
+    		if ( !objectCtx ) return false;
     		
     		let listener = objectCtx[eventName+'Handlers'];
-    		if ( !listener ) { return false; }
+    		if ( !listener ) return false;
 
     		return (listener.length > 0);
     	},
@@ -536,7 +536,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     		}
 
     		let objectCtx = this._objectCtxGet( object3d );
-    		if( !objectCtx[eventName+'Handlers'] )	{ objectCtx[eventName+'Handlers']	= []; }
+    		if( !objectCtx[eventName+'Handlers'] )	objectCtx[eventName+'Handlers']	= [];
 
     		objectCtx[eventName+'Handlers'].push({
     			callback	: callback,
@@ -592,10 +592,10 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     			return;
     		}
 
-    		if( !this._objectCtxIsInit(object3d) )	{ this._objectCtxInit(object3d); }
+    		if( !this._objectCtxIsInit(object3d) )	this._objectCtxInit(object3d);
 
     		let objectCtx	= this._objectCtxGet( object3d );
-    		if( !objectCtx[eventName+'Handlers'] )	{ return; }
+    		if( !objectCtx[eventName+'Handlers'] )	return;
 
     		let handlers = objectCtx[eventName+'Handlers'];
 
@@ -612,8 +612,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     		for( let i = 0; i < handlers.length; i++ ) {
     			let handler	= handlers[i];
 
-    			if( callback !== handler.callback )	{ continue; }
-    			if( useCapture !== handler.useCapture )	{ continue; }
+    			if( callback !== handler.callback )	continue;
+    			if( useCapture !== handler.useCapture )	continue;
     			handlers.splice(i, 1);
     			break;
     		}
@@ -636,9 +636,9 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     		};
     		const options = Object.assign( {}, defaults, opts );
 
-    		if ( !( object3d instanceof three_module_js.Object3D ) ){
+    		if ( !( object3d instanceof three.Object3D ) ){
 
-    			if ( object3d.target && object3d.target instanceof three_module_js.Object3D ) {
+    			if ( object3d.target && object3d.target instanceof three.Object3D ) {
     				object3d= object3d.target;
     			} else {
     				console.warn("object3d is not instance of THREE.Object3D");
@@ -678,10 +678,10 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     			return;
     		}
 
-    		if ( !( object3d instanceof three_module_js.Object3D ) ) {
+    		if ( !( object3d instanceof three.Object3D ) ) {
 
     			//event object?
-    			if ( object3d.target && object3d.target instanceof three_module_js.Object3D ) {
+    			if ( object3d.target && object3d.target instanceof three.Object3D ) {
     				object3d = object3d.target;
     			} else {
     				console.warn("Domevents: object3d is nit instance of THREE.Object3D", object3d );
@@ -813,7 +813,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     	_bound	: function( eventName, object3d )
     	{
     		let objectCtx = this._objectCtxGet( object3d );
-    		if( !objectCtx ) { return false; }
+    		if( !objectCtx ) return false;
     		return !!objectCtx[eventName+'Handlers'];
     	},
 
@@ -832,9 +832,9 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     		let boundObjs	= this._boundObjs[eventName];
     		let i = 0;
 
-    		if( boundObjs === undefined || boundObjs.length === 0 )	{ return; }
+    		if( boundObjs === undefined || boundObjs.length === 0 )	return;
     		// compute the intersection
-    		let vector	= new three_module_js.Vector3( mouseX, mouseY, 0.5 );
+    		let vector	= new three.Vector3( mouseX, mouseY, 0.5 );
     		this._ray.setFromCamera( vector, this._camera );
 
     		let intersects = null;
@@ -856,7 +856,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     		let object3d	= intersect.object;
     		let objectCtx	= this._objectCtxGet(object3d);
     		
-    		if( !objectCtx )	{ return; }
+    		if( !objectCtx )	return;
 
     		// notify handlers
     		if ( !object3d.geometry ){
@@ -887,7 +887,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     		
     		// if no handler do bubbling
     		if( !objectCtx || !handlers || handlers.length === 0 ){ 
-    			if ( object3d.parent ) { return this._notify( eventName, object3d.parent, origDomEvent, intersect, intersects ); }
+    			if ( object3d.parent ) return this._notify( eventName, object3d.parent, origDomEvent, intersect, intersects );
     			return false;
     		}
     		
@@ -998,28 +998,28 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     	}
     };
 
-    const CLICK_TIMEOUT = 500;
+    const CLICK_TIMEOUT$1 = 500;
     let emulateMouse = false, emulateClick = false;
 
     const _onPointerDown	= function( event ){
         
         this.pointerDownTimeStamp = event.timeStamp;
 
-        _onMouseEvent.call(this, 'pointerdown', event);
+        _onMouseEvent$1.call(this, 'pointerdown', event);
 
         if ( emulateMouse && ( event.pointerType === "mouse" || event.pointerType === "touch") ) {
             this.stateMouse.mousedown = true;
 
             if ( event.buttons && event.buttons > 1 ) {
                 if ( event.button === 1 ) {
-                    return _onMouseEvent.call(this, 'mousemiddledown', event);
+                    return _onMouseEvent$1.call(this, 'mousemiddledown', event);
                 }
                 if ( event.button === 2 ) {
                     //rightdown
-                    return _onMouseEvent.call(this, 'mouserightdown', event);
+                    return _onMouseEvent$1.call(this, 'mouserightdown', event);
                 }
             }
-            _onMouseEvent.call(this, 'mousedown', event);
+            _onMouseEvent$1.call(this, 'mousedown', event);
         }
     };
 
@@ -1027,21 +1027,21 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
         this.pointerUpTimeStamp = event.timeStamp;
 
-        _onMouseEvent.call(this, 'pointerup', event);
+        _onMouseEvent$1.call(this, 'pointerup', event);
 
         if ( emulateMouse && ( event.pointerType === "mouse" || event.pointerType === "touch") ) {
             this.stateMouse.mousedown = false;
 
             if ( event.buttons && event.buttons > 1 ) {
                 if ( event.button === 1 ) {
-                    return _onMouseEvent.call(this, 'mousemiddleup', event);
+                    return _onMouseEvent$1.call(this, 'mousemiddleup', event);
                 }
                 if ( event.button === 2 ) {
                     //rightdown
-                    return _onMouseEvent.call(this, 'mouserightup', event);
+                    return _onMouseEvent$1.call(this, 'mouserightup', event);
                 }
             }
-            _onMouseEvent.call(this, 'mouseup'	, event);
+            _onMouseEvent$1.call(this, 'mouseup'	, event);
 
             if ( emulateClick ){
                 this._$onClick( event );
@@ -1055,15 +1055,15 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
     // # handle mousemove kind of events
 
-    const _onMove = function( eventName, mouseX, mouseY, origDomEvent )
+    const _onMove$1 = function( eventName, mouseX, mouseY, origDomEvent )
     {
         //console.log('eventName', eventName, 'boundObjs', this._boundObjs[eventName])
         // get objects bound to this event
         let boundObjs	= this._boundObjs[eventName];
-        if( boundObjs === undefined || boundObjs.length === 0 )	{ return; }
+        if( boundObjs === undefined || boundObjs.length === 0 )	return;
 
         // compute the intersection
-        let vector = new three_module_js.Vector3( mouseX, mouseY, 0.5 );
+        let vector = new three.Vector3( mouseX, mouseY, 0.5 );
         this._ray.setFromCamera( vector, this._camera );
 
         let intersects = null;
@@ -1125,14 +1125,14 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     };
 
 
-    const _onClick = function( event )
+    const _onClick$1 = function( event )
     {
         // TODO handle touch ? 
-        if ( this.pointerDownTimeStamp !== null && (event.timeStamp - this.pointerDownTimeStamp) > CLICK_TIMEOUT ){
+        if ( this.pointerDownTimeStamp !== null && (event.timeStamp - this.pointerDownTimeStamp) > CLICK_TIMEOUT$1 ){
             return;
         }
         this.pointerDownTimeStamp = null;
-        _onMouseEvent.call(this, 'click', event );
+        _onMouseEvent$1.call(this, 'click', event );
     };
 
 
@@ -1141,7 +1141,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     /************************************************/
     // # handle mouse events
 
-    const _onMouseEvent	= function( eventName, domEvent )
+    const _onMouseEvent$1	= function( eventName, domEvent )
     {
         let mouseCoords = getRelativeMouseXY( domEvent );
         this._onEvent(eventName, mouseCoords.x, mouseCoords.y, domEvent);
@@ -1151,10 +1151,10 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     {
         let mouseCoords = getRelativeMouseXY( domEvent );
 
-        _onMove.call(this, 'pointermove', mouseCoords.x, mouseCoords.y, domEvent);
+        _onMove$1.call(this, 'pointermove', mouseCoords.x, mouseCoords.y, domEvent);
         
         if ( emulateMouse ){
-            _onMove.call(this, 'mousemove', mouseCoords.x, mouseCoords.y, domEvent);
+            _onMove$1.call(this, 'mousemove', mouseCoords.x, mouseCoords.y, domEvent);
         }
         
         //_onMove.call(this, 'mouseover', mouseCoords.x, mouseCoords.y, domEvent);
@@ -1229,8 +1229,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
             this.stateMouse = this.stateMouse || {};
             this.stateMouse.mousedown = false;
         
-            this._onMove            = function(){ _onMove.apply( _this, arguments ); };  
-            this._onMouseEvent      = function(){ _onMouseEvent.apply( _this, arguments ); };
+            this._onMove            = function(){ _onMove$1.apply( _this, arguments ); };  
+            this._onMouseEvent      = function(){ _onMouseEvent$1.apply( _this, arguments ); };
 
             this._$onPointerDown	= function(){ _onPointerDown.apply( _this, arguments ); };
     	    this._$onPointerUp	    = function(){ _onPointerUp.apply( _this, arguments ); };
@@ -1239,7 +1239,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
             this._$onPointerMove	= function(){ _onPointerMove.apply(_this, arguments);	};
 
             if ( emulateClick ){
-                this._$onClick      = function(){ _onClick.apply( _this, arguments ); };
+                this._$onClick      = function(){ _onClick$1.apply( _this, arguments ); };
             }
         },
 
@@ -1260,23 +1260,23 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
         }
     };
 
-    const CLICK_TIMEOUT$1 = 500;
+    const CLICK_TIMEOUT = 500;
 
     const _onMouseDown	= function( event ){
         this.stateMouse.mousedown = true;
 
         if ( event.buttons && event.buttons > 1 ) {
             if ( event.button === 1 ) {
-                return _onMouseEvent$1.call(this, 'mousemiddledown', event);
+                return _onMouseEvent.call(this, 'mousemiddledown', event);
             }
             if ( event.button === 2 ) {
                 //rightdown
-                return _onMouseEvent$1.call(this, 'mouserightdown', event);
+                return _onMouseEvent.call(this, 'mouserightdown', event);
             }
         }
         this.timeStamp = event.timeStamp;
 
-        return _onMouseEvent$1.call(this, 'mousedown', event);
+        return _onMouseEvent.call(this, 'mousedown', event);
     };
 
     const _onMouseUp	= function( event ){
@@ -1285,14 +1285,14 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
         if ( event.buttons && event.buttons > 1 ) {
             if ( event.button === 1 ) {
-                return _onMouseEvent$1.call(this, 'mousemiddleup', event);
+                return _onMouseEvent.call(this, 'mousemiddleup', event);
             }
             if ( event.button === 2 ) {
                 //rightdown
-                return _onMouseEvent$1.call(this, 'mouserightup', event);
+                return _onMouseEvent.call(this, 'mouserightup', event);
             }
         }
-        return _onMouseEvent$1.call(this, 'mouseup'	, event);
+        return _onMouseEvent.call(this, 'mouseup'	, event);
     };
 
     /********************************************************************************/
@@ -1301,15 +1301,15 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
     // # handle mousemove kind of events
 
-    const _onMove$1 = function( eventName, mouseX, mouseY, origDomEvent )
+    const _onMove = function( eventName, mouseX, mouseY, origDomEvent )
     {
         //console.log('eventName', eventName, 'boundObjs', this._boundObjs[eventName])
         // get objects bound to this event
         let boundObjs	= this._boundObjs[eventName];
-        if( boundObjs === undefined || boundObjs.length === 0 )	{ return; }
+        if( boundObjs === undefined || boundObjs.length === 0 )	return;
 
         // compute the intersection
-        let vector = new three_module_js.Vector3( mouseX, mouseY, 0.5 );
+        let vector = new three.Vector3( mouseX, mouseY, 0.5 );
         this._ray.setFromCamera( vector, this._camera );
 
         let intersects = null;
@@ -1371,20 +1371,20 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     };
 
 
-    const _onClick$1 = function( event )
+    const _onClick = function( event )
     {
         // TODO handle touch ? 
-        if ( this.timeStamp !== null && (event.timeStamp - this.timeStamp) > CLICK_TIMEOUT$1 ){
+        if ( this.timeStamp !== null && (event.timeStamp - this.timeStamp) > CLICK_TIMEOUT ){
             return;
         }
         this.timeStamp = null;
-        _onMouseEvent$1.call(this, 'click', event );
+        _onMouseEvent.call(this, 'click', event );
     };
 
     const _onDblClick = function( event )
     {
         // TODO handle touch ?
-        _onMouseEvent$1.call(this, 'dblclick', event);
+        _onMouseEvent.call(this, 'dblclick', event);
     };
 
 
@@ -1393,7 +1393,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     /************************************************/
     // # handle mouse events
 
-    const _onMouseEvent$1	= function( eventName, domEvent )
+    const _onMouseEvent	= function( eventName, domEvent )
     {
         let mouseCoords = getRelativeMouseXY( domEvent );
         this._onEvent(eventName, mouseCoords.x, mouseCoords.y, domEvent);
@@ -1403,16 +1403,16 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     {
         let mouseCoords = getRelativeMouseXY( domEvent );
         
-        _onMove$1.call(this, 'mousemove', mouseCoords.x, mouseCoords.y, domEvent);
-        _onMove$1.call(this, 'mouseover', mouseCoords.x, mouseCoords.y, domEvent);
-        _onMove$1.call(this, 'mouseout' , mouseCoords.x, mouseCoords.y, domEvent);
+        _onMove.call(this, 'mousemove', mouseCoords.x, mouseCoords.y, domEvent);
+        _onMove.call(this, 'mouseover', mouseCoords.x, mouseCoords.y, domEvent);
+        _onMove.call(this, 'mouseout' , mouseCoords.x, mouseCoords.y, domEvent);
     };
 
 
     const _onContextmenu = function( event )
     {
         //TODO don't have a clue about how this should work with touch..
-        _onMouseEvent$1.call(this, 'contextmenu', event);
+        _onMouseEvent.call(this, 'contextmenu', event);
     };
 
 
@@ -1448,14 +1448,14 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
             this.stateMouse = this.stateMouse || {};
             this.stateMouse.mousedown = false;
         
-            this._onMove = function(){ _onMove$1.apply( _this, arguments ); };  
-            this._onMouseEvent = function(){ _onMouseEvent$1.apply( _this, arguments ); };
+            this._onMove = function(){ _onMove.apply( _this, arguments ); };  
+            this._onMouseEvent = function(){ _onMouseEvent.apply( _this, arguments ); };
 
             this._$onMouseDown	= function(){ _onMouseDown.apply( _this, arguments ); };
     	    this._$onMouseUp	= function(){ _onMouseUp.apply( _this, arguments );	};
 
             this._$onDblClick	= function(){ _onDblClick.apply( _this, arguments);	};
-            this._$onClick		= function(){ _onClick$1.apply( _this, arguments); };
+            this._$onClick		= function(){ _onClick.apply( _this, arguments); };
 
             this._$onMouseMove	= function(){ _onMouseMove.apply(_this, arguments);	};
             this._$onContextmenu	= function(){ _onContextmenu.apply(_this, arguments);	};
@@ -1562,7 +1562,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
     const _onTouchMove = function( domEvent )
     {
-        if( domEvent.touches.length !== 1 )	{ return; }
+        if( domEvent.touches.length !== 1 )	return;
 
         domEvent.preventDefault();
         let mouseX	= +(domEvent.touches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
@@ -1581,7 +1581,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
     const _onTouchEvent = function( eventName, domEvent )
     {
-        if( domEvent.touches.length !== 1 )	{ return; }
+        if( domEvent.touches.length !== 1 )	return;
 
         domEvent.preventDefault();
 
@@ -1773,7 +1773,5 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     exports.DomeventTouch = DomeventTouch;
     exports.Domevents = DomEvents;
 
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-});
+}));
 //# sourceMappingURL=domevents.pack.amd.js.map

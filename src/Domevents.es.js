@@ -1,4 +1,4 @@
-import {Raycaster, Vector3, Object3D} from "../node_modules/three/build/three.module.js";
+import {Raycaster, Vector3, Object3D} from "three";
 
 import EventGroups from "./EventGroups.es.js";
 

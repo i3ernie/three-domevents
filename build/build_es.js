@@ -1,5 +1,5 @@
 const rollup  = require('rollup');
-const resolve = require('rollup-plugin-node-resolve');
+const resolve = require('@rollup/plugin-node-resolve');
 const replace = require("./replace.js");
 const async = require("async");
 
@@ -9,7 +9,7 @@ const build_domeventsPack = function( done ){
    
     rollup.rollup({
         input : 'src/domevents.pack.es.js',
-        external: ['../node_modules/three/build/three.module.js', '../../node_modules/three/build/three.module.js'],
+        external: ['../node_modules/three/build/three.module.js', '../../node_modules/three/build/three.module.js', 'three'],
         
         plugins:[
             
@@ -41,7 +41,7 @@ const build_domeventsES = function( done ){
    
     rollup.rollup({
         input : 'src/Domevents.es.js',
-        external: ['../node_modules/three/build/three.module.js', '../../node_modules/three/build/three.module.js'],
+        external: ['../node_modules/three/build/three.module.js', '../../node_modules/three/build/three.module.js', 'three'],
         
         plugins:[
             
@@ -72,7 +72,7 @@ const build_extDomeventsES = function( done ){
    
     rollup.rollup({
         input : 'src/domevents/DomeventDrag.es.js',
-        external: ['../../node_modules/three/build/three.module.js', '../node_modules/three/build/three.module.js'],
+        external: ['../../node_modules/three/build/three.module.js', '../node_modules/three/build/three.module.js', 'three'],
         
         plugins:[
             
@@ -104,7 +104,7 @@ const build_DomeventMouseES = function( done ){
    
     rollup.rollup({
         input : 'src/domevents/DomeventMouse.es.js',
-        external: ['../node_modules/three/build/three.module.js', '../../node_modules/three/build/three.module.js'],
+        external: ['../node_modules/three/build/three.module.js', '../../node_modules/three/build/three.module.js', 'three'],
         
         plugins:[
             

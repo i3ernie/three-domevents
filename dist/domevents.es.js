@@ -1,4 +1,4 @@
-import { Raycaster, Object3D, Vector3 } from 'three';
+import { Object3D, Vector3, Raycaster } from 'three';
 
 const defaults = {
 	"defaultEventGroup" : "_default"
@@ -950,6 +950,5 @@ Object.assign( DomEvents.prototype, Eventgroups.interface, {
 
 });
 
-export default DomEvents;
-export { DomEvents };
+export { DomEvents, DomEvents as default };
 //# sourceMappingURL=domevents.es.js.map

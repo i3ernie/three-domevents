@@ -1,4 +1,4 @@
-define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
+define(['exports', 'three'], (function (exports, three) { 'use strict';
 
     const defaults = {
     	"defaultEventGroup" : "_default"
@@ -354,7 +354,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     {
     	this._camera		= camera || null;
     	this._domElement 	= domElement || document;
-    	this._ray 			= new three_module_js.Raycaster();
+    	this._ray 			= new three.Raycaster();
     	this._selected		= null;
     	this._boundObjs		= {};
     	this.enabled = false;
@@ -483,7 +483,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     	 */
     	camera : function( value )
     	{
-    		if( value )	{ this._camera = value; }
+    		if( value )	this._camera = value;
     		return this._camera;
     	},
 
@@ -496,7 +496,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     		let scope = this;
 
     		extensions.forEach(function( ext ){ 
-    			if ( ext.addEventListener ) { ext.addEventListener.call( _this, object3d, eventName, callback, opt ); }
+    			if ( ext.addEventListener ) ext.addEventListener.call( _this, object3d, eventName, callback, opt );
     		});
 
     		if ( typeof eventName === "object" ) {
@@ -516,10 +516,10 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
     	hasListener : function( object3d, eventName ) {
     		let objectCtx = this._objectCtxGet( object3d );
-    		if ( !objectCtx ) { return false; }
+    		if ( !objectCtx ) return false;
     		
     		let listener = objectCtx[eventName+'Handlers'];
-    		if ( !listener ) { return false; }
+    		if ( !listener ) return false;
 
     		return (listener.length > 0);
     	},
@@ -536,7 +536,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     		}
 
     		let objectCtx = this._objectCtxGet( object3d );
-    		if( !objectCtx[eventName+'Handlers'] )	{ objectCtx[eventName+'Handlers']	= []; }
+    		if( !objectCtx[eventName+'Handlers'] )	objectCtx[eventName+'Handlers']	= [];
 
     		objectCtx[eventName+'Handlers'].push({
     			callback	: callback,
@@ -592,10 +592,10 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     			return;
     		}
 
-    		if( !this._objectCtxIsInit(object3d) )	{ this._objectCtxInit(object3d); }
+    		if( !this._objectCtxIsInit(object3d) )	this._objectCtxInit(object3d);
 
     		let objectCtx	= this._objectCtxGet( object3d );
-    		if( !objectCtx[eventName+'Handlers'] )	{ return; }
+    		if( !objectCtx[eventName+'Handlers'] )	return;
 
     		let handlers = objectCtx[eventName+'Handlers'];
 
@@ -612,8 +612,8 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     		for( let i = 0; i < handlers.length; i++ ) {
     			let handler	= handlers[i];
 
-    			if( callback !== handler.callback )	{ continue; }
-    			if( useCapture !== handler.useCapture )	{ continue; }
+    			if( callback !== handler.callback )	continue;
+    			if( useCapture !== handler.useCapture )	continue;
     			handlers.splice(i, 1);
     			break;
     		}
@@ -636,9 +636,9 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     		};
     		const options = Object.assign( {}, defaults, opts );
 
-    		if ( !( object3d instanceof three_module_js.Object3D ) ){
+    		if ( !( object3d instanceof three.Object3D ) ){
 
-    			if ( object3d.target && object3d.target instanceof three_module_js.Object3D ) {
+    			if ( object3d.target && object3d.target instanceof three.Object3D ) {
     				object3d= object3d.target;
     			} else {
     				console.warn("object3d is not instance of THREE.Object3D");
@@ -678,10 +678,10 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     			return;
     		}
 
-    		if ( !( object3d instanceof three_module_js.Object3D ) ) {
+    		if ( !( object3d instanceof three.Object3D ) ) {
 
     			//event object?
-    			if ( object3d.target && object3d.target instanceof three_module_js.Object3D ) {
+    			if ( object3d.target && object3d.target instanceof three.Object3D ) {
     				object3d = object3d.target;
     			} else {
     				console.warn("Domevents: object3d is nit instance of THREE.Object3D", object3d );
@@ -813,7 +813,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     	_bound	: function( eventName, object3d )
     	{
     		let objectCtx = this._objectCtxGet( object3d );
-    		if( !objectCtx ) { return false; }
+    		if( !objectCtx ) return false;
     		return !!objectCtx[eventName+'Handlers'];
     	},
 
@@ -832,9 +832,9 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     		let boundObjs	= this._boundObjs[eventName];
     		let i = 0;
 
-    		if( boundObjs === undefined || boundObjs.length === 0 )	{ return; }
+    		if( boundObjs === undefined || boundObjs.length === 0 )	return;
     		// compute the intersection
-    		let vector	= new three_module_js.Vector3( mouseX, mouseY, 0.5 );
+    		let vector	= new three.Vector3( mouseX, mouseY, 0.5 );
     		this._ray.setFromCamera( vector, this._camera );
 
     		let intersects = null;
@@ -856,7 +856,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     		let object3d	= intersect.object;
     		let objectCtx	= this._objectCtxGet(object3d);
     		
-    		if( !objectCtx )	{ return; }
+    		if( !objectCtx )	return;
 
     		// notify handlers
     		if ( !object3d.geometry ){
@@ -887,7 +887,7 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
     		
     		// if no handler do bubbling
     		if( !objectCtx || !handlers || handlers.length === 0 ){ 
-    			if ( object3d.parent ) { return this._notify( eventName, object3d.parent, origDomEvent, intersect, intersects ); }
+    			if ( object3d.parent ) return this._notify( eventName, object3d.parent, origDomEvent, intersect, intersects );
     			return false;
     		}
     		
@@ -955,5 +955,5 @@ define(['exports', 'three'], function (exports, three_module_js) { 'use strict';
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
-});
+}));
 //# sourceMappingURL=domevents.amd.js.map

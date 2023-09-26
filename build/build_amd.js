@@ -1,6 +1,6 @@
 const rollup  = require('rollup');
-const resolve =require('rollup-plugin-node-resolve');
-const buble = require('rollup-plugin-buble');
+const resolve = require('@rollup/plugin-node-resolve');
+
 const replace = require("./replace.js");
 const async = require("async");
 
@@ -13,15 +13,11 @@ const transforms = {
 const build_domeventsPack = function( done ){
     rollup.rollup({
         input : 'src/domevents.pack.es.js',
-        external: ['../node_modules/three/build/three.module.js', '../../node_modules/three/build/three.module.js', 'three'],
+        external: ['three'],
         
         plugins:[
 
-            resolve(),
-            
-            buble({
-				transforms: transforms
-			})
+            resolve()
         ]
     }).then(( bundle ) => { 
         bundle.write({
@@ -52,15 +48,11 @@ const build_domeventsAMD = function( done ){
    
     rollup.rollup({
         input : 'src/Domevents.es.js',
-        external: ['../node_modules/three/build/three.module.js', '../../node_modules/three/build/three.module.js', 'three'],
+        external: ['three'],
         
         plugins:[
 
-            resolve(),
-            
-            buble({
-				transforms: transforms
-			})
+            resolve()
         ]
     }).then(( bundle ) => { 
         bundle.write({
@@ -90,15 +82,11 @@ const build_domeventsDrag = function( done ){
    
     rollup.rollup({
         input : 'src/domevents/DomeventDrag.es.js',
-        external: ['../node_modules/three/build/three.module.js', 'three'],
+        external: ['three'],
         
         plugins:[
 
-            resolve(),
-            
-            buble({
-				transforms: transforms
-			})
+            resolve()
         ]
     }).then(( bundle ) => { 
         bundle.write({
