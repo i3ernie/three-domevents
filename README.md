@@ -17,7 +17,23 @@ easy-to-use
     world.name = "world";
     VP.scene.add( world );
 
-    DEH.activate( activeWorld ); //or for global ( VP.Scene )
+    DEH.activate( activeWorld ); //or for global: DEH.activate( VP.Scene )
+```
+
+minimal config in one line
+this will activate the whole scene node and all added childs
+
+```javascript
+    //activate scene graph
+    new DomEvents( VP.camera, VP.renderer.domElement ).activate( activeWorld );
+
+    //active scene child
+    let mesh = new THREE.Mesh( new THREE.BoxGeomtry, new THREE.StandardMeshMaterial() );
+    mesh.onClick = function(){
+        alert("click");
+    };
+
+    VP.scene.add( mesh );
 ```
 
 
