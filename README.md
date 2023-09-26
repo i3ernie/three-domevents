@@ -28,7 +28,7 @@ easy-to-use
     VP.scene.add( mesh );
 ```
 
-minimal config in one line
+minimal config in one line 
 this will activate the whole scene node and all added childs
 
 ```javascript
