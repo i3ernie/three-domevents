@@ -1,5 +1,15 @@
 <hhtml>
-    <head>
+    <head>   
+	<script type="importmap">
+            {
+                "imports": {
+                    "three": "./js/vendor/three.module.js",
+                    "OrbitControls" : "./js/vendor/OrbitControls.js",
+                    "viewport" : "./js/vendor/viewport.es.js",
+                    "domevents.pack" : "../dist/domevents.pack.es.js"
+                }
+            }
+        </script>
             <script type="module" src="./js/activeDom.m.js"></script>
             <style>
                 body {
