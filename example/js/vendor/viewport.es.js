@@ -1,6 +1,6 @@
-import { Raycaster, Vector2, Clock, EventDispatcher, WebGLRenderer, Color, Scene, PerspectiveCamera } from './three.module.js';
-import { OrbitControls } from './OrbitControls.js';
-export { OrbitControls } from './OrbitControls.js';
+import { Raycaster, Vector2, EventDispatcher, Clock, WebGLRenderer, Color, Scene, PerspectiveCamera } from 'three';
+import { OrbitControls } from 'OrbitControls';
+export { OrbitControls } from 'OrbitControls';
 
 /* 
  * To change this license header, choose License Headers in Project Properties.
@@ -216,17 +216,17 @@ RenderingLoop.prototype = Object.assign( Object.create( Loop.prototype ), {
      * @param {type} obj
      * @returns {ViewportL#14.Viewport}
      */
-    var Viewport = function( obj )
-    {        
-        this.options = Object.assign({}, defaults, obj );
-        
-        //this.model = new Model();
-        this.clock = new Clock();
-    };
-
-    Object.assign( Viewport.prototype, EventDispatcher.prototype, {
+    class Viewport extends EventDispatcher{ 
+        constructor ( obj )
+        {        
+            super();
+            this.options = Object.assign({}, defaults, obj );
+            
+            //this.model = new Model();
+            this.clock = new Clock();
+        }
     
-        init : function() {
+        init () {
 
             initRenderer.call( this ).dispatchEvent({ type:"rendererInitalized" });
 
@@ -253,9 +253,9 @@ RenderingLoop.prototype = Object.assign( Object.create( Loop.prototype ), {
             this.dispatchEvent( {type: "initalized" });
             
             return this;
-        },
+        }
     
-        start : function(){
+        start (){
             //this.DomEvents.addEventListener( this.scene, "click", this.onClick );
             this.clock.getDelta();
             this.loop.start();
@@ -263,30 +263,37 @@ RenderingLoop.prototype = Object.assign( Object.create( Loop.prototype ), {
             this.dispatchEvent({ type:"started" });
             
             return this;
-        },
+        }
         
-        stop : function(){
+        stop (){
             //this.DomEvents.removeEventListener( this.scene, "click", this.onClick );
             this.loop.stop();
             
             this.dispatchEvent({ type:"stopped" });
             
             return this;
-        },
-
-        onUpdateScene : function( ev ){
-        },
-        onClick : function( ev ){
         }
-    });
- 
-    Viewport.prototype.disableControl = function() {
-        this.control.enabled = false;
-    };
-    Viewport.prototype.enableControl = function() {
-        this.control.enabled = true;
+
+        onUpdateScene ( ev ){
+        }
+        onClick ( ev ){
+        }
+
+        disableControl () {
+            this.control.enabled = false;
+        }
+        enableControl () {
+            this.control.enabled = true;
+        }
+    } 
+    Viewport.make = function( opts ) {
+
+        var VP = new Viewport( opts );
+        VP.init();
+        VP.start();
+
+        return VP;
     };
 
-export default Viewport;
-export { RenderingLoop, Viewport };
+export { RenderingLoop, Viewport, Viewport as default };
 //# sourceMappingURL=viewport.es.js.map
