@@ -18,6 +18,14 @@ easy-to-use
     VP.scene.add( world );
 
     DEH.activate( activeWorld ); //or for global: DEH.activate( VP.Scene )
+
+    //add activeWorld child
+    let mesh = new THREE.Mesh( new THREE.BoxGeomtry, new THREE.StandardMeshMaterial() );
+    mesh.onClick = function(){
+        alert("click");
+    };
+
+    VP.scene.add( mesh );
 ```
 
 minimal config in one line
