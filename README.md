@@ -25,7 +25,7 @@ this will activate the whole scene node and all added childs
 
 ```javascript
     //activate scene graph
-    new DomEvents( VP.camera, VP.renderer.domElement ).activate( activeWorld );
+    new DomEvents( VP.camera, VP.renderer.domElement ).activate( VP.scene );
 
     //active scene child
     let mesh = new THREE.Mesh( new THREE.BoxGeomtry, new THREE.StandardMeshMaterial() );
