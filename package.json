@@ -52,7 +52,7 @@
   "scripts": {
     "build": "gulp build",
     "buildBundles": "rollup -c",
-    "init": "npm install",
-    "update": "npm update"
+    "init": "npm install && gulp copy",
+    "update": "npm update && gulp copy"
   }
 }

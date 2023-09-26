@@ -27,6 +27,17 @@ gulp.task("build", ( done ) => {
     });
 });
 
+gulp.task("copy", ( done ) => {
+    gulp.src([
+        "./node_modules/three/build/three.module.js",
+        "./node_modules/three/examples/jsm/controls/OrbitControls.js",
+        "./node_modules/three-viewport/dist/viewport.es.js"
+    ])
+    .pipe( gulp.dest("example/js/vendor/"));
+    
+    done();
+});
+
 gulp.task("buildAMD", build_domevents );
 
 gulp.task("buildES", build_domeventsES );
