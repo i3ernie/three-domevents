@@ -10,17 +10,13 @@ Domevents.extend( DomeventMouse );
 //DomEvents.extend( DomeventTouch );
 
 var VP;
-var DEH;
 
 init();
 
 function init() {
     
     
-    VP = new Viewport();
-
-    VP.init();
-    VP.start();
+    VP = new Viewport().init().start();
 
     VP.camera.position.z = 500;
 
@@ -32,8 +28,7 @@ function init() {
     light.position.set(100, 100, 300);
     VP.scene.add( light );
 
-    DEH = new Domevents( VP.camera, VP.renderer.domElement );
-
+    
     let activeWorld = new THREE.Object3D();
     activeWorld.name = "active_world";
     VP.scene.add( activeWorld );
@@ -43,7 +38,8 @@ function init() {
     world.name = "world";
     VP.scene.add( world );
 
-    DEH.activate( activeWorld ); //or for global ( VP.Scene )
+    //make node scene -> activeWorld interactive
+    new Domevents( VP.camera, VP.renderer.domElement ).activate( activeWorld ); 
 
     //box number one
     let mesh1 = new WoodBox(100, 100, 100);
@@ -60,8 +56,6 @@ function init() {
 
     mesh1.addEventListener("click", logEvent );
     mesh1.onClick = logOnClick;
-
-
 
 
     //box number two
