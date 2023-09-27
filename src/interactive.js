@@ -25,17 +25,20 @@ const Interactive = {
 
     removeDomevents : function( DEH, recursiv ){
 
-        let rec = ( recursiv === undefined )? true : recursiv;
+        const rec = ( recursiv === undefined )? true : recursiv;
+        const scope = this;
 
         function remove ( obj ){
             for ( let key in DomEvents.eventMapping ) {
-                if ( this[ DomEvents.eventMapping[key] ] ) DEH.removeEventListener(obj, key, this[ DomEvents.eventMapping[key] ] );    
+                if ( scope[ DomEvents.eventMapping[key] ] ) DEH.removeEventListener(obj, key, scope[ DomEvents.eventMapping[key] ] );    
             }
 
             if ( obj.children.length > 0 && rec ) {
-                child.children.forEach( function( el ){
+
+                obj.children.forEach( ( el ) => {
                     remove( el );
                 });
+           
             }
         } 
         
