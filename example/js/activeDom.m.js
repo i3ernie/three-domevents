@@ -1,12 +1,12 @@
-import * as THREE from './vendor/three.module.js';
-import DomEvents from "./domevents.es.js";
-import DomeventMouse from "./DomeventMouse.es.js";
-//import DomeventTouch from "../../src/domevents/DomeventTouch.es.js";
-import Viewport from "./vendor/viewport.es.js";
+import * as THREE from 'three';
+import {Domevents, DomeventMouse} from "domevents.pack";
+
+
+import Viewport from "viewport";
 import WoodBox from "./WoodBox.js";
 import Grassground from "./Grassground.es.js";
 
-DomEvents.extend( DomeventMouse );
+Domevents.extend( DomeventMouse );
 //DomEvents.extend( DomeventTouch );
 
 var VP;
@@ -32,7 +32,7 @@ function init() {
     light.position.set(100, 100, 300);
     VP.scene.add( light );
 
-    DEH = new DomEvents( VP.camera, VP.renderer.domElement );
+    DEH = new Domevents( VP.camera, VP.renderer.domElement );
 
     let activeWorld = new THREE.Object3D();
     activeWorld.name = "active_world";

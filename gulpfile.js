@@ -31,7 +31,8 @@ gulp.task("copy", ( done ) => {
     gulp.src([
         "./node_modules/three/build/three.module.js",
         "./node_modules/three/examples/jsm/controls/OrbitControls.js",
-        "./node_modules/three-viewport/dist/viewport.es.js"
+        "./node_modules/three-viewport/dist/viewport.es.js",
+        "./node_modules/es-module-shims/dist/es-module-shims.js"
     ])
     .pipe( gulp.dest("example/js/vendor/"));
     
