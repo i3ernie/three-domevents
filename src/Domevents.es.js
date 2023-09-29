@@ -134,11 +134,11 @@ const _removeEvents = function( obj, options ){
 	}
 	
 };
-
+/*
 const defaults = {
 	
 };
-
+*/
 
 // # Constructor
 const DomEvents = function( camera, domElement )

@@ -347,7 +347,11 @@ define(['exports', 'three'], (function (exports, three) { 'use strict';
     	}
     	
     };
-
+    /*
+    const defaults = {
+    	
+    };
+    */
 
     // # Constructor
     const DomEvents = function( camera, domElement )
