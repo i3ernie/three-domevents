@@ -2,9 +2,9 @@ import DomEvents from "./domevents.es.js";
 
 const Interactive = {
 
-    registerDomevents : function( DEH, recursiv ){
+    registerDomevents : function( DEH, recursiv ) {
 
-        let scope = this;
+        const scope = this;
         let rec = ( recursiv === undefined )? true : recursiv;
 
         this.addEventListener("added", function(){
