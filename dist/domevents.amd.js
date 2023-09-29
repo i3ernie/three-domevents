@@ -282,6 +282,17 @@ define(['exports', 'three'], (function (exports, three) { 'use strict';
     	/** @namespace */
     const extensions = [];
 
+    /*
+    const logEvent = function( ev ){
+    	if ( ev.type === "click" || 
+    		ev.type === "mousedown" || ev.type === "mouseup" || 
+    		ev.type === "mouseover" || ev.type === "mouseout" ||
+    		ev.type === "dblclick"
+    	)
+    		console.log( ev.type+" - "+ev.target.name );
+    };
+    */
+
     const _addEvents = function ( obj, options ) {
     	let scope = this;
 
@@ -699,9 +710,11 @@ define(['exports', 'three'], (function (exports, three) { 'use strict';
     		_addEvents.call(this, object3d, options );
 
     		if ( options.recursive && object3d.children.length > 0 ) {
-    			object3d.children.forEach( function( child ){
-    				scope.addToDom.call(scope, child, options );
+
+    			object3d.children.forEach( ( child ) => {
+    				scope.addToDom( child, options );
     			});
+    		
     		}
     	},
 
