@@ -1138,7 +1138,13 @@ const _onClick$1 = function( event )
     this.pointerDownTimeStamp = null;
     _onMouseEvent$1.call(this, 'click', event );
 };
-
+/*
+const _onDblClick = function( event )
+{
+    // TODO handle touch ?
+    _onMouseEvent.call(this, 'dblclick', event);
+};
+*/
 
 /************************************************/
 /*		handle mouse events						*/
@@ -1165,6 +1171,13 @@ const _onPointerMove	= function( domEvent )
     //_onMove.call(this, 'mouseout' , mouseCoords.x, mouseCoords.y, domEvent);
 };
 
+/*
+const _onContextmenu = function( event )
+{
+    //TODO don't have a clue about how this should work with touch..
+    _onMouseEvent.call(this, 'contextmenu', event);
+};
+*/
 
 const mouseEvents = [
     "mousedown",
