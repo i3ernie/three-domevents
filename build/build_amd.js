@@ -4,11 +4,6 @@ const resolve = require('@rollup/plugin-node-resolve');
 const replace = require("./replace.js");
 const async = require("async");
 
-const transforms = {
-    arrow: false,
-    classes: true,
-    letConst : false
-};
 
 const build_domeventsPack = function( done ){
     rollup.rollup({
