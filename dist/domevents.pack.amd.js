@@ -1646,6 +1646,10 @@ define(['exports', 'three'], (function (exports, three) { 'use strict';
         }
     };
 
+    //import getRelativeMouseXY from "../PointerTools.es.js";
+
+
+
     /*const _onMousedown = function( event ){ console.log("down");
         if ( event.intersect.object.id === event.target.id ){
             this._mousedownd[event.target.id] = event.target;
