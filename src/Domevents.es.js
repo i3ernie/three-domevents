@@ -78,7 +78,7 @@ const _addEvents = function ( obj, options ) {
 		return;
 	}
 
-	DomEvents.eventNames.forEach( function( eventName ) {
+	DomEvents.eventNames.forEach( ( eventName ) => {
 
 		if( scope.hasListener( obj, eventName ) ) {
 			console.warn("object3d has listener allready registered for " + eventName );
@@ -109,7 +109,7 @@ const _removeEvents = function( obj, options ){
 	let index;
 	let boundObjs;
 
-	DomEvents.eventNames.forEach( function( eventName ) {
+	DomEvents.eventNames.forEach( ( eventName ) => {
 
 		boundObjs = scope._boundObjs[eventName];
 
@@ -130,7 +130,7 @@ const _removeEvents = function( obj, options ){
 	//das ganze fuer alle kinder 
 	if ( options.recursive && obj.children.length > 0 ) {
 
-		obj.children.forEach( function( child ) {
+		obj.children.forEach( ( child ) => {
 			_removeEvents.call( scope, child, options );
 		});
 	}
@@ -155,7 +155,7 @@ const DomEvents = function( camera, domElement )
 	this._registeredObjs		= {};
 	
 	// Bind dom event for mouse and touch
-	let _this			= this;
+	const _this			= this;
 	this.firstClick 	= false;
 	this.delay = 300;
 
@@ -171,11 +171,11 @@ const DomEvents = function( camera, domElement )
 	};
 
 	//init extensions
-	extensions.forEach(function( ext ){
+	extensions.forEach( ( ext ) => {
 		ext.initialize.apply( _this, arguments );
 	});
 
-	DomEvents.eventNames.forEach(function( eventName ){
+	DomEvents.eventNames.forEach( ( eventName ) => {
 		_this._boundObjs[eventName]	= [];
 	});
 	
@@ -200,10 +200,24 @@ DomEvents.eventMapping = {
 };
 
 DomEvents.extend = function( obj ) {
+	
+	if ( arguments.length > 1 ) {
+
+		for ( let i = 0; i < arguments.length; i ++ ) {
+
+			DomEvents.extend( arguments[ i ] );
+
+		}
+
+		return this;
+
+	}
+
 	extensions.push( obj );
 
 	Object.assign( DomEvents.eventMapping, obj.eventMapping );
 	DomEvents.eventNames = DomEvents.eventNames.concat( obj.eventNames );
+
 };
 
 
@@ -217,7 +231,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 
 		let scope = this;
 
-		extensions.forEach(function( ext ) {
+		extensions.forEach(( ext ) => {
 			ext.enable.apply( scope, arguments );
 		});
 
@@ -226,7 +240,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 
 	disable : function(){
 
-		extensions.forEach(function( ext ) {
+		extensions.forEach(( ext ) => {
 			ext.disable.apply( this, arguments );
 		});
 
@@ -252,7 +266,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		this.aktEventGroup[object3d.id] = {};
 
 
-		DomEvents.eventNames.forEach( function( eventName ){
+		DomEvents.eventNames.forEach( ( eventName ) => {
 			scope.aktEventGroup[object3d.id][eventName] = [];
 
 		});
@@ -288,7 +302,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		const useCapture = opt.useCapture || false;
 		let scope = this;
 
-		extensions.forEach(function( ext ){ 
+		extensions.forEach( ( ext ) => { 
 			if ( ext.addEventListener ) ext.addEventListener.call( _this, object3d, eventName, callback, opt );
 		});
 
@@ -301,7 +315,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		}
 
 		if ( opt.recursive ) {
-			object3d.children.forEach( function( object3d ){
+			object3d.children.forEach( ( object3d ) => {
 				scope.addEventListener( object3d, eventName, callback, opt );
 			});
 		}
@@ -365,7 +379,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		this.unbind (object3d, eventName, callback, useCapture);
 
 		if ( opts.recursive ) {
-			object3d.children.forEach( function( object3d ){
+			object3d.children.forEach( ( object3d ) => {
 				scope.removeEventListener( object3d, eventName, callback, opts );
 			});
 		}
@@ -505,7 +519,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 			this.removeEventListener( object3d, key);
 		}
 		if ( object3d.children.length > 0 ){
-			object3d.children.forEach( function( el ){
+			object3d.children.forEach( ( el ) => {
 				scope.removeMappedListener( el );
 			});
 		}
@@ -538,7 +552,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		}
 
 		if( object3d.children.length > 0 ){ 
-			object3d.children.forEach( function( child ){ 
+			object3d.children.forEach( ( child ) => { 
 				scope.deactivate( child );
 			});
 		}
@@ -558,6 +572,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		}
 
 		this._previousFunctions[id].add = object3d.add;
+
 		object3d.add = function( child ){
 
 			scope.activate( child, opts );
@@ -578,7 +593,7 @@ Object.assign( DomEvents.prototype, EventGroups.interface, {
 		//wenn kindelemente vorhanden
 		if( object3d.children.length > 0 ){ 
 
-			object3d.children.forEach(function( child ){ 
+			object3d.children.forEach( ( child ) => { 
 				scope._observe( child );
 			});
 		}
