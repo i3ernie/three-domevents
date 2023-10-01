@@ -1,16 +1,14 @@
-import * as THREE from '../../node_modules/three/build/three.module.js';
-import DomEvents from "../../src/Domevents.es.js";
-import DomeventMouse from "../../src/domevents/DomeventMouse.es.js";
-import DomeventTouch from "../../src/domevents/DomeventTouch.es.js";
-import Viewport from "../../node_modules/three-viewport/dist/viewport.es.js";
-import WoodBox from "../WoodBox.js";
+import * as THREE from 'three';
+import Viewport from "viewport";
+
+import {Domevents, DomeventMouse, DomeventTouch } from "domevents.pack";
+
+import WoodBox from "./WoodBox.js";
 import Grassground from "./Grassground.es.js";
 
-DomEvents.extend( DomeventMouse );
-DomEvents.extend( DomeventTouch );
+Domevents.extend( DomeventMouse, DomeventTouch );
 
 var VP;
-var DEH;
 
 init();
 console.log("THREE rev. " + THREE.REVISION);
@@ -19,9 +17,7 @@ function init() {
     
     
     VP = new Viewport();
-
-    VP.init();
-    VP.start();
+    VP.init().start();
 
     VP.camera.position.z = 500;
 
@@ -33,18 +29,20 @@ function init() {
     light.position.set(100, 100, 300);
     VP.scene.add( light );
 
-    DEH = new DomEvents( VP.camera, VP.renderer.domElement );
 
     let activeWorld = new THREE.Object3D();
     activeWorld.name = "active_world";
     VP.scene.add( activeWorld );
+
+    //register only activeWorld or for global ( VP.Scene )
+    new Domevents( VP.camera, VP.renderer.domElement ).activate( activeWorld ); 
 
 
     let world = new THREE.Object3D();
     world.name = "world";
     VP.scene.add( world );
 
-    DEH.activate( activeWorld ); //or for global ( VP.Scene )
+    
    
     //box number one
     let mesh1 = new WoodBox(100, 100, 100);

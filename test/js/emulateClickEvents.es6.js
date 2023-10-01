@@ -1,20 +1,17 @@
-import * as THREE from '../../node_modules/three/build/three.module.js';
+import * as THREE from 'three';
 
-import DomEvents from "../../src/Domevents.es.js";
-
-import DomeventPointer from "../../src/domevents/DomeventPointer.es.js";
+import {Domevents, DomeventPointer } from "domevents.pack";
 
 
-import Viewport from "../../node_modules/three-viewport/dist/viewport.es.js";
-import WoodBox from "../WoodBox.js";
+import Viewport from "viewport";
+import WoodBox from "WoodBox";
 import Grassground from "./Grassground.es.js";
 
 //DomEvents.extend( DomeventPointer );
-DomEvents.extend( DomeventPointer.config({emulateClick : true}) );
+Domevents.extend( DomeventPointer.config({emulateClick : true}) );
 
 
 var VP;
-var DEH;
 
 init();
 
@@ -22,9 +19,7 @@ function init() {
     
     
     VP = new Viewport();
-
-    VP.init();
-    VP.start();
+    VP.init().start();
 
     VP.camera.position.z = 500;
 
@@ -36,7 +31,7 @@ function init() {
     light.position.set(100, 100, 300);
     VP.scene.add( light );
 
-    DEH = new DomEvents( VP.camera, VP.renderer.domElement );
+   
 
     let activeWorld = new THREE.Object3D();
     activeWorld.name = "active_world";
@@ -47,10 +42,9 @@ function init() {
     world.name = "world";
     VP.scene.add( world );
 
-    DEH.activate( activeWorld ); //or for global ( VP.Scene )
+    //or for global ( VP.Scene )
+    new Domevents( VP.camera, VP.renderer.domElement ).activate( activeWorld ); 
 
-
-    
 
     //box number one
     let mesh1 = new WoodBox(100, 100, 100);

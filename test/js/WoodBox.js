@@ -1,4 +1,4 @@
-import {TextureLoader, BoxGeometry, MeshBasicMaterial, Mesh} from "../node_modules/three/build/three.module.js";
+import {TextureLoader, BoxGeometry, MeshBasicMaterial, Mesh} from "three";
 
 const texture = new TextureLoader().load( 'textures/crate.gif' );
 

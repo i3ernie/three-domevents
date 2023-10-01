@@ -1,16 +1,14 @@
 
-import * as THREE from '../../node_modules/three/build/three.module.js';
-import DomEvents from "../../src/Domevents.es.js";
-import DomEventPointer from "../../src/domevents/DomeventPointer.es.js";
-import DomeventDrag from "../../src/domevents/DomeventDrag.es.js";
-import Viewport from "../../node_modules/three-viewport/dist/viewport.es.js";
-import WoodBox from "../WoodBox.js";
+import * as THREE from 'three';
+import {Domevents, DomeventPointer, DomeventDrag } from "domevents.pack";
+import Viewport from "viewport";
+import WoodBox from "WoodBox";
 
 var VP;
 var DEH;
 
-DomEvents.extend( DomEventPointer.config({emulateClick:true}) );
-DomEvents.extend( DomeventDrag );
+Domevents.extend( DomeventPointer.config({emulateClick:true}) );
+Domevents.extend( DomeventDrag );
 
 const onDrag = function( ev ){
     console.log("** dragging", ev.target.name);
@@ -32,12 +30,11 @@ function init() {
 
     VP = new Viewport();
 
-    VP.init();
-    VP.start();
+    VP.init().start();
 
     VP.camera.position.z = 400;
 
-    DEH = new DomEvents( VP.camera, VP.renderer.domElement, {trigger:true} );
+    DEH = new Domevents( VP.camera, VP.renderer.domElement, {trigger:true} );
 
 
     let mesh1 = new WoodBox( 100, 100, 100 );
