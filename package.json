@@ -1,5 +1,5 @@
 {
-  "name": "three-domevents",
+  "name": "@i3ernie/three-domevents",
   "version": "0.151.230924",
   "license": "MIT",
   "description": "domevents for three.js",
@@ -12,6 +12,9 @@
     "Viewport",
     "Domevents"
   ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "dependencies": {
     "three": "^0.151"
   },
@@ -39,14 +42,7 @@
   "files": [
     "LICENSE",
     "README.md",
-    "dist/domevents.es.js",
-    "dist/domevents.pack.es.js",
-    "dist/domevents.pack.amd.js",
-    "dist/domevents.amd.js",
-    "dist/DomeventDrag.es.js",
-    "dist/DomeventDrag.amd.js",
-    "dist/DomeventMouse.es.js",
-    "dist/DomeventTouch.es.js",
+    "dist/*",
     "package.json"
   ],
   "scripts": {
