@@ -16,7 +16,7 @@
     "registry": "https://npm.pkg.github.com/"
   },
   "dependencies": {
-    "three": "^0.151"
+    "three": "^0.160"
   },
 
   "devDependencies": {
