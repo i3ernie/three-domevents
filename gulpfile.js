@@ -27,6 +27,9 @@ gulp.task("build", ( done ) => {
     });
 });
 
+//**
+// copy npm files for examples 
+// */
 gulp.task("copy", ( done ) => {
     gulp.src([
         "./node_modules/three/build/three.module.js",
